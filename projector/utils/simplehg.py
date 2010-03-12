@@ -97,7 +97,7 @@ class MercurialRequest(wsgirequest):
         """
         if not self._response_written:
             self._response.write(''.join(
-                (each for each in hgserve.run_wsgi(self))))
+                (each for each in hgweb.run_wsgi(self))))
             self._response_written = True
         return self._response
 
