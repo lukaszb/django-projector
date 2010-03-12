@@ -1,0 +1,15 @@
+{% extends "projector/home.html" %}
+
+{% block col_main_title %}Project Category Creation {% endblock %}
+
+{% block col_main_content %}
+    <form action="." method="post">
+    <table class="form-table">
+        {% include "richtemplates/forms/form.html" %}
+        <tr>
+            <td></td>
+            <td><input id="id_submit" type="submit" name="submit" value="Create category"/></td>
+        </tr>
+    </table>
+    </form>
+{% endblock %}

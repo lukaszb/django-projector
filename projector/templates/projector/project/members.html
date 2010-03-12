@@ -1,0 +1,49 @@
+{% extends "projector/project/details.html" %}
+
+{% load i18n %}
+{% load pagination_tags %}
+{% load sorting_tags %}
+
+{% block col_main_extra %}
+
+{% autosort memberships %}
+{% autopaginate memberships %}
+
+<div class="richtemplates-panel">
+    <h5>Project's members</h5>
+    <div class="richtemplates-panel-content">
+        {# Task list: {{ task_list }} #}
+    <h1>{{ project.name }}</h1>
+    <h2>Membership</h2>
+    <ul class="nav-inline">
+        <li><a class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a></li>
+    </ul>
+    {% if invalid_page %}
+        <div class="messages">
+            <p class="error">{% trans "There is no such page!" %}</p>
+        </div>
+    {% else %}
+    <table class="datatable">
+        <thead class="datatable-thead">
+            <tr class="datatable-thead-subheader">
+                <th>{% anchor member "Username" %}</th>
+                <th>{% anchor created_at "Joined at" %}</th>
+                <th>{% trans "Permissions" %}</th>
+            </tr>
+        </thead>
+        <tbody class="datatable-tbody">
+            {% for membership in memberships %}
+            <tr class="{% cycle "odd" "even" %} hoverable">
+                <td><a class="block-link" href="{{ membership.member.get_absolute_url }}">{{ membership.member }}</a></td>
+                <td>{{ membership.joined_at }}</td>
+                <td><a class="block-link" href="{{ membership.get_absolute_url }}">{% trans "Manage" %}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% paginate %}
+    {% endif %}
+</div>
+</div>
+{% endblock %}
+

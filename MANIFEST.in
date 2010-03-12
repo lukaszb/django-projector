@@ -1,0 +1,8 @@
+include README.rst 
+include INSTALL.rst
+include LICENSE
+include MANIFEST.in
+recursive-include docs *
+recursive-include projector/locale *
+recursive-include projector/media *
+recursive-include projector/templates *

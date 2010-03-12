@@ -1,0 +1,64 @@
+{% extends "projector/project/details.html" %}
+
+{% load i18n %}
+
+{% if root.is_file %}
+    {% block head_css %}{{ block.super }}
+    {% endblock %}
+{% endif %}
+
+{% block col_main_extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Project's repository browser" %}</h5>
+    <div class="richtemplates-panel-content">
+    <div id="repo-browser">
+		{% load breadcrumber %}
+		<div class="browser-breadcrumbs">
+			{% path_breadcrumbs request.META.PATH_INFO 3 %}
+		</div>
+		
+		{% if root.is_dir %}
+		<table class="code-browser">
+			<thead>
+                <tr>
+                    <th colspan="5">{% path_breadcrumbs request.META.PATH_INFO %}</th>
+                </tr>
+				<tr>
+                    <th class="name">{% trans "Name" %}</th>
+                    <th class="size">{% trans "Size" %}</th>
+                    <th class="rev">{% trans "Revision" %}</th>
+                    <th class="age">{% trans "Age" %}</th>
+                    <th class="last-author">{% trans "Last committer" %}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for node in root.nodes %}
+				<tr class="{% cycle 'odd' 'even' %} hoverable">
+                    <td>
+                        <a class="{% if node.is_dir %}browser-dir{% else %}browser-file{% endif %}"
+                            href="{% url projector_project_browse_repository project.slug node.url %}">{{ node.name }}</a>
+                    </td>
+					<td class="centered">{% if node.is_file %}{{ node.info.size|filesizeformat }}{% endif %}</td>
+					<td class="centered">{{ node.info.revision }}</td>
+					<td class="centered">
+                        <span class="show-tooltip"
+                            title="{{ node.info.date|date:"Y-m-d" }} {{ node.info.date|date:"H:i:s" }}">
+						{{ node.info.date|timesince }}
+						</span>
+					</td>
+					<td class="centered">{{ node.info.author }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+		<div class="codeblock">
+			{{ root.get_pygmentized|safe }}
+		</div>
+		{% endif %}
+    </div>
+</div>
+</div>
+
+{% endblock %}

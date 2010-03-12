@@ -1,0 +1,20 @@
+{% extends "projector/home.html" %}
+
+{% block col_main_title %}Project Category List{% endblock %}
+
+{% block col_main_content %}
+
+    {% load pagination_tags %}
+    {% autopaginate project_category_list %}
+
+    <table class="datatable">
+    <tbody class="datatable-tbody">
+        {% for project_category in project_category_list %}
+        <tr>
+            <td><a href="{{ project_category.get_absolute_url }}">{{ project_category.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% paginate %}
+{% endblock %}

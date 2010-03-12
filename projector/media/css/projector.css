@@ -1,0 +1,90 @@
+h1,h2,h3,h4,h5 {
+    margin: 10px 5px;
+}
+
+p {
+    padding: 5px;
+    margin: 10px 5px 10px 5px;
+}
+
+/* Task block */
+
+.task-block {
+    background-color: #FAF8CC;
+    border: 1px solid #996;
+    border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+    margin: 10px 5px;
+}
+.task-block h2, .task-block h3 {
+    border-bottom: 1px solid #DDDD99;
+}
+.task-block-description {
+    margin: 10px 5px;
+}
+.task-block ul, .task-block ol {
+    padding-left: 30px;
+}
+
+table.task-block-properties {
+    /*width: 100%;*/
+    margin: 5px;
+}
+table.task-block-properties th {
+    text-align: right;
+    float: right;
+    margin-right: 10px;
+}
+table.task-block-properties td, table.task-block-properties th {
+    height: 1.5em;
+    vertical-align: top;
+}
+
+.task-block-description pre {
+    border: 1px dotted black;
+}
+
+.task-changeset fieldset {
+    border: 1px solid #D7D7D7;
+    padding: 0.5em;
+    margin: 10px 5px;
+    line-height: 2em;
+}
+.task-changeset fieldset legend {
+    font-weight: bold;
+    font-size: 2em;
+}
+
+#task-attachments ul { list-style: none; }
+#task-attachments ul li {  }
+
+#comment-list { border: 1px solid #D7D7D7; margin: 5px; }
+.comment-block { margin: 5px; border: 1px dotted #999; }
+.comment-block-content { margin: 5px; }
+
+#task-history { margin: 5px; }
+
+span.task-closed { padding-left: 12px; background: transparent url(../../richtemplates/img/icons/icon-yes.gif) no-repeat scroll; }
+span.task-open { padding-left: 12px; background: transparent url(../../richtemplates/img/icons/icon-no.gif) no-repeat scroll; }
+
+/* Messages & errors */
+.deadline-exceeded { border: 1px solid #966; background-color: #F33; color: #FFF; text-decoration: bold; }
+
+textarea {
+    font-family: monospace !important;
+}
+
+.task-revision-entry h3 {
+    border-bottom: 1px solid #d7d7d7;
+}
+
+.task-revision-entry {
+    background-color: #FFD;
+    border: 1px solid #996;
+    border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+#id_project_repository_url {
+    background-color: #FFD;
+    border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+}

@@ -1,0 +1,208 @@
+{% extends "projector/task/base.html" %}
+
+{% load markup %}
+
+{% block extra_head %}
+    {{ block.super }}
+    {#<script type="text/javascript" src="/static/js/projector/task_action_form.js"></script>#}
+    <script type="text/javascript" src="{{ MEDIA_URL }}richtemplates/js/action_form.js"></script>
+    {{ action_form.media }}
+{% endblock %}
+
+{% load i18n %}
+{% load attachments_tags %}
+
+{% block col_left %}{{ block.super }}
+<div class="richtemplates-panel">
+    <h5>Task changes</h5>
+    <div class="richtemplates-panel-content">
+        <ul class="nav-vertical">
+            {% for revision in task.revisions %}
+            {% if not forloop.first %}
+            <li><a href="{{ revision.task.get_absolute_url }}#revision:{{ revision.revision }}">{{ revision }} {% trans "by" %} {{ revision.author }} {% trans "at" %} {{ revision.created_at|date:"Y-m-d" }}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block col_main_title %}#{{ task.id }}: {{ task.summary }}{% endblock %}
+{% block col_main_content %}
+    <h1>{% trans "Task" %} {{ task.id }}: {{ task.summary }}</h1>
+    <h2>{{ task.status }} {% if not task.status.is_resolved %}({% trans "opened for" %} {{ task.created_at|timesince }}){% endif %}</h2>
+    <ul class="nav-inline">
+        <li><a class="button-link" href="{{ task.project.get_task_list_url }}">{% trans "Return to task list" %}</a></li>
+        <li><a class="button-link" href="{{ task.get_edit_url }}">{% trans "Edit" %}</a></li>
+    </ul>
+
+    <div class="task-block">
+        <table class="task-block-properties">
+            <tbody>
+                <tr>
+                    <th>{% trans "Task" %} Id</th>
+                    <td>{{ task.id }}</td>
+                </tr>
+                {% comment %}
+                <tr>
+                    <th>{% trans "Revision" %}</th>
+                    <td>{{ task.revision }}</td>
+                </tr>
+                {% endcomment %}
+                <tr>
+                    <th>{% trans "Project" %}</th>
+                    <td><a href="{{ task.project.get_absolute_url }}">{{ task.project }}</a></td>
+                </tr>
+                <tr>
+                    <th>{% trans "Component" %}</th>
+                    <td>{{ task.component }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Type" %}</th>
+                    <td>{{ task.type }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Milestone" %}</th>
+                    <td>{{ task.milestone|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Summary" %}</th>
+                    <td>{{ task.summary }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Reported by" %}</th>
+                    <td>{{ task.author }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Reported date" %}</th>
+                    <td>{{ task.created_at|date:"Y-m-d H:i:s" }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Last modified at" %}</th>
+                    <td>{{ task.edited_at|date:"Y-m-d H:i:s" }}
+                <tr>
+                    <th>{% trans "Deadline" %}</th>
+                    <td>
+                        {% if task.deadline %}
+                            {{ task.deadline|date:"Y-m-d" }}
+                            {% if now > task.deadline %}
+                                <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-no.gif" />
+                            {% endif %}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{% trans "Assigned to" %}</th>
+                    <td>{{ task.owner }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Priority" %}</th>
+                    <td>{{ task.priority }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Status" %}</th>
+                    <td>
+                        <span
+                        {% if task.status.is_resolved %}
+                        class="task-closed"
+                        {% else %}
+                        class="task-open"
+                        {% endif %}
+                        >
+                        {{ task.status }}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h2>{% trans "Description" %}:</h2>
+        <div class="task-block-description">
+            {{ task.description|safe|restructuredtext }}
+        </div>
+
+    </div>
+
+    <div class="task-changeset">
+        
+        <h2>{% trans "History" %}</h2>
+            {% for revision in task.revisions %}
+            {% if not forloop.first %}
+            <div id="revision:{{ revision.revision }}" class="task-block">
+                <h3>{{ revision.created_at|date:"Y-m-d H:i:s" }} {% trans "by" %} {{ revision.author }}</h3>
+                <div class="task-revision-changes">
+                    {% if revision.changes %}
+                    <ul>
+                        {% for field, values in revision.changes.items %}
+                        <li><strong>{{ field }}</strong> changed from {{ values.0|slice:":20" }} to {{ values.1|slice:":20" }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <p>
+                {{ revision.comment|default_if_none:""|restructuredtext }}
+                </p>
+            </div>
+            {% endif %}
+            {% endfor %}
+    
+
+        {% get_attachments_for task as "task_attachments" %}
+        <fieldset id="task-attachments">
+            <legend>{% trans "Attachments" %}</legend>
+            {% if task_attachments %}
+            <ul>
+            {% for attachment in task_attachments %}
+                <li>
+                    <a href="{{ attachment.attachment_file.url }}">{{ attachment.filename }}</a>
+                    {% attachment_delete_link attachment %}
+                </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+                        
+            {% attachment_form task %}
+        </fieldset>
+            
+        {# Form begin #}
+        {% if user.is_authenticated %}
+        <form action="." method="post" class="action-form">
+
+        <fieldset id="task-comment">
+            <legend>{% trans "Comment" %}</legend>
+            {{ comment_formset.management_form }}
+            {% for form in comment_formset.forms %}
+                <table class="form-table">
+                    {% include "richtemplates/forms/form.html" %}
+                </table>
+            {% endfor %}
+        </fieldset>
+
+        <fieldset id="task-action">
+            <legend>{% trans "Action" %}</legend>
+            
+            {{ action_form.as_p_rows }}
+            {% if action_form.errors %}
+            <ul class="errorlist">
+                {% for error in action_form.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <p>
+                <input type="submit" value="{% trans "Submit" %}" />
+            </p>
+        </fieldset>
+        </form>
+        {# Form end #}
+        {% else %}
+        <p>
+        {% trans "If you want to contribute, please" %}
+            <a href="{% url auth_login %}">{% trans "login" %}</a>.
+        </p>
+        {% endif %}
+
+    </div>
+    
+
+{% endblock %}

@@ -1,0 +1,62 @@
+#repo-browser { min-height: 400px; }
+.code-browser a, .code-browser a:visited, .code-browser a:link {
+	color: #333;
+	text-decoration: none;
+}
+.browser-dir {
+    background-image: url("../../richtemplates/img/icons/folder.png");
+    background-repeat: no-repeat;
+    padding-left: 20px;
+	padding-top: 5px;
+    height: 16px;
+	display: block;
+	text-align: left;
+}
+.browser-file {
+    background-image: url("../../richtemplates/img/icons/page.png");
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    padding-top: 5px;
+    height: 16px;
+	display: block;
+	text-align: left;
+}
+
+table.code-browser { width: 100%; }
+table.code-browser thead th.size { width: 70px; }
+table.code-browser thead th.rev { width: 30px; }
+table.code-browser thead th.age { width: 140px; }
+table.code-browser thead th.last-author { width: 140px; }
+table.code-browser thead th { height: 20px; border: 1px solid #999; background-color: #EEE; }
+
+table.code-browser tbody tr { height: 22px; }
+table.code-browser tbody td { height: 20px; border: 1px solid #999; }
+table.code-browser tbody td.name { height: 20px; border: 1px solid #999; text-align: left; }
+table.code-browser tbody tr:hover { color: #000; background: #eed !important }
+table.code-browser tbody tr:hover td { color: #000; background: #eed !important }
+
+
+/* BREADCRUMBS */
+
+.browser-breadcrumbs {
+	padding:5px 0px 3px 5px;
+	margin: 0;
+	font-size:11px;
+	color:#666;
+	border:1px solid #000;
+	text-align:left;
+	background-color: #C2EBEE;
+	
+	margin: 5px 0 10px 0;
+	height: 17px;
+}
+.browser-breadcrumbs a, .browser-breadcrumbs a:visited, .browser-breadcrumbs a:link {
+	color: #333;
+	text-decoration: none;
+	margin: 0 3px 0 3px;
+}
+.browser-breadcrumbs a:hover {
+	color: #333;
+	text-decoration: underline;
+}
+

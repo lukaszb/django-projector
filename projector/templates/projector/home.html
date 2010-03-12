@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/browser.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/projector.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}richtemplates/css/pygments.css" media="screen" />    
+{% endblock %}
+
+{% block col_left %}
+    
+    <div class="richtemplates-panel">
+	    <h5>Tracker links</h5>
+	    <div class="richtemplates-panel-content">
+	    	
+			<ul class="nav-vertical">
+                <li><a href="{% url projector_project_category_list %}">{% trans "Project Categories" %}</a></li>
+                <li><a href="{% url projector_project_category_create %}">{% trans "Project Category Add" %}</a></li>
+                
+                <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
+                <li><a href="{% url projector_project_create %}">{% trans "Project Add" %}</a></li>
+
+                {#<li><a href="{% url projector_task_reports %}">{% trans "Task reports" %}</a></li>#}
+
+	    	</ul>
+
+	    </div>
+	</div>
+
+{% endblock %}
+
+

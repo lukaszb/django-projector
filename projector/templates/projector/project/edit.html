@@ -1,0 +1,38 @@
+{% extends "projector/project/details.html" %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            jQuery('#id_name').slugify('#id_slug');
+        });
+    </script>
+{% endblock %}
+
+{% load i18n %}
+
+{% block col_main_extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Project's edit panel" %}</h5>
+    <div class="richtemplates-panel-content">
+        <form action="." method="post">
+            <table class="form-table">
+                {% include "richtemplates/forms/form.html" %}
+            </table>
+            <div>
+                <input id="id_submit" type="submit" name="submit"
+                value="{% trans "Update" %} {% trans "project" %}"/>
+                <input type="button" onclick="window.location='{% spaceless %}
+                    {% if form.instance.id %}
+                        {{ form.instance.get_absolute_url }}
+                    {% else %}
+                        {% url projector_project_list %}
+                    {% endif %}
+                    {% endspaceless %}'" value="{% trans "Cancel" %}"/>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

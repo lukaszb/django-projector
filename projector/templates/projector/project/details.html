@@ -1,0 +1,119 @@
+{% extends "projector/home.html" %}
+
+{% load markup %}
+{% load i18n %}
+{% load permissions %}
+
+{% block extra_head %}{{ block.super }}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_project_repository_url').click(function(){
+            this.select();
+            console.log('qwe');
+        });
+    });
+</script>
+{% endblock %}
+
+{% block col_main_title %}{{ project.name }}{% endblock %}
+
+{% block col_main %}
+<div class="richtemplates-panel">
+    <h5>{{ project.name }}</h5>
+    <div class="richtemplates-panel-content">
+        <h1>{{ project.name|capfirst }}</h1>
+        <ul class="nav-inline">
+            <li><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project details" %}</a></li>
+            {% ifhasperm "project_permission.change_project" request.user project %}
+            <li><a class="button-link" href="{{ project.get_edit_url }}">{% trans "Edit" %}</a></li>
+            {% endifhasperm %}
+            <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
+            {% if project.repository_url %}
+                {% comment %}
+                We need to check repo url and provide proper one
+                as project.repository_url is an absolute url to
+                repository, not repository browser itself.
+                {% endcomment %}
+                <li><a class="button-link" href="{% filter slice:":-1" %}{{ project.get_browse_repo_url }}{% endfilter %}">{% trans "Browse repository" %}</a></li>
+            {% endif %}
+        </ul>
+
+        <ul class="messages">
+            <li class="message message-info">Clone repository:
+            <input id="id_project_repository_url" value="hg clone {{ project.get_repo_url }}"
+                size="{{ project.get_repo_url|length|add:'11' }}"
+                onblur="this.value='hg clone {{ project.get_repo_url }}';"/></li>
+        </ul>
+
+        
+        {% if "://example.com" in project.get_repo_url %}
+        <ul class="messages">
+            <li class="message message-warning">{% trans "Repository URL seems to be broken." %}</li>
+        </ul>
+        {% endif %}
+
+    </div>
+</div>
+    {% block col_main_extra %}
+<div class="richtemplates-panel">    
+    <h5>{% trans "Project details" %}</h5>
+    <div class="richtemplates-panel-content">
+        <div class="task-block">
+            <table class="task-block-properties">
+                <tbody>
+                    <tr>
+                        <th>{% trans "Project" %}</th>
+                        <td>{{ project.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Category" %}</th>
+                        <td>{{ project.category|default_if_none:"-" }}</th>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Author" %}</th>
+                        <td>{{ project.author }}</th>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Visibility" %}</th>
+                        <td>
+                            {% if project.is_public %}
+                            {% trans "Public" %}
+                            {% else %}
+                            {% trans "Private" %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>{% trans "Description" %}:</h2>
+        <div class="block-rst">
+            {{ project.description|restructuredtext }}
+        </div>
+
+        <h2>{% trans "Milestones" %}:</h2>
+        <ul class="nav-vertical">
+            {% for milestone in project.milestone_set.all %}
+            <li>{{ milestone.name }}</li>
+            {% empty %}
+            <li>No milestones defined.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>{% trans "Timeline" %}:</h2>
+        <ul class="nav-vertical">
+            {% for entry in project.timelineentry_set.all %}
+            <li>{{ entry.action }} by {{ entry.user }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}</li>
+            {% empty %}
+            <li>No timline entries yet.</li>
+            {% endfor %}
+        </ul>
+        
+        
+    </div>
+</div>
+    {% endblock col_main_extra %}
+
+{% endblock col_main %}
+

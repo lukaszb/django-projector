@@ -1,0 +1,87 @@
+{% extends "projector/project/details.html" %}
+
+{% load i18n %}
+{% load permissions %}
+
+{% block extra_head %}{{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#id_select_all_perms').click(function(){
+                $('#id_form_perms input:checkbox').each(function(){
+                    this.checked = true;
+                });
+            });
+            $('#id_deselect_all_perms').click(function(){
+                $('#id_form_perms input:checkbox').each(function(){
+                    $(this).removeAttr('checked');
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block col_main_extra %}
+
+<div class="richtemplates-panel">
+    <h5>Project's member</h5>
+    <div class="richtemplates-panel-content">
+        {# Task list: {{ task_list }} #}
+    <h1>{% trans "Manage member" %} {{ membership.member }}</h1>
+    
+    {% if project.is_public %}
+        <ul class="messages">
+            <li class="message message-info">
+            {% blocktrans %}This is public project so anyone may view it or clone it's repository even if
+            does NOT have proper permissions.{% endblocktrans %}
+            </li>
+        </ul>
+    {% endif %}
+
+    <ul class="nav-inline">
+        <li><a class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a></li>
+    </ul>
+
+    <form id="id_form_perms" action="." method="post">
+    <table class="datatable">
+        <thead class="datatable-thead">
+            <tr class="datatable-thead-header">
+                <th colspan="3">{% trans "Permissions" %}</th>
+            </tr>
+            <tr class="datatable-thead-subheader">
+                <th>{% trans "State" %}</th>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "On/Off" %}</th>
+            </tr>
+        </thead>
+        <tbody class="datatable-tbody">
+            {% get_permissions membership.project for membership.member as "my_permissions" %}
+            {% for permission in available_permissions %}
+            <tr class="{% cycle "odd" "even" %} hoverable">
+                <td class="centered">
+                    {% ifhasperm permission membership.member project %}
+                        <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-yes.gif" />
+                    {% else %}
+                        <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-no.gif" />
+                    {% endifhasperm %}
+                </td>
+                <td>{{ permission }}</td>
+                <td class="centered">
+                {% if permission in my_permissions %}YES!!!{% endif %}
+                    <input type="checkbox" value="{{ permission }}" name="perms"
+                    {% ifhasperm permission membership.member project %} checked="checked"{% endifhasperm %}/>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        <input type="submit" name="Update" />
+        <input id="id_select_all_perms" type="button" value="{% trans "Select all" %}" />
+        <input id="id_deselect_all_perms" type="button" value="{% trans "Deselect all" %}" />
+    </p>
+    </form>
+    </div>
+</div>
+{% endblock %}
+
+

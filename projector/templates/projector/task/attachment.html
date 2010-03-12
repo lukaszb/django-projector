@@ -1,0 +1,9 @@
+{% extends "projector/task/attachment.html" %}
+
+{% block col_main_content %}
+<h1>Task {{ task.id }}: {{ task.summary }}</h1>
+<label>{{ attachment.name }}</label>
+    <p>
+        <pre>{{ attachment.body }}</pre>
+    </p>
+{% endblock %}

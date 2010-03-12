@@ -1,0 +1,20 @@
+{% extends "projector/home.html" %}
+
+{% load i18n %}
+
+{% block col_main_title %}{% if form.instance.id %}{% trans "Update" %}{% else %}{% trans "Create new" %}{% endif %} {% trans "task" %}{% endblock %}
+
+{% block col_main_content %}
+    <form action="." method="post">
+        <table class="form-table">
+            {% include "richtemplates/forms/form.html" %}
+        </table>
+        <div>
+            <input id="id_submit" type="submit" name="submit"
+            value="{% if form.instance.id %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %} {% trans "task" %}"/>
+            <input type="button" onclick="window.location='{% if form.instance %}{{ form.instance.get_absolute_url }}{% endif %}'"
+            value="{% trans "Cancel" %}"/>
+        </div>
+    </form>
+{% endblock %}
+
