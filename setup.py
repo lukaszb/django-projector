@@ -20,7 +20,7 @@ def find_package_data():
 setup(
     name = 'django-projector',
     version = projector.__version__,
-    url = 'http://code.python-center.pl/projects/projector/',
+    url = 'http://bitbucket.org/lukaszb/django-projector/',
     author = 'Lukasz Balcerzak',
     author_email = 'lukasz.balcerzak@python-center.pl',
     description = projector.__doc__,

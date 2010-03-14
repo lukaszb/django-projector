@@ -11,9 +11,9 @@ on.
 
 .. note::
     Well, in fact, as the time of writing only ``messages`` application is
-    used from new `Django`_ version. And to
-    use this new application you can simply copy ``django/contrib/messages``
-    folder into working installation of Django on your system.
+    used from new Django_ version. And to use this new application you can
+    simply copy ``django/contrib/messages`` folder into working installation
+    of Django on your system.
 
 Requirements
 ------------
@@ -31,7 +31,7 @@ Following packages are needed to get ``django-projector`` working:
 - `django-tagging`_
 - `docutils`_
 - `Pygments`_
-- `Mercurial`_
+- `Mercurial`_ >= 1.5
 
 
 .. [1] `pip <http://pip.openplans.org/>`_ is tool similar to `easy_install

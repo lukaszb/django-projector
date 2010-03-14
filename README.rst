@@ -8,9 +8,10 @@ and repository backend integration. Aimed to work with upcoming, version
 simple application which can be easily customized or plugged into
 existing systems.
 
-This application is at early-development stage but we strongly encourage
-you to give it a try if you are looking for project management toolkit
-for your Django_ based projet.
+.. warning::
+   This application is at early-development stage but we strongly encourage
+   you to give it a try if you are looking for project management toolkit
+   for your Django_ based project.
 
 ------------
 Installation
@@ -36,13 +37,14 @@ for that. Go into ``docs/`` and run::
 License
 -------
 
-``django-projector`` is released under MIT license. You should get a copy
+``django-projector`` is released under MIT_ license. You should get a copy
 of the license with source distribution, at the root location, within
 ``LICENSE`` file.
 
 .. _Django: http://www.djangoproject.com/
 .. _Trac: http://trac.edgewall.org/
 .. _Sphinx: http://sphinx.pocoo.org/
+.. _MIT: http://www.opensource.org/licenses/mit-license.php
 
 .. [1] Don't get us wrong, Trac_ is great tool but we believe that
    django's pluggable applications are far easier to configure and
