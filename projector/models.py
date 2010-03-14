@@ -1,3 +1,4 @@
+import os
 import pprint
 import datetime
 import logging
@@ -7,7 +8,7 @@ import mercurial.hg
 
 from django.conf import settings
 from django.template.defaultfilters import slugify  
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.safestring import mark_safe
 from django.db import models
@@ -16,11 +17,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.template.defaultfilters import slugify
 
-from tagging.fields import TagField
 from annoying.decorators import signals
+from authority.models import Permission
 from projector.utils import abspath
 from projector.settings import HG_ROOT_DIR, BANNED_PROJECT_NAMES
 from projector.exceptions import ProjectorError
+from projector.managers import ProjectManager
+from tagging.fields import TagField
 
 class DictModel(models.Model):
     #id = models.IntegerField('ID', primary_key=True)
@@ -66,24 +69,6 @@ class ProjectCategory(models.Model):
     def get_absolute_url(self):
         return ('projector_project_category_details', (), {
             'project_category_slug' : self.slug })
-
-class ProjectManager(models.Manager):
-    
-    def projects_for_user(self, user=None):
-        """
-        Returns queryset of Project instances available
-        for given user. If no user is given or user
-        is inactive/anonymous, only public projects are
-        returned.
-        """
-        logging.debug("Searching for projects for user '%s'" % user)
-        qs = self.get_query_set()
-        if user.is_active and user.is_superuser:
-            return qs
-        qset = Q(public=True)
-        if user.is_active:
-            qset = qset | Q(membership__member=user)
-        return qs.filter(qset)
 
 class Project(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True)
@@ -135,10 +120,10 @@ class Project(models.Model):
         self.slug = slugify(self.name)
         super(Project, self).save(*args, **kwargs)
     
-    #@models.permalink
+    @models.permalink
     def get_absolute_url(self):
-        #return ('projector_project_details', (), {'project_slug' : self.slug })
-        return '/projector/projects/' + self.slug + '/'
+        return ('projector_project_details', (), {'project_slug' : self.slug })
+        #return '/projector/projects/' + self.slug + '/'
 
     @models.permalink
     def get_edit_url(self):
@@ -200,25 +185,40 @@ class Project(models.Model):
         obj = TimelineEntry.objects.create(**timeline_entry_info)
         logging.info("Craeted timeline entry: %s" % obj)
 
-    def has_perm(self, perm, user):
-        """
-        Returns True if:
-        1. Given user is superuser.
-        2. Given user is owner of this project.
-        3. Given user's membership contains perm.
-        """
-        if user.is_superuser:
-            return True
-        elif user is self.owner:
-            return True
-        return False
-
     def save(self, *args, **kwargs):
         if self.name.lower() in BANNED_PROJECT_NAMES:
             raise WrongProjectNameError("Project's '%r' cannot be used - it "
                 "is one of the banned names:\n%s"
                 % (self.name, pprint.pformat(BANNED_PROJECT_NAMES)))
         super(Project, self).save(*args, **kwargs)
+        self.set_author_permissions()
+
+    def set_author_permissions(self):
+        """
+        Creates all available permissions for the author of
+        the project. Should be called every time project is
+        saved to ensure that at any given time project's author
+        has all permissions for the project.
+        """
+        if self.author.is_superuser:
+            # we don't need to add permissions for superuser
+            # as superusers has all permissions
+            return
+        import itertools
+        from projector.permissions import ProjectPermission, get_or_create_permisson
+        available_permissions = ProjectPermission.get_local_checks()
+
+        perms = Permission.objects.for_user(self.author, self)
+        perms_set = itertools.chain(perms.values_list('codename'))
+        check = ProjectPermission(self.author)
+        for perm in available_permissions:
+            if not perm in perms_set:
+                logging.debug("Project '%s': adding '%s' permission for user "
+                    "'%s'" % (self, perm, self.author))
+                get_or_create_permisson(
+                    user = self.author,
+                    project = self,
+                    codename = perm)
 
 class ProjectComponent(models.Model):
     project = models.ForeignKey(Project)
@@ -689,19 +689,16 @@ def project_creation_listener(instance, **kwargs):
     if HG_ROOT_DIR:
         repo_path = instance.get_repo_path()
         logging.info("Creating new mercurial repository at %s" % repo_path)
-        '''
-        create_repository(repo_path)
-        repo = Repository.objects.create(
-            name = instance.name,
-            slug = instance.slug,
-            location = repo_path,
-            owner = User.objects.filter(is_superuser=True)[0],
-            public = instance.public,
-        )
-        '''
-        repo = mercurial.hg.repository(mercurial.ui.ui(), repo_path,
-            create=True)
+        if os.path.exists(repo_path):
+            logging.warn("Project '%s': cannot create repository "
+                "as path '%s' already exists" % (instance, repo_path))
+        else:
+            repo = mercurial.hg.repository(mercurial.ui.ui(), repo_path,
+                create=True)
         instance.repository_url = repo_path
+    else:
+        logging.debug("PROJECTOR_HG_ROOT_DIR is not set so we do NOT "
+            "create repository to this project.")
 
 @signals.post_save(sender=Project)
 def new_project_handler(instance, **kwargs):

@@ -13,6 +13,7 @@ from authority.decorators import permission_required_or_403
 
 from projector.models import Task, Status, Priority, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm, UserByNameField
+from projector.permissions import ProjectPermission
 
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
@@ -147,7 +148,7 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
-        if not check.can_add_task_to(project):
+        if not check.can_add_task_to_project(project):
             raise PermissionDenied()
     initial = {
         'owner': request.user.username, # form's owner is UserByNameField

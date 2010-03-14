@@ -36,7 +36,12 @@
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td><a class="block-link" href="{{ membership.member.get_absolute_url }}">{{ membership.member }}</a></td>
                 <td>{{ membership.joined_at }}</td>
-                <td><a class="block-link" href="{{ membership.get_absolute_url }}">{% trans "Manage" %}</a></td>
+                <td>
+                    {% if project.author == membership.member %}
+                    {% trans "Owner has all permissions" %}
+                    {% else %}
+                    <a class="block-link" href="{{ membership.get_absolute_url }}">{% trans "Manage" %}</a></td>
+                    {% endif %}
             </tr>
             {% endfor %}
         </tbody>

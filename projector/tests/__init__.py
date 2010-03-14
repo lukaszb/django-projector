@@ -1,3 +1,3 @@
 from version import *
-from permissions import *
+from test_permissions import *
 

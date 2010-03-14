@@ -29,13 +29,21 @@ from projector.utils.simplehg import hgrepo_detail, is_mercurial
 
 from urlparse import urljoin
 
-def project_details(request, project_slug, template_name='projector/project/details.html'):
+def project_details(request, project_slug,
+        template_name='projector/project/details.html'):
+    """
+    Returns selected project's detail for user given in ``request``.
+    We make necessary permission checks *after* dispatching between
+    normal and mercurial request, as mercurial requests has it's own
+    permission requirements.
+    """
     project = get_object_or_404(Project, slug=project_slug)
     if is_mercurial(request):
         return hgrepo_detail(request, project.slug)
-    if not request.user.is_authenticated() and project.is_private():
-        raise PermissionDenied()
-    
+    if project.is_private():
+        check = ProjectPermission(user=request.user)
+        if not check.view_project(project):
+            raise PermissionDenied()
     context = {
         'project': project,
     }
@@ -50,7 +58,8 @@ def project_list(request, template_name='projector/project/list.html'):
     }
     return list_detail.object_list(request, **kwargs)
 
-def project_task_list(request, project_slug, template_name='projector/project/task_list.html'):
+def project_task_list(request, project_slug,
+        template_name='projector/project/task_list.html'):
     project = Project.objects.get(slug=project_slug)    
     if project.is_private():
         check = ProjectPermission(request.user)
@@ -133,7 +142,7 @@ def project_members(request, project_slug):
     }
     return context
 
-@permission_required_or_403('project_permission.add_member_to_project',
+@permission_required_or_403('project_permission.add_member_project',
     (Project, 'slug', 'project_slug'))
 @render_to('projector/project/members_add.html')
 def project_members_add(request, project_slug):
@@ -160,7 +169,7 @@ def project_members_add(request, project_slug):
     }
     return context
 
-@permission_required_or_403('project_permission.add_member_to_project',
+@permission_required_or_403('project_permission.change_member_project',
     (Project, 'slug', 'project_slug'))
 @render_to('projector/project/members_manage.html')
 def project_members_manage(request, project_slug, username):
@@ -171,6 +180,10 @@ def project_members_manage(request, project_slug, username):
         project__slug=project_slug, member__username=username)
     member = membership.member
     project = membership.project
+    if project.author == member:
+        messages.warning(request, _("Project owner's membership cannot be "
+            "modified. He/She has all permissions for this project."))
+        return redirect(project.get_members_url())
     check = ProjectPermission(user=member)
 
     form = MembershipForm(request.POST or None, instance=membership)
