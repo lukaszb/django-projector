@@ -14,7 +14,7 @@ else:
     HG_ROOT_DIR = abspath(HG_ROOT_DIR)
     if not os.path.exists(HG_ROOT_DIR):
         os.mkdir(HG_ROOT_DIR)
-        logging.info("djangi-projector: created %s directory."
+        logging.info("django-projector: created %s directory."
             % HG_ROOT_DIR)
 HG_BASIC_AUTH_REALM = getattr(settings, 'PROJECTOR_HG_BASIC_AUTH_REALM', 'Projector Basic Auth')
 HG_PUSH_SSL = getattr(settings, 'PROJECTOR_HG_PUSH_SSL', None)
