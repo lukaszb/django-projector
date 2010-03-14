@@ -49,7 +49,10 @@
         
         {% if "://example.com" in project.get_repo_url %}
         <ul class="messages">
-            <li class="message message-warning">{% trans "Repository URL seems to be broken." %}</li>
+            <li class="message message-warning">
+                {% trans "Repository URL seems to be broken. Maybe you have forgotten to " %}
+                <a href="{% url admin:sites_site_change 1 %}">{% trans "set site" %}</a> at admin panel?
+            </li>
         </ul>
         {% endif %}
 

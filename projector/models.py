@@ -11,6 +11,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.safestring import mark_safe
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.template.defaultfilters import slugify
@@ -75,14 +76,14 @@ class ProjectManager(models.Manager):
         is inactive/anonymous, only public projects are
         returned.
         """
+        logging.debug("Searching for projects for user '%s'" % user)
         qs = self.get_query_set()
-        if user is None or user.is_anonymous() or not user.is_active:
-            qs = qs.filter(public=True)
-        elif not user.is_superuser:
-            # Custom logic to obtain projects for given user
-            qs = qs\
-                .filter(membership__member=user)
-        return qs
+        if user.is_active and user.is_superuser:
+            return qs
+        qset = Q(public=True)
+        if user.is_active:
+            qset = qset | Q(membership__member=user)
+        return qs.filter(qset)
 
 class Project(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True)

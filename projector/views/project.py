@@ -34,14 +34,21 @@ def project_details(request, project_slug, template_name='projector/project/deta
     if is_mercurial(request):
         return hgrepo_detail(request, project.slug)
     if not request.user.is_authenticated() and project.is_private():
-        path = urlquote(request.get_full_path())
-        tup = settings.LOGIN_URL, auth.REDIRECT_FIELD_NAME, path
-        return HttpResponseRedirect('%s?%s=%s' % tup)
+        raise PermissionDenied()
     
     context = {
         'project': project,
     }
     return render_to_response(template_name, context, RequestContext(request))
+
+def project_list(request, template_name='projector/project/list.html'):
+    project_queryset = Project.objects.projects_for_user(user=request.user)
+    kwargs = {
+        'queryset' : project_queryset.annotate(Count('task')),
+        'template_name' : template_name,
+        'template_object_name' : 'project',
+    }
+    return list_detail.object_list(request, **kwargs)
 
 def project_task_list(request, project_slug, template_name='projector/project/task_list.html'):
     project = Project.objects.get(slug=project_slug)    
@@ -62,7 +69,7 @@ def project_task_list(request, project_slug, template_name='projector/project/ta
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-@permission_required('projector.add_project')
+@permission_required_or_403('project_permission.add_project')
 @render_to('projector/project/create.html')
 def project_create(request):
     """
@@ -230,15 +237,6 @@ def project_members_manage(request, project_slug, username):
         'available_permissions': available_permissions,
     }
     return context
-
-def project_list(request, template_name='projector/project/list.html'):
-    project_queryset = Project.objects.projects_for_user(user=request.user)
-    kwargs = {
-        'queryset' : project_queryset.annotate(Count('task')),
-        'template_name' : template_name,
-        'template_object_name' : 'project',
-    }
-    return list_detail.object_list(request, **kwargs)
 
 @render_to('projector/project/repository.html')
 def project_browse_repository(request, project_slug, rel_repo_url):
