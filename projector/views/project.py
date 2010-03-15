@@ -207,10 +207,11 @@ def project_members_manage(request, project_slug, username):
         project__slug=project_slug, member__username=username)
     member = membership.member
     project = membership.project
-    #if project.author == member:
-    #    messages.warning(request, _("Project owner's membership cannot be "
-    #        "modified. He/She has all permissions for this project."))
-    #    return redirect(project.get_members_url())
+    if not request.user.is_superuser and project.author == member:
+        # allow if requested by superuser
+        messages.warning(request, _("Project owner's membership cannot be "
+            "modified. He/She has all permissions for this project."))
+        return redirect(project.get_members_url())
     check = ProjectPermission(user=member)
 
     form = MembershipForm(request.POST or None, instance=membership)
