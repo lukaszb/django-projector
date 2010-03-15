@@ -96,20 +96,43 @@
         </div>
 
         <h2>{% trans "Milestones" %}:</h2>
-        <ul class="nav-vertical">
-            {% for milestone in project.milestone_set.all %}
-            <li>{{ milestone.name }}</li>
-            {% empty %}
-            <li>No milestones defined.</li>
-            {% endfor %}
-        </ul>
+        {% for milestone in project.milestone_set.all %}
+        <h3>{{ milestone.name }}</h3>
+        {% if milestone.task_set.all %}
+        <table class="projetor-milestone-progress-table">
+            <tbody>
+                <tr>
+                    <td class="projector-milestone-progress-table-finished"
+                        width="{{ milestone.get_finished_tasks_count_as_percentage }}%">
+                        <a class="block-link" href="#">{% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%</a>
+                    </td>
+                    <td class="projector-milestone-progress-table-unfinished">
+                        <a class="block-link" href="#">{% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        {% else %}
+            <ul class="messages">
+                <li class="message message-info">{% trans "No tasks for this milestone were found" %}</li>
+            </ul>
+        {% endif %}
+        {% empty %}
+            <ul class="messages">
+                <li class="message message-info">{% trans "No milestones defined yet" %}</li>
+            </ul>
+        {% endfor %}
 
         <h2>{% trans "Timeline" %}:</h2>
         <ul class="nav-vertical">
             {% for entry in project.timelineentry_set.all %}
             <li>{{ entry.action }} by {{ entry.user }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}</li>
             {% empty %}
-            <li>No timline entries yet.</li>
+            <li>
+                <ul class="messages">
+                    <li class="message message-info">{% trans "No timeline entries defined yet" %}</li>
+                </ul>
+            </li>
             {% endfor %}
         </ul>
         

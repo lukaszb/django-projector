@@ -19,13 +19,15 @@ Project permissions
 Following permissions are defined for each project:
 
 - ``view``
-- ``add_member_to``
-- ``delete_member_from``
-- ``view_tasks_for``
-- ``can_add_task_to``
-- ``can_change_task_to``
-- ``can_read_repository``
-- ``can_write_repository``
+- ``view_members``
+- ``add_member``
+- ``change_member``
+- ``delete_member``
+- ``view_tasks``
+- ``add_task``
+- ``change_task``
+- ``read_repository``
+- ``write_repository``
 
 .. note::
    ``django-authority`` adds suffix ``_project`` for each of this permissions.

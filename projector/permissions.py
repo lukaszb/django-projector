@@ -17,9 +17,9 @@ class ProjectPermission(permissions.BasePermission):
         'change_member',
         'delete_member',
 
-        'view_tasks_for',
-        'add_task_to',
-        'change_task_to',
+        'view_tasks',
+        'add_task',
+        'change_task',
 
         'read_repository',
         'write_repository',

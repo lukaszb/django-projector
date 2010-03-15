@@ -21,8 +21,8 @@ from authority.decorators import permission_required_or_403
 from authority.forms import UserPermissionForm
 from authority.models import Permission
 
-from projector.models import Project, ProjectCategory, Membership, Task
-from projector.forms import ProjectForm, MembershipForm
+from projector.models import Project, ProjectCategory, Membership, Task, Milestone
+from projector.forms import ProjectForm, MembershipForm, MilestoneForm
 from projector.views.task import task_create
 from projector.permissions import ProjectPermission
 from projector.utils.simplehg import hgrepo_detail, is_mercurial
@@ -63,7 +63,7 @@ def project_task_list(request, project_slug,
     project = Project.objects.get(slug=project_slug)    
     if project.is_private():
         check = ProjectPermission(request.user)
-        if not check.has_perm('project_permission.view_tasks_for_project',
+        if not check.has_perm('project_permission.view_tasks_project',
             project):
             raise PermissionDenied()
 
@@ -90,7 +90,6 @@ def project_create(request):
     if request.method == 'POST' and form.is_valid():
         project = form.save(commit=False)
         project.save()
-        member = Membership.objects.create(project=project, member=request.user)
         return HttpResponseRedirect(project.get_absolute_url())
     
     context = {
@@ -114,7 +113,8 @@ def project_edit(request, project_slug):
     form = ProjectForm(request.POST or None, instance=project)
     if request.method == 'POST' and form.is_valid():
         project = form.save()
-        messages.success(request, "Project edited successfully.")
+        message = _("Project edited successfully")
+        messages.success(request, message)
         return HttpResponseRedirect(project.get_absolute_url())
 
     context = {
@@ -122,6 +122,27 @@ def project_edit(request, project_slug):
         'project': form.instance,
     }
 
+    return context
+
+@permission_required_or_403('project_permission.change_project',
+    (Project, 'slug', 'project_slug'))
+@render_to('projector/project/milestones_add.html')
+def project_milestones_add(request, project_slug):
+    """
+    Adds milestone for project.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    milestone = Milestone(project=project, author=request.user)
+    form = MilestoneForm(request.POST or None, instance=milestone)
+    if request.method == 'POST' and form.is_valid():
+        milestone = form.save()
+        message = _("Milestone added successfully")
+        messages.success(request, message)
+        return HttpResponseRedirect(project.get_absolute_url())
+    context = {
+        'form': form,
+        'project': project,
+    }
     return context
 
 @render_to('projector/project/members.html')
@@ -271,7 +292,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     if project.is_private():
         check = ProjectPermission(request.user)
         if not request.user.is_authenticated() or \
-            not check.can_read_repository_project(project):
+            not check.read_repository_project(project):
             raise PermissionDenied()
 
 

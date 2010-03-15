@@ -10,6 +10,7 @@ from projector.models import Project
 from projector.models import ProjectCategory
 from projector.models import Task
 from projector.models import Status
+from projector.models import Milestone
 from projector.settings import BANNED_PROJECT_NAMES
 
 from richtemplates.forms import DynamicActionChoice
@@ -138,4 +139,10 @@ class MembershipForm(LimitingModelForm):
             raise forms.ValidationError(_("This user is already member of "
                 "this project"))
         return member
+
+class MilestoneForm(forms.ModelForm):
+
+    class Meta:
+        model = Milestone
+        exclude = ['project', 'author']
 

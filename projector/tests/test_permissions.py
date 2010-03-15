@@ -85,8 +85,10 @@ class ProjectorPermissionTests(TestCase):
             self.public_project.get_members_manage_url('john_doe'),
             self.public_project.get_create_task_url(),
             self.public_project.get_edit_url(),
+            self.public_project.get_milestones_add_url(),
             self.john_project.get_absolute_url(),
             self.john_project.get_edit_url(),
+            self.john_project.get_milestones_add_url(),
             self.john_project.get_members_url(),
         )
         self._assert_urls_code(urls_403, 403)
@@ -106,6 +108,7 @@ class ProjectorPermissionTests(TestCase):
         urls_403 = (
             self.john_project.get_absolute_url(),
             self.john_project.get_edit_url(),
+            self.john_project.get_milestones_add_url(),
             self.john_project.get_members_url(),
         )
         self._assert_urls_code(urls_403, 403)
@@ -116,4 +119,4 @@ class ProjectorPermissionTests(TestCase):
             self.public_project.get_absolute_url(),
         )
         self._assert_urls_code(urls_200, 200)
-
+    

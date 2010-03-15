@@ -137,7 +137,7 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
 
     return render_to_response(template_name, context, RequestContext(request))
 
-@permission_required_or_403('project_permission.add_task_to_project',
+@permission_required_or_403('project_permission.add_task_project',
     (Project, 'slug', 'project_slug'))
 def task_create(request, project_slug, template_name='projector/task/create.html'):
     """
@@ -147,7 +147,7 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
-        if not check.can_add_task_to_project(project):
+        if not check.add_task_project(project):
             raise PermissionDenied()
     initial = {
         'owner': request.user.username, # form's owner is UserByNameField
@@ -182,9 +182,8 @@ def task_create(request, project_slug, template_name='projector/task/create.html
 
     return render_to_response(template_name, context, RequestContext(request))
 
-@login_required
-@permission_required('projector.change_project')
-@permission_required('projector.change_task')
+@permission_required_or_403('project_permission.change_task_project',
+    (Project, 'slug', 'project_slug'))
 def task_edit(request, project_slug, task_id, template_name='projector/task/create.html'):
     """
     Edit Task meta information. task_details edits the rest.

@@ -88,3 +88,25 @@ textarea {
     background-color: #FFD;
     border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
 }
+
+.projetor-milestone-progress-table {
+    width: 100%;
+    border: 1px solid green;
+}
+
+.projector-milestone-progress-table-finished {
+    text-align: center;
+    background-color: #C3FDB8;
+}
+.projector-milestone-progress-table-finished:hover {
+    background-color: #5EFB6E;
+    border-color: #5EFB6E;
+}
+
+.projector-milestone-progress-table-unfinished {
+    text-align: center;
+    background-color: #F75D59;
+}
+.projector-milestone-progress-table-unfinished:hover {
+    background-color: #C24641;
+}

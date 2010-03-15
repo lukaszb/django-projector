@@ -6,6 +6,8 @@ import mercurial
 import mercurial.ui
 import mercurial.hg
 
+from decimal import Decimal
+
 from django.conf import settings
 from django.template.defaultfilters import slugify  
 from django.contrib.auth.models import User, Group
@@ -148,6 +150,11 @@ class Project(models.Model):
     @models.permalink
     def get_task_list_url(self):
         return ('projector_task_list', (), {'project_slug': self.slug})
+
+    @models.permalink
+    def get_milestones_add_url(self):
+        return ('projector_project_milestones_add', (),
+            {'project_slug': self.slug })
     
     @models.permalink
     def get_browse_repo_url(self):
@@ -275,6 +282,21 @@ class Milestone(models.Model):
 
     def __unicode__(self):
         return self.name
+    
+    def get_finished_tasks_count(self):
+        finished_tasks = self.task_set\
+            .select_related('status')\
+            .filter(status__is_resolved=True)
+        return finished_tasks.count()
+
+    def get_finished_tasks_count_as_percentage(self):
+        finished = self.get_finished_tasks_count()
+        all = self.task_set.count()
+        logging.debug("finished: %s | all: %s" % (finished, all))
+        return Decimal(finished) / Decimal(all) * Decimal(100)
+
+    def get_unfinished_tasks_count_as_percentage(self):
+        return Decimal(100) - self.get_finished_tasks_count_as_percentage()
 
 class TimelineEntry(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'), editable=False)
@@ -706,44 +728,47 @@ def project_creation_listener(instance, **kwargs):
 
 @signals.post_save(sender=Project)
 def new_project_handler(instance, **kwargs):
-    # TODO: Cannot call so many queries every time project is updated!
-    logging.debug("new_project_handler called")
-    component, created = ProjectComponent.objects\
-        .get_or_create(project=instance, name=u'Global')
-    
-    if created:
-        logging.debug("Created standard 'Global' component for project %s"
-            % instance.name)
-    for component_info in new_components:
+    if kwargs['created'] is True:
+        logging.debug("Project '%s': new project handler." % instance)
+        member = Membership.objects.create(project=instance, member=instance.author)
         component, created = ProjectComponent.objects\
-            .get_or_create(
-                project = instance,
-                **component_info)
+            .get_or_create(project=instance, name=u'Global')
+        
         if created:
-            logging.debug("For project '%s' new component '%s' was craeted"
-                % (component.project, component))
-    for task_type_info in new_task_types:
-        task, created = TaskType.objects\
-            .get_or_create(
-                project = instance,
-                **task_type_info)
-        if created:
-            logging.debug("For project '%s' new task type '%s' was craeted"
-                % (task.project, task))
-    for priority_info in new_priorities:
-        priority, created = Priority.objects\
-            .get_or_create(
-                project = instance,
-                **priority_info)
-        if created:
-            logging.debug("For project '%s' new priority '%s' was created."
-                % (priority.project, priority))
-    for status_info in new_statuses:
-        status, created = Status.objects\
-            .get_or_create(
-                project = instance,
-                **status_info)
-        if created:
-            logging.debug("For project '%s' new status '%s' was created."
-                % (status.project, status))
+            logging.debug("Created standard 'Global' component for project %s"
+                % instance.name)
+        for component_info in new_components:
+            component, created = ProjectComponent.objects\
+                .get_or_create(
+                    project = instance,
+                    **component_info)
+            if created:
+                logging.debug("For project '%s' new component '%s' was craeted"
+                    % (component.project, component))
+        for task_type_info in new_task_types:
+            task, created = TaskType.objects\
+                .get_or_create(
+                    project = instance,
+                    **task_type_info)
+            if created:
+                logging.debug("For project '%s' new task type '%s' was craeted"
+                    % (task.project, task))
+        for priority_info in new_priorities:
+            priority, created = Priority.objects\
+                .get_or_create(
+                    project = instance,
+                    **priority_info)
+            if created:
+                logging.debug("For project '%s' new priority '%s' was created."
+                    % (priority.project, priority))
+        for status_info in new_statuses:
+            status, created = Status.objects\
+                .get_or_create(
+                    project = instance,
+                    **status_info)
+            if created:
+                logging.debug("For project '%s' new status '%s' was created."
+                    % (status.project, status))
+    else:
+        logging.debug("Project '%s': update handler." % instance)
 

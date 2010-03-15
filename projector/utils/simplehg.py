@@ -163,13 +163,13 @@ def hgrepo_detail(request, project_slug):
         check = ProjectPermission(user)
         # Reading from repository (clone/pull/etc)
         if project.is_private() and request.method == 'GET' and \
-            not check.can_read_repository_project(project):
+            not check.read_repository_project(project):
             logging.warn("User %s does not have permission to read this repository (%s)."
                 % (user, project))
             raise PermissionDenied()
         # Writing to repository (push)
         if request.method == 'POST' and \
-            not check.can_write_repository_project(project):
+            not check.write_repository_project(project):
             logging.warn("User %s does not have permission to write to this repository."
                 % user)
             raise PermissionDenied()
