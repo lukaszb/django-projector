@@ -137,9 +137,8 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
 
     return render_to_response(template_name, context, RequestContext(request))
 
-@login_required
-#@permission_required_or_403('project_permission.add_task_to_project',
-#    (Project, 'slug', 'project_slug'))
+@permission_required_or_403('project_permission.add_task_to_project',
+    (Project, 'slug', 'project_slug'))
 def task_create(request, project_slug, template_name='projector/task/create.html'):
     """
     New Task creation view.

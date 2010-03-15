@@ -123,7 +123,6 @@ class Project(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_details', (), {'project_slug' : self.slug })
-        #return '/projector/projects/' + self.slug + '/'
 
     @models.permalink
     def get_edit_url(self):
@@ -136,6 +135,11 @@ class Project(models.Model):
     @models.permalink
     def get_members_add_url(self):
         return ('projector_project_members_add', (), {'project_slug': self.slug })
+
+    @models.permalink
+    def get_members_manage_url(self, username):
+        return ('projector_project_members_manage', (),
+            {'project_slug': self.slug, 'username': username})
 
     @models.permalink
     def get_create_task_url(self):

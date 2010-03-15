@@ -12,6 +12,7 @@ class ProjectPermission(permissions.BasePermission):
     checks = [
         'view',
 
+        'view_members',
         'add_member',
         'change_member',
         'delete_member',

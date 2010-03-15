@@ -101,7 +101,6 @@ def project_create(request):
 
     return context
 
-@login_required
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
 @render_to('projector/project/edit.html')
@@ -133,6 +132,11 @@ def project_members(request, project_slug):
     Shows/updates project's members view.
     """
     project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(request.user)
+        if not check.has_perm('project_permission.view_members_project',
+            project):
+            raise PermissionDenied()
     memberships = Membership.objects\
         .filter(project=project)
     

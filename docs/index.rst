@@ -39,6 +39,7 @@ release.
 - Charts, statistics, graphs, plots, analyzies
 - Functional roadmap/timeline
 - Email notification
+- `django-piston`_ integration
 
 .. warning::
    This application is at early-development stage but we strongly encourage
@@ -66,6 +67,7 @@ Other topics
 
 .. _django: http://www.djangoproject.com/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/django-richtemplates/
+.. _django-piston: http://bitbucket.org/jespern/django-piston/
 .. _restructuredText: http://docutils.sourceforge.net/rst.html
 .. _mercurial: http://mercurial.selenic.com/
 .. _subversion: http://subversion.tigris.org/
