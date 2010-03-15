@@ -12,7 +12,7 @@
         <form action="." method="get">
             {% csrf_token %}
             <table class="filterform-table">
-                {% for field in filter.form %}
+                {% for field in filters.form %}
                     {% include "richtemplates/forms/filter-field.html" %}
                 {% endfor %}
             </table>
@@ -26,7 +26,7 @@
 
 {% block col_main_extra %}
 
-{% autosort filter.qs as task_list %}
+{% autosort filters.qs as task_list %}
 {% autopaginate task_list %}
 
 <div class="richtemplates-panel">

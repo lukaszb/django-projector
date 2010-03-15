@@ -70,15 +70,15 @@ def project_task_list(request, project_slug,
 
     task_list = Task.objects.filter(project__id=project.id)\
             .select_related('priority', 'status', 'author', 'project')
-            #.defer('project')
-    filter = TaskFilter(request.GET,
+    filters = TaskFilter(request.GET,
         queryset=task_list, project=project)
+    if request.GET and 'id' in request.GET and filters.qs.count() == 1:
+        task = filters.qs[0]
+        return redirect(task.get_absolute_url())
     context = {
         'project': project,
-        #'task_list': task_list,
-        'filter': filter,
+        'filters': filters,
     }
-    #logging.info("Task list:\n%s" % task_list)
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required

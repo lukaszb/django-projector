@@ -292,7 +292,6 @@ class Milestone(models.Model):
     def get_finished_tasks_count_as_percentage(self):
         finished = self.get_finished_tasks_count()
         all = self.task_set.count()
-        logging.debug("finished: %s | all: %s" % (finished, all))
         return Decimal(finished) / Decimal(all) * Decimal(100)
 
     def get_unfinished_tasks_count_as_percentage(self):

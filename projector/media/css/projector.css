@@ -94,6 +94,9 @@ textarea {
     border: 1px solid green;
 }
 
+.projector-milestone-progress-table-finished a {
+    color: #F75D59;
+}
 .projector-milestone-progress-table-finished {
     text-align: center;
     background-color: #C3FDB8;
@@ -102,11 +105,21 @@ textarea {
     background-color: #5EFB6E;
     border-color: #5EFB6E;
 }
+.projector-milestone-progress-table-finished:hover a {
+    color: #FFF;
+}
 
 .projector-milestone-progress-table-unfinished {
     text-align: center;
     background-color: #F75D59;
 }
+.projector-milestone-progress-table-unfinished a {
+    color: #C3FDB8;
+}
+
 .projector-milestone-progress-table-unfinished:hover {
     background-color: #C24641;
+}
+.projector-milestone-progress-table-unfinished:hover a {
+    color: #FFF;
 }

@@ -215,16 +215,3 @@ def task_edit(request, project_slug, task_id, template_name='projector/task/crea
 
     return render_to_response(template_name, context, RequestContext(request))
 
-def task_list(request, template_name='projector/task/list.html'):
-    """
-    List task view.
-    """
-    logging.debug("task_list called")
-
-    context = {
-        'task_list': Task.objects\
-            .select_related('author', 'project', 'status', 'priority')
-    }
-
-    return render_to_response(template_name, context, RequestContext(request))
-
