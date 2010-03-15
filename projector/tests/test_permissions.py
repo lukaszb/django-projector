@@ -113,6 +113,17 @@ class ProjectorPermissionTests(TestCase):
         )
         self._assert_urls_code(urls_403, 403)
         self.client.logout()
+
+    def test_views_johndoe(self):
+        self.client.logout()
+        self.client.login(username='john_doe', password='john_doe')
+        urls_200 = (
+            self.public_project.get_absolute_url(),
+            self.public_project.get_members_url(),
+            self.public_project.get_members_add_url(),
+            self.public_project.get_create_task_url(),
+        )
+        self._assert_urls_code(urls_200, 200)
     
     def test_project_details_views(self):
         urls_200 = (
