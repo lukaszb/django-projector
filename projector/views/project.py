@@ -78,7 +78,6 @@ def project_task_list(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-@permission_required_or_403('project_permission.add_project')
 @render_to('projector/project/create.html')
 def project_create(request):
     """
@@ -90,7 +89,6 @@ def project_create(request):
     form = ProjectForm(request.POST or None, instance=project)
     if request.method == 'POST' and form.is_valid():
         project = form.save(commit=False)
-        #project.author = request.user
         project.save()
         member = Membership.objects.create(project=project, member=request.user)
         return HttpResponseRedirect(project.get_absolute_url())

@@ -15,20 +15,22 @@ class ProjectorPermissionTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-        self.admin = User.objects.create(
+        self.admin = User.objects.create_superuser(
             username = 'admin',
+            email = 'admin@example.com',
             password = 'admin',
-            is_superuser = True,
-            is_staff = True,
         )
-        self.john_doe = User.objects.create(
+        self.john_doe = User.objects.create_user(
             username = 'john_doe',
+            email = 'john_doe@example.com',
             password = 'john_doe',
         )
-        self.noperms = User.objects.create(
+        self.noperms = User.objects.create_user(
             username = 'noperms',
+            email = 'noperms@nodomain.net',
             password = 'noperms',
         )
+        # Create projects
         self.public_project = Project.objects.create(
             name = 'public project',
             slug = slugify('public project'),
@@ -71,6 +73,11 @@ class ProjectorPermissionTests(TestCase):
             self.public_project.get_task_list_url(),
         )
         self._assert_urls_code(urls_200, 200)
+        
+        urls_302 = (
+            reverse('projector_project_create'),
+        )
+        self._assert_urls_code(urls_302, 302)
 
         urls_403 = (
             self.public_project.get_edit_url(),
@@ -86,10 +93,11 @@ class ProjectorPermissionTests(TestCase):
             
     def test_views_logged(self):
         self.client.logout()
-        self.client.login(username='noperms', password='noperms')
+        logged = self.client.login(username='noperms', password='noperms')
         urls_200 = (
             reverse('projector_home'),
             reverse('projector_project_list'),
+            reverse('projector_project_create'),
             self.public_project.get_absolute_url(),
             self.public_project.get_members_url(),
         )
@@ -101,6 +109,7 @@ class ProjectorPermissionTests(TestCase):
             self.john_project.get_members_url(),
         )
         self._assert_urls_code(urls_403, 403)
+        self.client.logout()
     
     def test_project_details_views(self):
         urls_200 = (
