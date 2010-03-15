@@ -26,6 +26,7 @@ from projector.forms import ProjectForm, MembershipForm, MilestoneForm
 from projector.views.task import task_create
 from projector.permissions import ProjectPermission
 from projector.utils.simplehg import hgrepo_detail, is_mercurial
+from projector.filters import TaskFilter
 
 from urlparse import urljoin
 
@@ -70,9 +71,12 @@ def project_task_list(request, project_slug,
     task_list = Task.objects.filter(project__id=project.id)\
             .select_related('priority', 'status', 'author', 'project')
             #.defer('project')
+    filter = TaskFilter(request.GET,
+        queryset=task_list, project=project)
     context = {
         'project': project,
-        'task_list': task_list,
+        #'task_list': task_list,
+        'filter': filter,
     }
     #logging.info("Task list:\n%s" % task_list)
     return render_to_response(template_name, context, RequestContext(request))

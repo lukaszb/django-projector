@@ -104,10 +104,14 @@
                 <tr>
                     <td class="projector-milestone-progress-table-finished"
                         width="{{ milestone.get_finished_tasks_count_as_percentage }}%">
-                        <a class="block-link" href="#">{% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%</a>
+                        <a class="block-link" href="{{ project.get_task_list_url }}?milestone={{ milestone.id }}">
+                            {% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%
+                        </a>
                     </td>
                     <td class="projector-milestone-progress-table-unfinished">
-                        <a class="block-link" href="#">{% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%</a>
+                        <a class="block-link" href="{{ project.get_task_list_url }}?milestone={{ milestone.id }}">
+                            {% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%
+                        </a>
                     </td>
                 </tr>
             </tbody>

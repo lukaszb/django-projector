@@ -1,3 +1,8 @@
+import datetime
+import pprint
+import logging
+import django_filters
+
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
@@ -16,10 +21,6 @@ from projector.forms import TaskForm, TaskEditForm, TaskCommentForm, UserByNameF
 from projector.permissions import ProjectPermission
 
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
-
-import datetime
-import pprint
-import logging
 
 def task_details(request, project_slug, task_id, template_name='projector/task/details.html'):
     """

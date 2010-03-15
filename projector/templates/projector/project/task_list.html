@@ -4,9 +4,29 @@
 {% load pagination_tags %}
 {% load sorting_tags %}
 
+{% block col_left %}{{ block.super }}
+
+<div class="richtemplates-panel">
+    <h5>Task search</h5>
+    <div class="richtemplates-panel-content">
+        <form action="." method="get">
+            {% csrf_token %}
+            <table class="filterform-table">
+                {% for field in filter.form %}
+                    {% include "richtemplates/forms/filter-field.html" %}
+                {% endfor %}
+            </table>
+            <p>
+                <input id="id_filter_task" type="submit" value="Search" />
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
 {% block col_main_extra %}
 
-{% autosort task_list %}
+{% autosort filter.qs as task_list %}
 {% autopaginate task_list %}
 
 <div class="richtemplates-panel">
