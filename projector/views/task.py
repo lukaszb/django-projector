@@ -104,11 +104,6 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
             comment_form = comment_formset.forms[0]
             if comment_form.cleaned_data.has_key('comment'):
                 comment = comment_form.cleaned_data['comment']
-                from django.db import connection
-                q = connection.queries
-                #task.add_comment_to_current_revision(comment)
-                logging.debug("Added comment to current revision")
-                logging.debug("Query was: %s" % pprint.pformat(q[-1]))
                 messages.success(request, _("Comment added successfully."))
             else:
                 comment = None

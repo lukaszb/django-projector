@@ -70,7 +70,7 @@ span.task-open { padding-left: 12px; background: transparent url(../../richtempl
 .deadline-exceeded { border: 1px solid #966; background-color: #F33; color: #FFF; text-decoration: bold; }
 
 textarea {
-    font-family: monospace !important;
+    font: 1.1em monospace !important;
 }
 
 .task-revision-entry h3 {
@@ -91,35 +91,37 @@ textarea {
 
 .projetor-milestone-progress-table {
     width: 100%;
-    border: 1px solid green;
+    border: 1px solid #000;
+}
+.projetor-milestone-progress-table a {
+    text-decoration: none;
+    text-align: center;
 }
 
-.projector-milestone-progress-table-finished a {
-    color: #F75D59;
-}
 .projector-milestone-progress-table-finished {
-    text-align: center;
-    background-color: #C3FDB8;
+    background-color: #5EFB6E;
 }
 .projector-milestone-progress-table-finished:hover {
-    background-color: #5EFB6E;
-    border-color: #5EFB6E;
+    background-color: #4DEA5D;
+}
+.projector-milestone-progress-table-finished a {
+    color: green;
 }
 .projector-milestone-progress-table-finished:hover a {
-    color: #FFF;
+    color: #000;
+    text-decoration: none;
 }
 
 .projector-milestone-progress-table-unfinished {
-    text-align: center;
     background-color: #F75D59;
 }
-.projector-milestone-progress-table-unfinished a {
-    color: #C3FDB8;
-}
-
 .projector-milestone-progress-table-unfinished:hover {
     background-color: #C24641;
+    background-color: #E64E48;
+}
+.projector-milestone-progress-table-unfinished a {
+    color: #600;
 }
 .projector-milestone-progress-table-unfinished:hover a {
-    color: #FFF;
+    color: #300;
 }

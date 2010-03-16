@@ -1,6 +1,7 @@
 {% extends "projector/project/details.html" %}
 
 {% load i18n %}
+{% load richtemplates %}
 
 {% if root.is_file %}
     {% block head_css %}{{ block.super }}
@@ -12,6 +13,10 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Project's repository browser" %}</h5>
     <div class="richtemplates-panel-content">
+    <ul class="nav-inline">
+        <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
+        <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
+    </ul>    
     <div id="repo-browser">
 		{% load breadcrumber %}
 		<div class="browser-breadcrumbs">
@@ -47,7 +52,7 @@
 						{{ node.info.date|timesince }}
 						</span>
 					</td>
-					<td class="centered">{{ node.info.author }}</td>
+					<td class="centered">{{ node.info.author|tooltip:"20" }}</td>
 				</tr>
 				{% endfor %}
 			</tbody>

@@ -30,6 +30,9 @@ urlpatterns += patterns('projector.views.project',
     url(r'^projects/(?P<project_slug>[-\w]+)/repository/(?P<rel_repo_url>.*)$',
         view='project_browse_repository',
         name='projector_project_browse_repository'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/src/changesets/$',
+        view='project_changesets',
+        name='projector_project_changesets'),
 
     url(r'^projects/(?P<project_slug>[-\w]+)/tasks/$', 'project_task_list', name='projector_task_list'),
 )

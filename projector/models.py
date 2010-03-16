@@ -160,8 +160,13 @@ class Project(models.Model):
     def get_browse_repo_url(self):
         return ('projector_project_browse_repository', (), {
             'project_slug': self.slug,
-            'rel_repo_url': '/',
+            'rel_repo_url': '',
         })
+
+    @models.permalink
+    def get_changesets_url(self):
+        return ('projector_project_changesets', (),
+            {'project_slug': self.slug})
     
     def get_repo_path(self):
         repo_path = abspath(HG_ROOT_DIR, self.slug)

@@ -30,12 +30,7 @@
             <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
             <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
             {% if project.repository_url %}
-                {% comment %}
-                We need to check repo url and provide proper one
-                as project.repository_url is an absolute url to
-                repository, not repository browser itself.
-                {% endcomment %}
-                <li><a class="button-link" href="{% filter slice:":-1" %}{{ project.get_browse_repo_url }}{% endfilter %}">{% trans "Browse repository" %}</a></li>
+                <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Browse repository" %}</a></li>
             {% endif %}
         </ul>
 
@@ -97,7 +92,7 @@
 
         <h2>{% trans "Milestones" %}:</h2>
         {% for milestone in project.milestone_set.all %}
-        <h3>{{ milestone.name }}</h3>
+        <h3>{{ milestone.name }} ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
         {% if milestone.task_set.all %}
         <table class="projetor-milestone-progress-table">
             <tbody>

@@ -124,6 +124,10 @@ class ProjectorPermissionTests(TestCase):
             self.public_project.get_create_task_url(),
         )
         self._assert_urls_code(urls_200, 200)
+
+        urls_403 = (
+        )
+        self._assert_urls_code(urls_403, 403)
     
     def test_project_details_views(self):
         urls_200 = (

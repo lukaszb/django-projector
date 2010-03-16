@@ -72,8 +72,9 @@ def project_task_list(request, project_slug,
             .select_related('priority', 'status', 'author', 'project')
     filters = TaskFilter(request.GET,
         queryset=task_list, project=project)
-    if request.GET and 'id' in request.GET and filters.qs.count() == 1:
+    if request.GET and 'id' in request.GET and request.GET['id'] and filters.qs.count() == 1:
         task = filters.qs[0]
+        messages.info(request, _("One task matched - redirecting..."))
         return redirect(task.get_absolute_url())
     context = {
         'project': project,
@@ -323,3 +324,36 @@ def project_browse_repository(request, project_slug, rel_repo_url):
         messages.error(request, str(err))
     return context
 
+@render_to('projector/project/changesets.html')
+def project_changesets(request, project_slug):
+    """
+    Returns repository's changesets view.
+    """
+    try:
+        from vcbrowser import engine_from_url
+        from vcbrowser.engine.base import VCBrowserError, EngineError
+    except ImportError, err:
+        messages.error(request, str(err))
+        return {}
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(request.user)
+        if not check.read_repository_project(project):
+            raise PermissionDenied()
+    if not project.repository_url:
+        messages.error(request, _("Repository's url is not set! Please "
+            "configure project preferences first."))
+    context = {
+        'project': project,
+    }
+    try:
+        engine = engine_from_url('hg://' + project.get_repo_path())
+        changesets = [engine.get_changeset(rev) for rev in 
+            reversed(engine.revision_numbers)]
+        context['changesets'] = changesets
+        context['engine'] = engine
+    except VCBrowserError, err:
+        messages.error(request, str(err))
+    except EngineError, err:
+        messages.error(request, str(err))
+    return context
