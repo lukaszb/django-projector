@@ -167,6 +167,10 @@ class Project(models.Model):
     def get_changesets_url(self):
         return ('projector_project_changesets', (),
             {'project_slug': self.slug})
+
+    def get_task(self, id):
+        queryset = Task.objects.filter(project=self)
+        return queryset.get(id=id)
     
     def get_repo_path(self):
         repo_path = abspath(HG_ROOT_DIR, self.slug)

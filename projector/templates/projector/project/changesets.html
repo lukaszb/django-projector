@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load richtemplates %}
+{% load projector_tags %}
 
 {% if root.is_file %}
     {% block head_css %}{{ block.super }}
@@ -22,7 +23,7 @@
         <li>{% trans "Revision" %}: {{ changeset }} {% trans "commited at" %}
             {{ changeset.date }} {% trans "by" %} {{ changeset.author }}
             <div class="message message-info show-tooltip" title="{{ changeset.message }}">
-                <p>{{ changeset.message }}</p>
+                <p>{{ changeset.message|changeset_message:project }}</p>
             </div>
         </li>
         {% endfor %}
