@@ -14,7 +14,7 @@ django-notification==0.1.5
 django-pagination==1.0.5
 django-registration==0.7
 django-rosetta==0.5.3
--e git+git@github.com:lukaszb/django-sorting.git@637b02c8636a49802ee0b72253cbbcfc4f10f8d5#egg=django_sorting-0.1-py2.6-dev
+-e git+git://github.com/lukaszb/django-sorting.git#egg=django_sorting-0.1
 django-tagging==0.3.1
 docutils==0.6
 enum==0.4.4
