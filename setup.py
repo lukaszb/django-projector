@@ -1,8 +1,17 @@
+import sys
+
 from ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup, find_packages
 
 projector = __import__('projector')
+readme_file = 'README.rst'
+try:
+    long_description = open(readme_file).read()
+except IOError, err:
+    sys.stderr.write("[ERROR] Cannot find file specified as "
+        "``long_description`` (%s)\n" % readme_file)
+    sys.exit(1)
 
 def find_package_data():
     import os
@@ -24,7 +33,7 @@ setup(
     author = 'Lukasz Balcerzak',
     author_email = 'lukasz.balcerzak@python-center.pl',
     description = projector.__doc__,
-    long_description = open('README.rst').read(),
+    long_description = long_description,
     zip_safe = False,
     packages = find_packages(),
     include_package_data = True,
