@@ -36,7 +36,7 @@ def changeset_message(value, project=None, path=None):
             id = int(m.group(1))
             try:
                 task = project.get_task(id)
-                message = task.summary + "\n" + \
+                message = _("Summary") + ": %s" % task.summary + "\n" + \
                     _("Status") + ": %s" % task.status
                 archon = '<a href="%s" class="show-tipsy" title="%s">#%d</a>'\
                     % (task.get_absolute_url(), escape(message), id)
