@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-16 22:12+0100\n"
+"POT-Creation-Date: 2010-03-19 18:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgstr ""
 msgid "name"
 msgstr ""
 
-#: models.py:33 models.py:78 models.py:366
+#: models.py:33 models.py:78 models.py:370
 msgid "description"
 msgstr ""
 
@@ -96,8 +96,8 @@ msgstr ""
 msgid "public"
 msgstr ""
 
-#: models.py:59 models.py:96 models.py:256 models.py:273 models.py:306
-#: models.py:381
+#: models.py:59 models.py:96 models.py:260 models.py:277 models.py:310
+#: models.py:385
 msgid "project"
 msgstr ""
 
@@ -125,11 +125,11 @@ msgstr ""
 msgid "members"
 msgstr ""
 
-#: models.py:85 models.py:276 models.py:362
+#: models.py:85 models.py:280 models.py:366
 msgid "author"
 msgstr ""
 
-#: models.py:86 models.py:277 models.py:307 models.py:361
+#: models.py:86 models.py:281 models.py:311 models.py:365
 msgid "created at"
 msgstr ""
 
@@ -145,131 +145,131 @@ msgstr ""
 msgid "projects"
 msgstr ""
 
-#: models.py:245 models.py:373
+#: models.py:249 models.py:377
 msgid "component"
 msgstr ""
 
-#: models.py:246
+#: models.py:250
 msgid "components"
 msgstr ""
 
-#: models.py:254
+#: models.py:258
 msgid "member"
 msgstr ""
 
-#: models.py:255
+#: models.py:259
 msgid "joined at"
 msgstr ""
 
-#: models.py:278 models.py:371
+#: models.py:282 models.py:375
 msgid "deadline"
 msgstr ""
 
-#: models.py:280
+#: models.py:284
 msgid "date completed"
 msgstr ""
 
-#: models.py:284 models.py:372
+#: models.py:288 models.py:376
 msgid "milestone"
 msgstr ""
 
-#: models.py:285
+#: models.py:289
 msgid "milestones"
 msgstr ""
 
-#: models.py:308 models.py:591
+#: models.py:312 models.py:595
 msgid "user"
 msgstr ""
 
-#: models.py:309
+#: models.py:313
 msgid "action"
 msgstr ""
 
-#: models.py:313
+#: models.py:317
 msgid "timeline entry"
 msgstr ""
 
-#: models.py:314
+#: models.py:318
 msgid "timeline entries"
 msgstr ""
 
-#: models.py:329
+#: models.py:333
 msgid "priority level"
 msgstr ""
 
-#: models.py:330
+#: models.py:334
 msgid "priority levels"
 msgstr ""
 
-#: models.py:335
+#: models.py:339
 msgid "is resolved"
 msgstr ""
 
-#: models.py:336
+#: models.py:340
 msgid "is task action"
 msgstr ""
 
-#: models.py:339 models.py:367
+#: models.py:343 models.py:371
 msgid "status"
 msgstr ""
 
-#: models.py:340
+#: models.py:344
 msgid "statuses"
 msgstr ""
 
-#: models.py:350 models.py:369
+#: models.py:354 models.py:373
 msgid "task type"
 msgstr ""
 
-#: models.py:351
+#: models.py:355
 msgid "task types"
 msgstr ""
 
-#: models.py:365
+#: models.py:369
 msgid "summary"
 msgstr ""
 
-#: models.py:368
+#: models.py:372
 msgid "priority"
 msgstr ""
 
-#: models.py:370
+#: models.py:374
 msgid "owner"
 msgstr ""
 
-#: models.py:382
+#: models.py:386
 msgid "edited at"
 msgstr ""
 
-#: models.py:383
+#: models.py:387
 msgid "editor"
 msgstr ""
 
-#: models.py:388
+#: models.py:392
 msgid "task"
 msgstr ""
 
-#: models.py:389
+#: models.py:393
 msgid "tasks"
 msgstr ""
 
-#: models.py:542
+#: models.py:546
 msgid "comment"
 msgstr ""
 
-#: models.py:550
+#: models.py:554
 msgid "Revision "
 msgstr ""
 
-#: models.py:592
+#: models.py:596
 msgid "activation_token"
 msgstr ""
 
-#: models.py:596
+#: models.py:600
 msgid "user profile"
 msgstr ""
 
-#: models.py:597
+#: models.py:601
 msgid "user profiles"
 msgstr ""
 
@@ -289,27 +289,27 @@ msgstr ""
 msgid "Project Add"
 msgstr ""
 
-#: templates/projector/project/changesets.html:14
+#: templates/projector/project/changesets.html:15
 msgid "Project's repository browser"
 msgstr ""
 
-#: templates/projector/project/changesets.html:17
+#: templates/projector/project/changesets.html:18
 msgid "Sources"
 msgstr ""
 
-#: templates/projector/project/changesets.html:18
+#: templates/projector/project/changesets.html:19
 msgid "Changesets"
 msgstr ""
 
-#: templates/projector/project/changesets.html:22
+#: templates/projector/project/changesets.html:23
 msgid "Revision"
 msgstr ""
 
-#: templates/projector/project/changesets.html:22
+#: templates/projector/project/changesets.html:23
 msgid "commited at"
 msgstr ""
 
-#: templates/projector/project/changesets.html:23
+#: templates/projector/project/changesets.html:24
 msgid "by"
 msgstr ""
 
@@ -347,7 +347,7 @@ msgid "Members"
 msgstr ""
 
 #: templates/projector/project/details.html:33
-msgid "Browse repository"
+msgid "Sources"
 msgstr ""
 
 #: templates/projector/project/details.html:48
@@ -707,6 +707,18 @@ msgstr ""
 
 #: templates/projector/task/details.html:201
 msgid "login"
+msgstr ""
+
+#: templatetags/projector_tags.py:39
+msgid "Summary"
+msgstr ""
+
+#: templatetags/projector_tags.py:40
+msgid "Status"
+msgstr ""
+
+#: templatetags/projector_tags.py:46
+msgid "There is no such task for this project"
 msgstr ""
 
 #: views/project.py:77

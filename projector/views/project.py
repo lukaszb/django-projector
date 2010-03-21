@@ -129,9 +129,44 @@ def project_edit(request, project_slug):
 
     return context
 
+@render_to('projector/project/milestone_list.html')
+def project_milestones(request, project_slug):
+    """
+    Returns milestones view.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(user=request.user)
+        if not check.view_project(project):
+            raise PermissionDenied()
+    milestone_list = project.milestone_set\
+        .annotate(Count('task'))
+    context = {
+        'project': project,
+        'milestone_list': milestone_list,
+    }
+    return context
+
+@render_to('projector/project/milestone_detail.html')
+def project_milestone_detail(request, project_slug, milestone_slug):
+    """
+    Returns milestone detail view.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    milestone = get_object_or_404(Milestone, slug=milestone_slug)
+    if project.is_private():
+        check = ProjectPermission(user=request.user)
+        if not check.view_project(project):
+            raise PermissionDenied()
+    context = {
+        'project': project,
+        'milestone': milestone,
+    }
+    return context
+
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/milestones_add.html')
+@render_to('projector/project/milestone_add.html')
 def project_milestones_add(request, project_slug):
     """
     Adds milestone for project.
@@ -289,7 +324,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
         from vcbrowser import engine_from_url
         from vcbrowser.engine.base import VCBrowserError, EngineError
     except ImportError, err:
-        messages.error(request, str(err))
+        messages.error(request, repr(err))
         messages.info(request, "vcbrowser is available at "
             "http://code.google.com/p/python-vcbrowser/")
         return {}
@@ -319,7 +354,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
         requested_node = engine.request(rel_repo_url, revision, fetch_content=True)
         context['root'] = requested_node
     except VCBrowserError, err:
-        messages.error(request, str(err))
+        messages.error(request, repr(err))
     except EngineError, err:
         messages.error(request, str(err))
     return context

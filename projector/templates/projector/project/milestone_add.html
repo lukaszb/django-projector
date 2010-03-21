@@ -4,6 +4,15 @@
 {% load pagination_tags %}
 {% load sorting_tags %}
 
+{% block extra_head %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            jQuery('#id_name').slugify('#id_slug');
+        });
+    </script>
+{% endblock %}
+
 {% block col_main_extra %}
 <div class="richtemplates-panel">
     <h5>{% trans "Add milestone" %}</h5>

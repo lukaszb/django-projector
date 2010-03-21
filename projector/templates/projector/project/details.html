@@ -21,16 +21,17 @@
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
     <div class="richtemplates-panel-content">
-        <h1>{{ project.name|capfirst }}</h1>
+        <h1>{{ project.name }}</h1>
         <ul class="nav-inline">
             <li><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project details" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a></li>
             {% ifhasperm "project_permission.change_project" request.user project %}
             <li><a class="button-link" href="{{ project.get_edit_url }}">{% trans "Edit" %}</a></li>
             {% endifhasperm %}
             <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
             <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
             {% if project.repository_url %}
-                <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Browse repository" %}</a></li>
+                <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
             {% endif %}
         </ul>
 
@@ -90,7 +91,7 @@
             {{ project.description|restructuredtext }}
         </div>
 
-        <h2>{% trans "Milestones" %}:</h2>
+        <h2><a href="{{ project.get_milestones_url }}">{% trans "Roadmap" %}</a>:</h2>
         {% for milestone in project.milestone_set.all %}
         <h3>{{ milestone.name }} ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
         {% if milestone.task_set.all %}

@@ -152,6 +152,11 @@ class Project(models.Model):
         return ('projector_task_list', (), {'project_slug': self.slug})
 
     @models.permalink
+    def get_milestones_url(self):
+        return ('projector_project_milestones', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
     def get_milestones_add_url(self):
         return ('projector_project_milestones_add', (),
             {'project_slug': self.slug })
@@ -276,6 +281,7 @@ class Membership(models.Model):
 class Milestone(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'))
     name = models.CharField(max_length=64)
+    slug = models.SlugField(unique=True)
     description = models.TextField()
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -301,6 +307,8 @@ class Milestone(models.Model):
     def get_finished_tasks_count_as_percentage(self):
         finished = self.get_finished_tasks_count()
         all = self.task_set.count()
+        if all == 0:
+            return 100
         return Decimal(finished) / Decimal(all) * Decimal(100)
 
     def get_unfinished_tasks_count_as_percentage(self):

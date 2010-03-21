@@ -1,0 +1,82 @@
+{% extends "projector/project/details.html" %}
+
+{% load i18n %}
+{% load permissions %}
+{% load richtemplates %}
+
+{% block col_main_extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Project's milestones" %}</h5>
+    <div class="richtemplates-panel-content">
+    <ul class="nav-inline">
+        {% ifhasperm "project_permission.change_project" request.user project %}
+        <li><a class="button-link" href="{{ project.get_milestones_add_url }}">{% trans "Add milestone" %}</a></li>
+        {% endifhasperm %}        
+    </ul>    
+
+    {% load pagination_tags %}
+    {% load sorting_tags %}
+
+    {% autosort milestone_list %}
+    {% autopaginate milestone_list %}
+
+    <table class="datatable">
+        <thead class="datatable-thead">
+            <tr class="datatable-thead-subheader">
+                <th>{% anchor name _("Milestone") %}</th>
+                <th>{% anchor task__count _("Tasks") %}</th>
+                <th>{% trans "Progress" %}</th>
+            </tr>
+        </thead>
+        <tbody class="datatable-tbody">
+            {% for milestone in milestone_list %}
+            <tr class="{% cycle "odd" "even" %} hoverable">
+                <td><a class="block-link show-tipsy" href="{% url projector_project_milestone_detail project.slug milestone.slug %}"
+                        title="{{ milestone.description }}">{{ milestone.name }}</a>
+                </td>
+                <td><a class="block-link show-tipsy centered"
+                        title="{% trans "Show all related tasks" %}"
+                        href="{{ project.get_task_list_url }}?milestone={{ milestone.id }}">
+                        {{ milestone.task__count }}</a>
+                </td>
+                <td>
+
+        <table class="projetor-milestone-progress-table">
+            <tbody>
+                <tr>
+                    {% with milestone.get_finished_tasks_count_as_percentage as finished %}
+                    {% if finished %}
+                        <td class="projector-milestone-progress-table-finished"
+                            width="{{ milestone.get_finished_tasks_count_as_percentage }}%">
+                            <a class="block-link" href="{{ project.get_task_list_url }}?is_resolved=2&milestone={{ milestone.id }}">
+                                {% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%
+                            </a>
+                        </td>
+                    {% endif %}
+                    {% endwith %}
+                    {% with milestone.get_unfinished_tasks_count_as_percentage as unfinished %}
+                    {% if unfinished %}
+                    <td class="projector-milestone-progress-table-unfinished">
+                        <a class="block-link" href="{{ project.get_task_list_url }}?is_resolved=3&milestone={{ milestone.id }}">
+                            {% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%
+                        </a>
+                    </td>
+                    {% endif %}
+                    {% endwith %}
+                </tr>
+            </tbody>
+        </table>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+</div>
+</div>
+
+{% endblock %}
+
