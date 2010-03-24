@@ -49,6 +49,7 @@ def project_details(request, project_slug,
         'project': project,
     }
     return render_to_response(template_name, context, RequestContext(request))
+project_details.csrf_exempt = True
 
 def project_list(request, template_name='projector/project/list.html'):
     project_queryset = Project.objects.projects_for_user(user=request.user)
