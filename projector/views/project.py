@@ -177,9 +177,30 @@ def project_milestones_add(request, project_slug):
     form = MilestoneForm(request.POST or None, instance=milestone)
     if request.method == 'POST' and form.is_valid():
         milestone = form.save()
-        message = _("Milestone added successfully")
-        messages.success(request, message)
-        return HttpResponseRedirect(project.get_absolute_url())
+        msg = _("Milestone added successfully")
+        messages.success(request, msg)
+        return redirect(project.get_absolute_url())
+    context = {
+        'form': form,
+        'project': project,
+    }
+    return context
+
+@permission_required_or_403('project_permission.change_project',
+    (Project, 'slug', 'project_slug'))
+@render_to('projector/project/milestone_edit.html')
+def project_milestone_edit(request, project_slug, milestone_slug):
+    """
+    Edits chosen milestone.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    milestone = get_object_or_404(Milestone, slug=milestone_slug)
+    form = MilestoneForm(request.POST or None, instance=milestone)
+    if request.method == 'POST' and form.is_valid():
+        milestone = form.save()
+        msg = _("Milestone updated successfully")
+        messages.success(request, msg)
+        return redirect(milestone.get_absolute_url())
     context = {
         'form': form,
         'project': project,

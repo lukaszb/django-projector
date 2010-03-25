@@ -2,19 +2,19 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-23 22:09+0100\n"
-"PO-Revision-Date: 2010-02-09 15:25\n"
+"POT-Creation-Date: 2010-03-25 03:55+0100\n"
+"PO-Revision-Date: 2010-03-24 22:08\n"
 "Last-Translator: <a@a.pl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Translated-Using: django-rosetta 0.5.1\n"
+"X-Translated-Using: django-rosetta 0.5.3\n"
 
 #: admin.py:81
 msgid "Task details"
@@ -30,14 +30,11 @@ msgid ""
 "                they will be probably really uneditable. For now, they are\n"
 "                here but even if you change them, they will be overriden\n"
 "                at the time of pushing data into database."
-msgstr ""
-"To są pola tylko-do-odczytu. W Django 1.2 prawdopodobnie będą faktycznie "
-"nieedytowalne. Na razie tu pozostaną, lecz nawet jeśli zostaną zmienione, "
-"będą nadpisane w momencie wstrzykiwania danych do bazy."
+msgstr "To są pola tylko-do-odczytu. W Django 1.2 prawdopodobnie będą faktycznie nieedytowalne. Na razie tu pozostaną, lecz nawet jeśli zostaną zmienione, będą nadpisane w momencie wstrzykiwania danych do bazy."
 
 #: filters.py:12
 msgid "All"
-msgstr ""
+msgstr "Wszystko"
 
 #: forms.py:47 templates/projector/project/details.html:80
 msgid "Public"
@@ -48,7 +45,7 @@ msgid "Private"
 msgstr "Prywatny"
 
 #: forms.py:52 templates/projector/project/members_manage.html:52
-#: templates/projector/project/milestone_detail.html:28
+#: templates/projector/project/milestone_detail.html:21
 #: templates/projector/project/repository.html:33
 msgid "Name"
 msgstr "Nazwa"
@@ -63,7 +60,7 @@ msgstr "Wybierz jedną z opcji"
 
 #: forms.py:76
 msgid "Cannot use this name"
-msgstr ""
+msgstr "Nie można użyć tej nazwy"
 
 #: forms.py:80 templates/projector/task/details.html:172
 msgid "Comment"
@@ -78,19 +75,18 @@ msgid "No changes made"
 msgstr "Nie zmieniono"
 
 #: forms.py:126
-#, fuzzy
 msgid "Member"
-msgstr "Członkowie"
+msgstr "Członek"
 
 #: forms.py:139
 msgid "This user is already member of this project"
-msgstr ""
+msgstr "Użytkownik jest już członkiem tego projektu"
 
 #: models.py:32 models.py:53 models.py:76
 msgid "name"
 msgstr "nazwa"
 
-#: models.py:33 models.py:78 models.py:378
+#: models.py:33 models.py:78 models.py:396
 msgid "description"
 msgstr "opis"
 
@@ -102,8 +98,8 @@ msgstr "porządek"
 msgid "public"
 msgstr "publiczny"
 
-#: models.py:59 models.py:96 models.py:265 models.py:282 models.py:318
-#: models.py:393 templates/projector/project/create.html:24
+#: models.py:59 models.py:96 models.py:265 models.py:282 models.py:336
+#: models.py:411 templates/projector/project/create.html:24
 #: templates/projector/project/edit.html:25
 msgid "project"
 msgstr "projekt"
@@ -132,11 +128,11 @@ msgstr "aktywny"
 msgid "members"
 msgstr "członekowie"
 
-#: models.py:85 models.py:286 models.py:374
+#: models.py:85 models.py:286 models.py:392
 msgid "author"
 msgstr "autor"
 
-#: models.py:86 models.py:287 models.py:319 models.py:373
+#: models.py:86 models.py:287 models.py:337 models.py:391
 msgid "created at"
 msgstr "utworzone"
 
@@ -152,7 +148,7 @@ msgstr "nieaktualne"
 msgid "projects"
 msgstr "projekty"
 
-#: models.py:254 models.py:385
+#: models.py:254 models.py:403
 msgid "component"
 msgstr "Komponent"
 
@@ -168,7 +164,7 @@ msgstr "członek"
 msgid "joined at"
 msgstr "dołączył w"
 
-#: models.py:288 models.py:383
+#: models.py:288 models.py:401
 msgid "deadline"
 msgstr "termin"
 
@@ -176,7 +172,7 @@ msgstr "termin"
 msgid "date completed"
 msgstr "data zakończenia"
 
-#: models.py:294 models.py:384
+#: models.py:294 models.py:402
 msgid "milestone"
 msgstr "kamień milowy"
 
@@ -184,100 +180,100 @@ msgstr "kamień milowy"
 msgid "milestones"
 msgstr "kamienie milowe"
 
-#: models.py:320 models.py:603
+#: models.py:338 models.py:621
 msgid "user"
 msgstr "użytkownik"
 
-#: models.py:321
+#: models.py:339
 msgid "action"
 msgstr "akcja"
 
-#: models.py:325
+#: models.py:343
 msgid "timeline entry"
 msgstr "wpis harmonogramu"
 
-#: models.py:326
+#: models.py:344
 msgid "timeline entries"
 msgstr "wpisy harmonogramu"
 
-#: models.py:341
+#: models.py:359
 msgid "priority level"
 msgstr "poziom priorytetu"
 
-#: models.py:342
+#: models.py:360
 msgid "priority levels"
 msgstr "poziomy priorytetów"
 
-#: models.py:347
+#: models.py:365
 msgid "is resolved"
 msgstr "czy rowziązany"
 
-#: models.py:348
+#: models.py:366
 msgid "is task action"
 msgstr "czy akcja zadania"
 
-#: models.py:351 models.py:379
+#: models.py:369 models.py:397
 msgid "status"
 msgstr "status"
 
-#: models.py:352
+#: models.py:370
 msgid "statuses"
 msgstr "statusy"
 
-#: models.py:362 models.py:381
+#: models.py:380 models.py:399
 msgid "task type"
 msgstr "typ zadania"
 
-#: models.py:363
+#: models.py:381
 msgid "task types"
 msgstr "typy zadań"
 
-#: models.py:377
+#: models.py:395
 msgid "summary"
 msgstr "podsumowanie"
 
-#: models.py:380
+#: models.py:398
 msgid "priority"
 msgstr "priorytet"
 
-#: models.py:382
+#: models.py:400
 msgid "owner"
 msgstr "właściciel"
 
-#: models.py:394
+#: models.py:412
 msgid "edited at"
 msgstr "Zaktualizowano"
 
-#: models.py:395
+#: models.py:413
 msgid "editor"
 msgstr "edytor"
 
-#: models.py:400 templates/projector/task/create.html:5
+#: models.py:418 templates/projector/task/create.html:5
 #: templates/projector/task/create.html:14
 msgid "task"
 msgstr "zadanie"
 
-#: models.py:401
+#: models.py:419
 msgid "tasks"
 msgstr "zadania"
 
-#: models.py:554
+#: models.py:572
 msgid "comment"
 msgstr "komentarz"
 
-#: models.py:562
+#: models.py:580
 msgid "Revision "
 msgstr "Rewizja"
 
-#: models.py:604
+#: models.py:622
 msgid "activation_token"
 msgstr "token aktywacyjny"
 
-#: models.py:608
+#: models.py:626
 msgid "user profile"
 msgstr "profil użytkownika"
 
-#: models.py:609
+#: models.py:627
 msgid "user profiles"
 msgstr "profile użytkowników"
 
@@ -306,13 +302,12 @@ msgstr "Przeglądanie repozytorium projektu"
 #: templates/projector/project/details.html:34
 #: templates/projector/project/repository.html:17
 msgid "Sources"
-msgstr ""
+msgstr "Źródła"
 
 #: templates/projector/project/changesets.html:19
 #: templates/projector/project/repository.html:18
-#, fuzzy
 msgid "Changesets"
-msgstr "zmiana zadania"
+msgstr "Zmiany"
 
 #: templates/projector/project/changesets.html:23
 #: templates/projector/project/repository.html:35
@@ -323,7 +318,7 @@ msgstr "Rewizja"
 #: templates/projector/project/changesets.html:23
 #, fuzzy
 msgid "commited at"
-msgstr "dołączył w"
+msgstr "popełnione w"
 
 #: templates/projector/project/changesets.html:24
 #: templates/projector/task/details.html:22
@@ -344,7 +339,8 @@ msgstr "Utwórz"
 #: templates/projector/project/create.html:31
 #: templates/projector/project/edit.html:32
 #: templates/projector/project/members_add.html:21
-#: templates/projector/project/milestone_add.html:30
+#: templates/projector/project/milestone_add.html:21
+#: templates/projector/project/milestone_edit.html:21
 #: templates/projector/task/create.html:16
 msgid "Cancel"
 msgstr "Anuluj"
@@ -359,6 +355,7 @@ msgid "Milestones"
 msgstr "Kamienie milowe"
 
 #: templates/projector/project/details.html:29
+#: templates/projector/project/milestone_detail.html:14
 #: templates/projector/task/details.html:36
 msgid "Edit"
 msgstr "Edycja"
@@ -373,11 +370,11 @@ msgstr "Członkowie"
 
 #: templates/projector/project/details.html:49
 msgid "Repository URL seems to be broken. Maybe you have forgotten to "
-msgstr ""
+msgstr "URL do repozytorium jest nieprawidłowe. Może zapomniałeś"
 
 #: templates/projector/project/details.html:50
 msgid "set site"
-msgstr ""
+msgstr "o ustawieniu obiektu Site"
 
 #: templates/projector/project/details.html:65
 #: templates/projector/task/details.html:53
@@ -393,56 +390,54 @@ msgid "Author"
 msgstr "Autor"
 
 #: templates/projector/project/details.html:89
-#: templates/projector/project/milestone_detail.html:32
+#: templates/projector/project/milestone_detail.html:25
 #: templates/projector/task/details.html:119
 msgid "Description"
 msgstr "Opis"
 
 #: templates/projector/project/details.html:94
 msgid "Roadmap"
-msgstr ""
+msgstr "Mapa zadań"
 
 #: templates/projector/project/details.html:96
-#, fuzzy
 msgid "deadline set to"
-msgstr "termin"
+msgstr "termin ustawiony"
 
 #: templates/projector/project/details.html:106
-#: templates/projector/project/milestone_detail.html:48
+#: templates/projector/project/milestone_detail.html:42
 #: templates/projector/project/milestone_list.html:53
-#, fuzzy
 msgid "Done"
-msgstr "właściciel"
+msgstr "Wykonano"
 
 #: templates/projector/project/details.html:115
-#: templates/projector/project/milestone_detail.html:57
+#: templates/projector/project/milestone_detail.html:50
 #: templates/projector/project/milestone_list.html:62
 msgid "Left"
-msgstr ""
+msgstr "Pozostało"
 
 #: templates/projector/project/details.html:125
-#: templates/projector/project/milestone_detail.html:67
+#: templates/projector/project/milestone_detail.html:59
 msgid "No tasks for this milestone were found"
-msgstr ""
+msgstr "Brak zadań dla tego kroku milowego"
 
 #: templates/projector/project/details.html:130
 msgid "No milestones defined yet"
-msgstr ""
+msgstr "Nie zdefiniowano jeszcze kroków milowych"
 
 #: templates/projector/project/details.html:134
 msgid "Timeline"
 msgstr "wpis harmonogramu"
 
 #: templates/projector/project/details.html:141
-#, fuzzy
 msgid "No timeline entries defined yet"
-msgstr "wpisy harmonogramu"
+msgstr "Brak wpisów"
 
 #: templates/projector/project/edit.html:17
 msgid "Project's edit panel"
 msgstr "Panel edytowania projektu"
 
 #: templates/projector/project/edit.html:25
+#: templates/projector/project/milestone_edit.html:18
 #: templates/projector/task/create.html:5
 #: templates/projector/task/create.html:14
 msgid "Update"
@@ -472,23 +467,20 @@ msgstr "Nie ma takiej strony!"
 
 #: templates/projector/project/members.html:34
 #: templates/projector/project/members_manage.html:48
-#, fuzzy
 msgid "Permissions"
-msgstr "Rewizja"
+msgstr "Uprawnienia"
 
 #: templates/projector/project/members.html:44
 msgid "Owner has all permissions"
-msgstr ""
+msgstr "Właściciel ma wszystkie uprawnienia"
 
 #: templates/projector/project/members.html:46
-#, fuzzy
 msgid "Manage"
-msgstr "nazwa"
+msgstr "Zarządzaj"
 
 #: templates/projector/project/members_add.html:9
-#, fuzzy
 msgid "Add member"
-msgstr "Dodaj użytkownika"
+msgstr "Dodaj członka"
 
 #: templates/projector/project/members_add.html:18
 #: templates/projector/task/details.html:193
@@ -496,54 +488,55 @@ msgid "Submit"
 msgstr "Wyślij"
 
 #: templates/projector/project/members_manage.html:29
-#, fuzzy
 msgid "Manage member"
-msgstr "Dodaj użytkownika"
+msgstr "Zarządzaj"
 
 #: templates/projector/project/members_manage.html:34
 msgid ""
-"This is public project so anyone may view it or clone it's repository even "
-"if\n"
+"This is public project so anyone may view it or clone it's repository even if\n"
 "            does NOT have proper permissions."
-msgstr ""
+msgstr "To jest projekt publiczny więc każdy może przeglądać jego szczegóły oraz klonować repozytorium, nawet jeżeli NIE posiada żadnych uprawnień."
 
 #: templates/projector/project/members_manage.html:51
-#, fuzzy
 msgid "State"
 msgstr "Status"
 
 #: templates/projector/project/members_manage.html:53
 msgid "On/Off"
-msgstr ""
+msgstr "Włącz/Wyłącz"
 
 #: templates/projector/project/members_manage.html:79
 msgid "Select all"
-msgstr ""
+msgstr "Zaznacz wszystko"
 
 #: templates/projector/project/members_manage.html:80
 msgid "Deselect all"
-msgstr ""
+msgstr "Odznacz wszystko"
+
+#: templates/projector/project/milestone_add.html:9
+#: templates/projector/project/milestone_list.html:14
+msgid "Add milestone"
+msgstr "Dodaj kamień milowy"
 
 #: templates/projector/project/milestone_add.html:18
-#: templates/projector/project/milestone_list.html:14
-#, fuzzy
-msgid "Add milestone"
-msgstr "kamień milowy"
-
-#: templates/projector/project/milestone_add.html:27
-#, fuzzy
 msgid "Create milestone"
-msgstr "kamień milowy"
+msgstr "Stwórz kamień milowy"
 
-#: templates/projector/project/milestone_detail.html:22
-#, fuzzy
+#: templates/projector/project/milestone_detail.html:11
 msgid "Milestone detail"
-msgstr "Kamień milowy"
+msgstr "Szczegóły kamienia milowego"
+
+#: templates/projector/project/milestone_detail.html:15
+msgid "Show tasks"
+msgstr "Pokaż zadania"
+
+#: templates/projector/project/milestone_edit.html:9
+msgid "Edit milestone"
+msgstr "Edytuj kamień milowy"
 
 #: templates/projector/project/milestone_list.html:10
-#, fuzzy
 msgid "Project's milestones"
-msgstr "Lista projektów"
+msgstr "Kamienie milowe projektu"
 
 #: templates/projector/project/milestone_list.html:27
 #: templates/projector/task/details.html:65
@@ -551,19 +544,16 @@ msgid "Milestone"
 msgstr "Kamień milowy"
 
 #: templates/projector/project/milestone_list.html:28
-#, fuzzy
 msgid "Tasks"
-msgstr "Zadanie"
+msgstr "Zadania"
 
 #: templates/projector/project/milestone_list.html:29
-#, fuzzy
 msgid "Progress"
-msgstr "Projekty"
+msgstr "Postęp"
 
 #: templates/projector/project/milestone_list.html:39
-#, fuzzy
 msgid "Show all related tasks"
-msgstr "utworzone zadania"
+msgstr "Pokaż wszystkie powiązane zadania"
 
 #: templates/projector/project/repository.html:34
 msgid "Size"
@@ -587,7 +577,7 @@ msgstr "Utwórz"
 
 #: templates/projector/task/details.html:22
 msgid "at"
-msgstr ""
+msgstr "na"
 
 #: templates/projector/task/details.html:32
 #: templates/projector/task/details.html:43
@@ -663,33 +653,31 @@ msgid "login"
 msgstr "zalugj się"
 
 #: templatetags/projector_tags.py:46
-#, fuzzy
 msgid "There is no such task for this project"
-msgstr "Nie ma takiej strony!"
+msgstr "Nie ma takiego zadania"
 
-#: views/project.py:77
+#: views/project.py:78
 msgid "One task matched - redirecting..."
-msgstr ""
+msgstr "Znaleziono jedno zadania - przekierowuję..."
 
-#: views/project.py:121
-#, fuzzy
+#: views/project.py:122
 msgid "Project edited successfully"
-msgstr "Pomyślnie dodano komentarz"
+msgstr "Pomyślnie zaktualizowano projekt"
 
-#: views/project.py:179
-#, fuzzy
+#: views/project.py:180
 msgid "Milestone added successfully"
-msgstr "Pomyślnie dodano komentarz"
+msgstr "Pomyślnie dodano kamień milowy"
 
-#: views/project.py:248
-msgid ""
-"Project owner's membership cannot be modified. He/She has all permissions "
-"for this project."
-msgstr ""
+#: views/project.py:201
+msgid "Milestone updated successfully"
+msgstr "Pomyślnie zaktualizowano kamień milowy"
 
-#: views/project.py:341 views/project.py:379
-msgid ""
-"Repository's url is not set! Please configure project preferences first."
+#: views/project.py:270
+msgid "Project owner's membership cannot be modified. He/She has all permissions for this project."
+msgstr "Członkostwo właściciela projektu nie może być zmodyfikowane. Właściciel zawsze posiada wszystkie uprawnienia dla swojego projektu."
+
+#: views/project.py:363 views/project.py:401
+msgid "Repository's url is not set! Please configure project preferences first."
 msgstr "Nie ustawiono lokacji repozytorium! Zaktualizuj właściwości projektu."
 
 #: views/reports.py:26
@@ -729,7 +717,6 @@ msgid "Resolved to"
 msgstr "Rozwiązany"
 
 #: views/task.py:95
-#, fuzzy
 msgid "Reopened as"
 msgstr "Ponownie otwarto jako"
 

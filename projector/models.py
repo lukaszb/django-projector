@@ -298,6 +298,24 @@ class Milestone(models.Model):
     def __unicode__(self):
         return self.name
     
+    @models.permalink
+    def get_absolute_url(self):
+        return ('projector_project_milestone_detail', (), {
+            'project_slug': self.project.slug,
+            'milestone_slug': self.slug,
+        })
+
+    @models.permalink
+    def get_edit_url(self):
+        return ('projector_project_milestone_edit', (), {
+            'project_slug': self.project.slug,
+            'milestone_slug': self.slug,
+        })
+
+    @models.permalink
+    def get_task_url(self):
+        return ()
+
     def get_finished_tasks_count(self):
         finished_tasks = self.task_set\
             .select_related('status')\
