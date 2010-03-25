@@ -21,14 +21,15 @@ from django.template.defaultfilters import slugify
 
 from annoying.decorators import signals
 from authority.models import Permission
-from projector.utils import abspath
+from projector.utils import abspath, using_projector_profile
 from projector.settings import HG_ROOT_DIR, BANNED_PROJECT_NAMES
 from projector.exceptions import ProjectorError
 from projector.managers import ProjectManager
+from richtemplates.forms import RichSkinChoiceField
+from richtemplates.utils import get_user_profile_model
 from tagging.fields import TagField
 
 class DictModel(models.Model):
-    #id = models.IntegerField('ID', primary_key=True)
     name = models.CharField(_('name'), max_length=32)
     description = models.TextField(_('description'), null=True, blank=True)
 
@@ -312,9 +313,10 @@ class Milestone(models.Model):
             'milestone_slug': self.slug,
         })
 
-    @models.permalink
-    def get_task_url(self):
-        return ()
+    def get_tasks_url(self):
+        _url = self.project.get_task_list_url()
+        url = _url + '?milestone=%d' % self.pk
+        return url
 
     def get_finished_tasks_count(self):
         finished_tasks = self.task_set\
@@ -615,26 +617,18 @@ def update_task_handler(instance, **kwargs):
 # If projector is kind of main application in your project
 # it's build-in user profile could be used as it provides
 # some nice user buffs
-# TODO: Well, at least it should provide buffs, but none of them exists now...
 
-class UserProfile(models.Model):
-    user = models.ForeignKey('auth.User', verbose_name=_('user'), unique=True)
-    activation_token = models.CharField(_('activation_token'), max_length=32)
-
-    class Meta:
-        app_label = 'auth'
-        verbose_name = _('user profile')
-        verbose_name_plural = _('user profiles')
-
-    def __unicode__(self):
-        return u"<%s's profile>" % self.user
+# ==================== #
+# Signals and handlers #
+# ==================== #
 
 @signals.post_save(sender=User)
 def request_new_profile(sender, instance, **kwargs):
     """
     Creation of profile for new users
     """
-    profile, created = UserProfile.objects.get_or_create(
+    _UserProfile = get_user_profile_model()
+    profile, created = _UserProfile.objects.get_or_create(
         user=instance,
     )
     if created is True:
@@ -763,8 +757,9 @@ def project_creation_listener(instance, **kwargs):
 @signals.post_save(sender=Project)
 def new_project_handler(instance, **kwargs):
     if kwargs['created'] is True:
-        logging.debug("Project '%s': new project handler." % instance)
-        member = Membership.objects.create(project=instance, member=instance.author)
+        logging.debug("Project '%s': new project handler connected" % instance)
+        membership = Membership.objects.create(project=instance,
+            member=instance.author)
         component, created = ProjectComponent.objects\
             .get_or_create(project=instance, name=u'Global')
         
@@ -773,36 +768,28 @@ def new_project_handler(instance, **kwargs):
                 % instance.name)
         for component_info in new_components:
             component, created = ProjectComponent.objects\
-                .get_or_create(
-                    project = instance,
-                    **component_info)
+                .get_or_create(project = instance, **component_info)
             if created:
                 logging.debug("For project '%s' new component '%s' was craeted"
                     % (component.project, component))
         for task_type_info in new_task_types:
             task, created = TaskType.objects\
-                .get_or_create(
-                    project = instance,
-                    **task_type_info)
+                .get_or_create(project = instance, **task_type_info)
             if created:
                 logging.debug("For project '%s' new task type '%s' was craeted"
                     % (task.project, task))
         for priority_info in new_priorities:
             priority, created = Priority.objects\
-                .get_or_create(
-                    project = instance,
-                    **priority_info)
+                .get_or_create(project = instance, **priority_info)
             if created:
                 logging.debug("For project '%s' new priority '%s' was created."
                     % (priority.project, priority))
         for status_info in new_statuses:
             status, created = Status.objects\
-                .get_or_create(
-                    project = instance,
-                    **status_info)
+                .get_or_create(project = instance, **status_info)
             if created:
                 logging.debug("For project '%s' new status '%s' was created."
                     % (status.project, status))
     else:
-        logging.debug("Project '%s': update handler." % instance)
+        logging.debug("Project '%s': update handler connected" % instance)
 

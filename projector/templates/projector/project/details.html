@@ -93,7 +93,7 @@
 
         <h2><a href="{{ project.get_milestones_url }}">{% trans "Roadmap" %}</a>:</h2>
         {% for milestone in project.milestone_set.all %}
-        <h3>{{ milestone.name }} ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
+        <h3><a href="{{ milestone.get_absolute_url }}">{{ milestone.name }}</a> ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
         {% if milestone.task_set.all %}
         <table class="projetor-milestone-progress-table">
             <tbody>

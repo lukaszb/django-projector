@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block col_left %}
+    
+    <div class="richtemplates-panel">
+        <h5>{% trans "User" %}: {{ profile.user }}</h5>
+	    <div class="richtemplates-panel-content">
+            {% if user == profile.user %}
+			<ul class="nav-vertical">
+                <li><a href="{{ profile.user.get_absolute_url }}">{% trans "Show your public profile" %}</a></li>
+            </ul>
+            {% endif %}
+	    </div>
+	</div>
+
+{% endblock %}
+
+{% block col_main %}
+<div class="richtemplates-panel">
+    <h5>{% trans "Your homepage" %}</h5>
+    <div class="richtemplates-panel-content">
+        <div class="richblock">
+            <table class="richblock-properties">
+                <tbody>
+                    <tr>
+                        <th>{% trans "User" %}</th>
+                        <td>{{ profile.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Full name" %}</th>
+                        <td>{{ profile.user.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>E-mail</th>
+                        <td>{{ profile.user.email }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>{% trans "Member of projects" %}</h3>
+        <table class="datatable">
+            <thead class="datatable-thead">
+                <tr class="datatable-thead-subheader">
+                    <th>{% trans "Project" %}</th>
+                    <th>{% trans "Category" %}</th>
+                </tr>
+            </thead>
+            <tbody class="datatable-tbody">
+                {% for project in profile.user.project_set.all %}
+                <tr class="{% cycle "odd" "even" %} hoverable">
+                    <td><a class="block-link" href="{{ project.get_absolute_url }}">{{ project.name }}</a></td>
+                    <td>{{ project.category|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

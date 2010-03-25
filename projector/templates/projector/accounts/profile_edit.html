@@ -1,0 +1,17 @@
+{% extends "richtemplates/accounts/profile.html" %}
+
+{% load i18n %}
+
+{% block col_main_title %}{% trans "User profile" %}{% endblock %}
+{% block col_main_content %}
+    <form action="." method="post">
+        {% csrf_token %}
+        <table class="form-table">
+            {% include "richtemplates/forms/form.html" %}
+        </table>
+        <div>
+            <input id="id_submit" type="submit" name="submit" value="Submit" />
+        </div>
+    </form>
+{% endblock %}
+

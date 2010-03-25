@@ -76,7 +76,6 @@ urlpatterns += patterns('projector.views.project',
 # Feeds dict #
 # ========== #
 
-
 feeds = {
     'projects': LatestProjectsFeed,
 }

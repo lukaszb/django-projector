@@ -49,6 +49,7 @@ def project_details(request, project_slug,
         'project': project,
     }
     return render_to_response(template_name, context, RequestContext(request))
+
 project_details.csrf_exempt = True
 
 def project_list(request, template_name='projector/project/list.html'):
@@ -381,7 +382,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
         messages.error(request, str(err))
     return context
 
-@render_to('projector/project/changesets.html')
+@render_to('projector/project/changeset_list.html')
 def project_changesets(request, project_slug):
     """
     Returns repository's changesets view.
@@ -405,9 +406,9 @@ def project_changesets(request, project_slug):
     }
     try:
         engine = engine_from_url('hg://' + project.get_repo_path())
-        changesets = [engine.get_changeset(rev) for rev in 
+        changeset_list = [engine.get_changeset(rev) for rev in 
             reversed(engine.revision_numbers)]
-        context['changesets'] = changesets
+        context['changeset_list'] = changeset_list
         context['engine'] = engine
     except VCBrowserError, err:
         messages.error(request, str(err))

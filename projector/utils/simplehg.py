@@ -109,10 +109,15 @@ class MercurialServer(object):
         self._hgserve = hgweb(repo_path)
         self.setup_web(**webinfo)
 
+    def ui_config(self, section, key, value):
+        self._hgserve.repo.ui.setconfig(
+            section, key, smart_str(value))
+
     def setup_web(self, **webinfo):
         for key, value in webinfo.items():
             if value is not None:
-                self._hgserve.repo.ui.setconfig('web', key, smart_str(value))
+                self.ui_config('web', key, value)
+                #self._hgserve.repo.ui.setconfig('web', key, smart_str(value))
 
     def get_response(self, request):
         mercurial_request = MercurialRequest(request)
@@ -120,7 +125,7 @@ class MercurialServer(object):
         return response
         
 def get_mercurial_response(request, repo_path, name, baseurl, push_ssl='false',
-    description='', contact='', allow_push=None):
+    description='', contact='', allow_push=None, username=None):
     """
     Returns ``HttpResponse`` object prepared basing
     on the given ``hgserve`` instance.
@@ -135,7 +140,11 @@ def get_mercurial_response(request, repo_path, name, baseurl, push_ssl='false',
         allow_push = allow_push,
     )
     mercurial_server = MercurialServer(repo_path, **webinfo)
+    if username is not None:
+        mercurial_server.ui_config('ui', 'username', smart_str(username))
     response = mercurial_server.get_response(request)
+    #logging.info("Mercurial server configured:\n%s"
+    #    % pprint.pformat(list(mercurial_server._hgserve.repo.ui.walkconfig())))
     return response
 
 class NotMercurialRequestError(Exception):
@@ -188,6 +197,7 @@ def hgrepo_detail(request, project_slug):
             baseurl = project.get_absolute_url(),
             allow_push = user.username,
             push_ssl = HG_PUSH_SSL,
+            username = user.username,
             )
     except Exception, err:
         f = cStringIO.StringIO()
