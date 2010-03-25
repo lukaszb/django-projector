@@ -628,6 +628,8 @@ def request_new_profile(sender, instance, **kwargs):
     Creation of profile for new users
     """
     _UserProfile = get_user_profile_model()
+    if _UserProfile is None:
+        return
     profile, created = _UserProfile.objects.get_or_create(
         user=instance,
     )
