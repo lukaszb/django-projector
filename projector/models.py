@@ -318,6 +318,9 @@ class Milestone(models.Model):
         url = _url + '?milestone=%d' % self.pk
         return url
 
+    def get_tasks_count(self):
+        return self.task_set.count()
+
     def get_finished_tasks_count(self):
         finished_tasks = self.task_set\
             .select_related('status')\
@@ -330,6 +333,12 @@ class Milestone(models.Model):
         if all == 0:
             return 100
         return Decimal(finished) / Decimal(all) * Decimal(100)
+
+    def get_unfinished_tasks_count(self):
+        return self.task_set\
+            .select_related('status')\
+            .filter(status__is_resolved=False)\
+            .count()
 
     def get_unfinished_tasks_count_as_percentage(self):
         return Decimal(100) - self.get_finished_tasks_count_as_percentage()

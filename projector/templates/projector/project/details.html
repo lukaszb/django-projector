@@ -94,37 +94,7 @@
         <h2><a href="{{ project.get_milestones_url }}">{% trans "Roadmap" %}</a>:</h2>
         {% for milestone in project.milestone_set.all %}
         <h3><a href="{{ milestone.get_absolute_url }}">{{ milestone.name }}</a> ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
-        {% if milestone.task_set.all %}
-        <table class="projetor-milestone-progress-table">
-            <tbody>
-                <tr>
-                    {% with milestone.get_finished_tasks_count_as_percentage as finished %}
-                    {% if finished %}
-                        <td class="projector-milestone-progress-table-finished"
-                            width="{{ milestone.get_finished_tasks_count_as_percentage }}%">
-                            <a class="block-link" href="{{ project.get_task_list_url }}?is_resolved=2&milestone={{ milestone.id }}">
-                                {% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%
-                            </a>
-                        </td>
-                    {% endif %}
-                    {% endwith %}
-                    {% with milestone.get_unfinished_tasks_count_as_percentage as unfinished %}
-                    {% if unfinished %}
-                    <td class="projector-milestone-progress-table-unfinished">
-                        <a class="block-link" href="{{ project.get_task_list_url }}?is_resolved=3&milestone={{ milestone.id }}">
-                            {% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%
-                        </a>
-                    </td>
-                    {% endif %}
-                    {% endwith %}
-                </tr>
-            </tbody>
-        </table>
-        {% else %}
-            <ul class="messages">
-                <li class="message message-info">{% trans "No tasks for this milestone were found" %}</li>
-            </ul>
-        {% endif %}
+        {% include "projector/project/milestone_progress_table.html" %}
         {% empty %}
             <ul class="messages">
                 <li class="message message-info">{% trans "No milestones defined yet" %}</li>
