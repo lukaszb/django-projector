@@ -11,6 +11,7 @@ from projector.models import Project, Task
 from projector.extras.users.forms import UserProfileForm
 from richtemplates.utils import get_user_profile_model
 
+@login_required
 @render_to('projector/accounts/user_list.html')
 def user_list(request):
     user_list = User.objects.all()
@@ -21,7 +22,13 @@ def user_list(request):
 
 @render_to('projector/accounts/user_homepage.html')
 def user_homepage(request):
-    return {'profile': request.user.get_profile()}    
+    if request.user.is_authenticated():
+        return {'profile': request.user.get_profile()}
+    else:
+        msg = _("You are not logged in. You may view only public content "
+            "of this website")
+        messages.warning(request, msg)
+        return {}
 
 @login_required
 @render_to('projector/accounts/profile.html')
