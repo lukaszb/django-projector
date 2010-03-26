@@ -51,7 +51,9 @@
                 {% endcomment %}
                 <tr>
                     <th>{% trans "Project" %}</th>
-                    <td><a href="{{ task.project.get_absolute_url }}">{{ task.project }}</a></td>
+                    <td class="show-tipsy" title="{{ task.project.description }}">
+                        <a href="{{ task.project.get_absolute_url }}">{{ task.project }}</a>
+                    </td>
                 </tr>
                 <tr>
                     <th>{% trans "Component" %}</th>
@@ -63,7 +65,13 @@
                 </tr>
                 <tr>
                     <th>{% trans "Milestone" %}</th>
-                    <td>{{ task.milestone|default:"-" }}</td>
+                    {% if task.milestone %}
+                    <td class="show-tipsy" title="{{ task.milestone.description }}">
+                        <a href="{{ task.milestone.get_absolute_url }}">{{ task.milestone }}</a>
+                    </td>
+                    {% else %}
+                    <td>-</td>
+                    {% endif %}
                 </tr>
                 <tr>
                     <th>{% trans "Summary" %}</th>
