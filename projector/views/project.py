@@ -41,6 +41,10 @@ def project_details(request, project_slug,
     project = get_object_or_404(Project, slug=project_slug)
     if is_mercurial(request):
         return hgrepo_detail(request, project.slug)
+    last_part = request.path.split('/')[-1]
+    if last_part and last_part != project_slug:
+        raise Http404("Not a mercurial request and path longer than should "
+            "be: %s" % request.path)
     if project.is_private():
         check = ProjectPermission(user=request.user)
         if not check.view_project(project):
@@ -52,14 +56,16 @@ def project_details(request, project_slug,
 
 project_details.csrf_exempt = True
 
-def project_list(request, template_name='projector/project/list.html'):
-    project_queryset = Project.objects.projects_for_user(user=request.user)
-    kwargs = {
-        'queryset' : project_queryset.annotate(Count('task')),
-        'template_name' : template_name,
-        'template_object_name' : 'project',
+@render_to('projector/project/list.html')
+def project_list(request):
+    project_list = Project.objects.projects_for_user(user=request.user)\
+        .annotate(Count('task'))
+    #project_list = Project.objects.filter(membership__member=request.user)\
+    #    .annotate(Count('task'))
+    context = {
+        'project_list' : project_list,
     }
-    return list_detail.object_list(request, **kwargs)
+    return context
 
 def project_task_list(request, project_slug,
         template_name='projector/project/task_list.html'):

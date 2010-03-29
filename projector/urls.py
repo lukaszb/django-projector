@@ -69,7 +69,7 @@ urlpatterns += patterns('projector.views.reports',
 )
 
 urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+)/.*', 'project_details', name='projector_project_details'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
 )        
 
 # ========== #
