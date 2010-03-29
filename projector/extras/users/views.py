@@ -22,13 +22,21 @@ def user_list(request):
 
 @render_to('projector/accounts/user_homepage.html')
 def user_homepage(request):
-    if request.user.is_authenticated():
-        return {'profile': request.user.get_profile()}
-    else:
+    if not request.user.is_authenticated():
         msg = _("You are not logged in. You may view only public content "
             "of this website")
         messages.warning(request, msg)
         return {}
+    # Authed user homepage
+    context = {
+        'profile': request.user.get_profile(),
+        'owned_task_list': request.user.owned_task\
+            .select_related('status', 'project', 'priority',
+                'milestone', 'component')\
+            .filter(status__is_resolved=False)\
+            .order_by('project')
+    }
+    return context
 
 @login_required
 @render_to('projector/accounts/profile.html')

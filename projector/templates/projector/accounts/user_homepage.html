@@ -1,4 +1,5 @@
-{% extends "base.html" %}
+{% extends "projector/home.html" %}
+
 
 {% load i18n %}
 
@@ -40,6 +41,8 @@
                 </tbody>
             </table>
         </div>
+
+        {% comment %}
         <h3>{% trans "Member of projects" %}</h3>
         <table class="datatable">
             <thead class="datatable-thead">
@@ -57,6 +60,36 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% endcomment %}
+
+        <h1>{% trans "Tasks to do" %}</h1>
+        {% regroup owned_task_list by project as project_list %}
+        {% for project in project_list %}
+            <h2>{{ project.grouper }}</h2>
+            <table class="datatable">
+                <thead class="datatable-thead">
+                    <tr class="datatable-thead-subheader lefted">
+                        <th>{% trans "Status" %}</th>
+                        <th>ID</th>
+                        <th>{% trans "Summary" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="datatable-tbody">
+                    {% for task in project.list %}
+                    <tr class="{% cycle "odd" "even" %} hoverable">
+                        <td style="width: 10%">
+                            <span class="{% if task.status.is_resolved %}task-closed{% else %}task-open{% endif %}">
+                                {{ task.status }}
+                            </span>
+                        </td>
+                        <td style="width: 10%">{{ task.id }}</td>
+                        <td><a class="block-link" href="{{ task.get_absolute_url }}">{{ task.summary }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+
 
     </div>
 </div>
