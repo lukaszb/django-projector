@@ -2,6 +2,10 @@
 
 {% load i18n %}
 
+{% block extra_head %}{{ block.super }}
+    {{ form.media }}
+{% endblock %}
+
 {% block col_main_title %}{% if form.instance.id %}{% trans "Update" %}{% else %}{% trans "Create new" %}{% endif %} {% trans "task" %}{% endblock %}
 
 {% block col_main_content %}

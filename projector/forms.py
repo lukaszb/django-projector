@@ -1,5 +1,6 @@
 from django import forms
 from django.forms.util import ErrorList
+from django.contrib.admin import widgets
 from django.contrib.auth.models import User
 from django.contrib.formtools.wizard import FormWizard
 from django.shortcuts import render_to_response
@@ -82,7 +83,9 @@ class TaskCommentForm(forms.Form):
 
 class TaskForm(LimitingModelForm):
     owner = UserByNameField(max_length=128, label=_('Owner'))
-
+    deadline = forms.DateField(required=False, label=_("Deadline"),
+        widget=forms.DateInput(attrs={'class': 'datepicker'}))
+    
     class Meta:
         model = Task
         exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip',
@@ -112,6 +115,8 @@ class TaskForm(LimitingModelForm):
         return super(TaskForm, self).save(commit)
 
 class TaskEditForm(TaskForm):
+    deadline = forms.DateField(required=False, label=_("Deadline"),
+        widget=forms.DateInput(attrs={'class': 'datepicker'}))
     comment = forms.CharField(max_length=3000, widget=forms.Textarea,
         required=False)
 
@@ -141,6 +146,9 @@ class MembershipForm(LimitingModelForm):
         return member
 
 class MilestoneForm(forms.ModelForm):
+    deadline = forms.DateField(required=False, label=_("Deadline"),
+        widget=forms.DateInput(attrs={'class': 'datepicker'}))
+
 
     class Meta:
         model = Milestone

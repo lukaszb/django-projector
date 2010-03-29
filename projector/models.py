@@ -512,41 +512,6 @@ class Task(AbstractTask):
                 diff[field] = (old_val, new_val)
         return diff
 
-    def make_revision(self, old=None, comment=None, commit=True):
-        """
-        Once done completely via signals but since we need to
-        leave comment as optional attribute we need separete
-        logic fragment for this.
-        ``old`` parameter is optional as not passing it would
-        force the method to fetch original Task object directly
-        from database.
-        """
-        if old is None:
-            old = self.fetch_old()
-        diff = Task.diff(old, self)
-        revision_info = dict(
-            task = old,
-            author = old.editor,
-            author_ip = old.editor_ip,
-            created_at = old.edited_at,
-            revision = old.revision,
-            summary = old.summary,
-            description = old.description,
-            owner = old.owner,
-            type = old.type,
-            priority = old.priority,
-            status = old.status,
-            milestone = old.milestone,
-            component = old.component,
-        )
-        if comment:
-            revision_info['comment'] = comment
-        if commit:
-            revision = TaskRevision.objects.create(**revision_info)
-        else:
-            revision = TaskRevision(**revision_info)
-        return revision
-
     def add_comment_to_current_revision(self, comment):
         """
         Adds given ``comment`` to the current TaskRevision (last revisioned).
@@ -616,6 +581,7 @@ def update_task_handler(instance, **kwargs):
         status = instance.status,
         milestone = instance.milestone,
         component = instance.component,
+        deadline = instance.deadline,
     )
     logging.debug("TaskRevision created: %s" % revision)
 
