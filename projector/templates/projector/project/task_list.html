@@ -7,7 +7,7 @@
 {% block col_left %}{{ block.super }}
 
 <div class="richtemplates-panel">
-    <h5>Task search</h5>
+    <h5>{% trans "Task search" %}</h5>
     <div class="richtemplates-panel-content">
         <form action="." method="get">
             {% csrf_token %}
@@ -30,11 +30,10 @@
 {% autopaginate task_list %}
 
 <div class="richtemplates-panel">
-    <h5>Project's task list</h5>
+    <h5>{% trans "Project's task list" %}</h5>
     <div class="richtemplates-panel-content">
         {# Task list: {{ task_list }} #}
-    <h1>{{ project.name }}</h1>
-    <h2>Task List</h2>
+    <h2>{% trans "Task List" %}</h2>
     <ul class="nav-inline">
         <li><a class="button-link" href="{{ project.get_create_task_url }}">{% trans "Create new task" %}</a></li>
     </ul>

@@ -2,6 +2,8 @@ import django_filters
 
 from django import forms
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
+
 from projector.models import Task
 
 class ResolvedStatusFilter(django_filters.BooleanFilter):
@@ -24,7 +26,7 @@ def TaskFilter(data=None, queryset=Task.objects.all(), project=None):
         is_resolved = ResolvedStatusFilter()
         class Meta:
             model = Task
-            fields = ['id', 'priority', 'milestone', 'status']
+            fields = ['id', 'priority', 'milestone', 'status', 'owner']
 
         def __init__(self, *args, **kwargs):
             super(TaskFilter, self).__init__(*args, **kwargs)
@@ -35,6 +37,10 @@ def TaskFilter(data=None, queryset=Task.objects.all(), project=None):
                     {'queryset': project.priority_set.all()})
                 self.filters['milestone'].extra.update(
                     {'queryset': project.milestone_set.all()})
+                self.filters['owner'].extra.update(
+                    {'queryset': project.members.order_by('username')})
+                #self.filters['owner'].extra.update(
+                #    {'label': _('Assigned to')})
     filterset = TaskFilter(data, queryset)
     return filterset
 

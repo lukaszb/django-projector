@@ -14,21 +14,25 @@
             <li><a class="button-link" href="{{ milestone.get_edit_url }}">{% trans "Edit" %}</a></li>
             <li><a class="button-link" href="{{ milestone.get_tasks_url }}">{% trans "Show tasks" %}</a></li>
         </ul>
-        <div class="task-block">
-            <table class="task-block-properties">
+        <div class="richblock">
+            <table class="richblock-properties">
                 <tbody>
                     <tr>
                         <th>{% trans "Name" %}</th>
                         <td>{{ milestone.name }}</td>
                     </tr>
                     <tr>
-                        <th>{% trans "Description" %}</th>
-                        <td>{{ milestone.description|safe|restructuredtext }}</td>
+                        <th>{% trans "Deadline" %}</th>
+                        <td>{{ milestone.deadline }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        
+        <h2>{% trans "Description" %}:</h2>
+        <div class="block-rst">
+            {{ milestone.description|restructuredtext }}
+        </div>
+
         {% include "projector/project/milestone_progress_table.html" %}
 
     </div>

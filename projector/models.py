@@ -177,6 +177,17 @@ class Project(models.Model):
     def get_task(self, id):
         queryset = Task.objects.filter(project=self)
         return queryset.get(id=id)
+
+    def get_tasks(self):
+        return self.task_set\
+            .select_related('status', 'milestone', 'owner',
+                    'priority', 'component')
+
+    def get_open_tasks(self):
+        return self.get_tasks().filter(status__is_resolved=False)
+
+    def get_closed_tasks(self):
+        return self.get_tasks().filter(status__is_resolved=True)
     
     def get_repo_path(self):
         repo_path = abspath(HG_ROOT_DIR, self.slug)
