@@ -41,15 +41,15 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
         DynamicActionChoice(2, _("Resolve to"),
             {
                 'resolve_to' : forms.ModelChoiceField(
-                    Status.objects.filter(is_resolved=True, project=task.project)),
+                    task.project.status_set.filter(is_resolved=True)),
             }),
         DynamicActionChoice(3, _("Assign to"),
             { 'assign_to' : UserByNameField(max_length=256) }),
         DynamicActionChoice(4, _("Reopen as"),
             {
                 'reopen_as' : forms.ModelChoiceField(
-                    Status.objects\
-                            .filter(is_resolved=False, project=task.project)\
+                    task.project.status_set\
+                            .filter(is_resolved=False)\
                             .exclude(name='assigned'),
                 empty_label=None)
             }),
@@ -118,7 +118,7 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
         action_form = TaskActionForm()
         comment_formset = CommentFormset()
     
-    status_list = Status.objects.order_by('order')
+    status_list = task.project.status_set.order_by('order')
     resolve_status_list = status_list.filter(is_resolved=True)
     reopen_status_list = status_list.filter(is_resolved=False)
     

@@ -82,7 +82,7 @@ class TaskCommentForm(forms.Form):
         required=False)
 
 class TaskForm(LimitingModelForm):
-    owner = UserByNameField(max_length=128, label=_('Owner'))
+    owner = UserByNameField(max_length=128, label=_('Owner'), required=False)
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
     

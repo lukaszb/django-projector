@@ -419,7 +419,7 @@ class AbstractTask(models.Model):
     status = models.ForeignKey(Status, verbose_name=_('status'))
     priority = models.ForeignKey(Priority, verbose_name=_('priority'))
     type = models.ForeignKey(TaskType, verbose_name=_('task type'))
-    owner = models.ForeignKey(User, verbose_name=_('owner'), related_name='owned_%(class)s')
+    owner = models.ForeignKey(User, verbose_name=_('owner'), related_name='owned_%(class)s', null=True, blank=True)
     deadline = models.DateField(_('deadline'), null=True, blank=True, help_text='YYYY-MM-DD')
     milestone = models.ForeignKey(Milestone, verbose_name=_('milestone'), null=True, blank=True)
     component = models.ForeignKey(ProjectComponent, verbose_name=_('component'))
