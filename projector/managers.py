@@ -15,12 +15,14 @@ class ProjectManager(models.Manager):
         qs = self.get_query_set()
         if user.is_active and user.is_superuser:
             return qs
+        qset = Q()
         if user.is_active:
             qset = Q(public=True) | Q(public=False, membership__member=user)
         qs = qs.filter(qset)
         ids = set(qs.values_list('pk', flat=True))
-        qs = self.get_query_set().select_related('membership__member')\
-            .filter(pk__in=ids)
+        qs = self.get_query_set().select_related('membership__member')
+        if ids:
+            qs = qs.filter(pk__in=ids)
         return qs
 
 

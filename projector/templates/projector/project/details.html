@@ -21,49 +21,50 @@
     <h5>{% trans "Projects' tasks summary" %}</h5>
     <div class="richtemplates-panel-content">
         <table class="datatable">
-                <caption>{% trans "Open tasks" %}</caption>
-                <tr>
-                    <th colspan="2">{% trans "By assignee" %}</th>
-                </tr>
-                {% regroup project.get_open_tasks by owner as tasks_by_owner %}
-                {% for owner in tasks_by_owner %}
-                <tr>
-                    <td>
-                        <a href="{{ owner.grouper.get_absolute_url }}">{{ owner.grouper }}</a>
-                    </td>
-                    <td><a href="{{ project.get_task_list_url }}?is_resolved=3&owner={{ owner.grouper.id }}"
-                            class="block-link show-tipsy"
-                            title="{% trans "Show open tasks for user" %}
-                            {{ owner.grouper }}">{{ owner.list|length }}</a>
-                    </td>
-                </tr>
-                {% endfor %}
+            <caption>{% trans "Open tasks" %}</caption>
+            <tr>
+                <th colspan="2">{% trans "By assignee" %}</th>
+            </tr>
+            {% regroup project.get_open_tasks by owner as tasks_by_owner %}
+            {% for owner in tasks_by_owner %}
+            <tr>
+                <td>
+                    <a href="{{ owner.grouper.get_absolute_url }}">{{ owner.grouper }}</a>
+                </td>
+                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&owner={{ owner.grouper.id }}"
+                        class="block-link show-tipsy"
+                        title="{% trans "Show open tasks for user" %}
+                        {{ owner.grouper }}">{{ owner.list|length }}</a>
+                </td>
+            </tr>
+            {% endfor %}
 
-                <tr>
-                    <th colspan="2">{% trans "By status" %}</th>
-                </tr>
-                {% regroup project.get_open_tasks by status as tasks_by_status %}
-                {% for status in tasks_by_status %}
-                <tr>
-                    <td>
-                        {{ status.grouper }}
-                    </td>
-                    <td><a href="{{ project.get_task_list_url }}?is_resolved=3&status={{ status.grouper.id }}"
-                            class="block-link show-tipsy"
-                            title="{% trans "Show open tasks with status" %}
-                            {{ status.grouper }}">{{ status.list|length }}</a>
-                    </td>
-                </tr>
+            <tr>
+                <th colspan="2">{% trans "By status" %}</th>
+            </tr>
+            {% regroup project.get_open_tasks by status as tasks_by_status %}
+            {% for status in tasks_by_status %}
+            <tr>
+                <td>
+                    {{ status.grouper }}
+                </td>
+                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&status={{ status.grouper.id }}"
+                        class="block-link show-tipsy"
+                        title="{% trans "Show open tasks with status" %}
+                        {{ status.grouper }}">{{ status.list|length }}</a>
+                </td>
+            </tr>
 
-                <tr>
-                    <th>{% trans "All open tasks" %}</th>
-                    <th><a href="{{ project.get_task_list_url }}?is_resolved=3"
-                            class="block-link">{{ project.get_open_tasks.count }}</a></th>
-                </tr>
-                {% endfor %}
+            <tr>
+                <th>{% trans "All open tasks" %}</th>
+                <th><a href="{{ project.get_task_list_url }}?is_resolved=3"
+                        class="block-link">{{ project.get_open_tasks.count }}</a></th>
+            </tr>
+            {% endfor %}
         </table>
     </div>
 </div>
+
 {% endblock %}
 
 {% block col_main_title %}{{ project.name }}{% endblock %}
@@ -75,17 +76,18 @@
         <h1>{{ project.name }}</h1>
         <ul class="nav-inline">
             <li><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project details" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a></li>
             {% ifhasperm "project_permission.change_project" request.user project %}
             <li><a class="button-link" href="{{ project.get_edit_url }}">{% trans "Edit" %}</a></li>
             {% endifhasperm %}
+            <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a></li>
             <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a></li>
             <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
             {% if project.repository_url %}
                 <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
             {% endif %}
         </ul>
-
+        
         <ul class="messages">
             <li class="message message-info">Clone repository:
             <input id="id_project_repository_url" value="hg clone {{ project.get_repo_url }}"

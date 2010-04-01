@@ -131,16 +131,20 @@ class OrderedDictModelAdmin(admin.ModelAdmin):
     list_display_links = ( 'id', 'name' )
     list_editable = ( 'order', )
 
-class MilestoneInline(admin.StackedInline):
+class MilestoneInline(admin.TabularInline):
     model = Milestone
     extra = 1
 
-class TaskTypeInline(admin.StackedInline):
+class TaskTypeInline(admin.TabularInline):
     model = TaskType
     extra = 1
 
-class ProjectComponentInline(admin.StackedInline):
+class ProjectComponentInline(admin.TabularInline):
     model = ProjectComponent 
+    extra = 1
+
+class StatusInline(admin.TabularInline):
+    model = Status
     extra = 1
 
 class ProjectAdmin(admin.ModelAdmin):
@@ -152,7 +156,8 @@ class ProjectAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description']    
     prepopulated_fields = {"slug": ("name",)}
 
-    inlines = [MilestoneInline, ProjectComponentInline, TaskTypeInline]
+    inlines = [MilestoneInline, ProjectComponentInline, TaskTypeInline,
+        StatusInline]
 
 class ProjectComponentAdmin(admin.ModelAdmin):
     list_display = 'project', 'name', 'description'

@@ -88,8 +88,7 @@ class TaskForm(LimitingModelForm):
     
     class Meta:
         model = Task
-        exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip',
-                'status']
+        exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip']
         choices_limiting_fields = ['project']
 
     def clean(self):
@@ -119,6 +118,11 @@ class TaskEditForm(TaskForm):
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
     comment = forms.CharField(max_length=3000, widget=forms.Textarea,
         required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(TaskEditForm, self).__init__(*args, **kwargs)
+        status_field = self['status'].field
+        status_field.queryset = self.instance.status.destinations.all()
 
     def clean(self):
         cleaned_data = self.cleaned_data

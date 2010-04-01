@@ -9,6 +9,7 @@ import mercurial.hg
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify  
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.tokens import default_token_generator
@@ -257,6 +258,20 @@ class Project(models.Model):
                     project = self,
                     codename = perm)
 
+    def create_default_workflow(self):
+        """
+        Creates ``Transition`` objects linking all projects' statuses with
+        each other providing default *workflow* schema.
+        """
+        statuses = self.status_set.all()
+        for status in statuses:
+            for new_status in statuses:
+                transition, created = Transition.objects\
+                    .get_or_create(source=status, destination=new_status)
+                if created:
+                    logging.debug("Project '%s': created %s"
+                        % (self, transition))
+
 class ProjectComponent(models.Model):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=64)
@@ -386,7 +401,21 @@ class Status(OrderedDictModel):
     project = models.ForeignKey(Project)
     is_resolved = models.BooleanField(verbose_name=_('is resolved'), default=False)
     is_task_action = models.BooleanField(verbose_name=_('is task action'), default=False)
+    destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
+        through='Transition', symmetrical=False)
     
+    def can_change_to(self, new_status):
+        """
+        Checks if ``Transition`` object with ``source`` set to ``self`` and
+        ``destination`` to given ``new_status`` exists.
+        """
+        try:
+            Transition.objects.only('id')\
+                .get(source__id=self.id, destination__id=new_status.id)
+            return True
+        except Transition.DoesNotExist:
+            return False
+
     class Meta:
         verbose_name = _('status')
         verbose_name_plural = _('statuses')
@@ -394,6 +423,25 @@ class Status(OrderedDictModel):
     
     def __unicode__(self):
         return self.name
+
+class Transition(models.Model):
+    """
+    Instances allow to change source Status to destination Status.
+    Needed for custom workflows.
+    """
+    source = models.ForeignKey(Status,
+        verbose_name=_('source status'),
+        related_name='sources')
+    destination = models.ForeignKey(Status,
+        verbose_name=_('destination status'))
+
+    class Meta:
+        verbose_name = _('transition')
+        verbose_name_plural = _('transitions')
+        unique_together = ('source', 'destination')
+
+    def __unicode__(self):
+        return u'%s->%s' % (self.source, self.destination)
 
 class TaskType(OrderedDictModel):
     project = models.ForeignKey(Project)
@@ -423,6 +471,14 @@ class AbstractTask(models.Model):
     deadline = models.DateField(_('deadline'), null=True, blank=True, help_text='YYYY-MM-DD')
     milestone = models.ForeignKey(Milestone, verbose_name=_('milestone'), null=True, blank=True)
     component = models.ForeignKey(ProjectComponent, verbose_name=_('component'))
+
+
+    def get_status(self):
+        return self.status
+
+    def set_status(self, new_status):
+        if self.status != new_status:
+            self.status = new_status
 
     class Meta:
         abstract = True
@@ -772,12 +828,17 @@ def new_project_handler(instance, **kwargs):
             if created:
                 logging.debug("For project '%s' new priority '%s' was created."
                     % (priority.project, priority))
+        statuses = []
         for status_info in new_statuses:
             status, created = Status.objects\
                 .get_or_create(project = instance, **status_info)
             if created:
                 logging.debug("For project '%s' new status '%s' was created."
                     % (status.project, status))
+                statuses.append(status)
+        # Create necessary transitions
+        logging.debug("Creating transitions")
+        instance.create_default_workflow()
     else:
         logging.debug("Project '%s': update handler connected" % instance)
 
