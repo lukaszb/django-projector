@@ -15,6 +15,7 @@ urlpatterns += patterns('projector.views.project_category',
 )
 
 urlpatterns += patterns('projector.views.project',
+    # Basic
     url(r'^projects/$',
         view='project_list',
         name='projector_project_list'),
@@ -25,6 +26,7 @@ urlpatterns += patterns('projector.views.project',
         view='project_edit',
         name='projector_project_edit'),
 
+    # Milestones
     url(r'^projects/(?P<project_slug>[-\w]+)/milestones/$',
         view='project_milestones',
         name='projector_project_milestones'),    
@@ -38,6 +40,18 @@ urlpatterns += patterns('projector.views.project',
         view='project_milestone_edit',
         name='projector_project_milestone_edit'),
 
+    # Workflow
+    url(r'^projects/(?P<project_slug>[-\w]+)/workflow/$',
+        view='project_workflow_detail',
+        name='projector_project_workflow_detail'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/workflow/edit/$',
+        view='project_workflow_edit',
+        name='projector_project_workflow_edit'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/workflow/create-status/$',
+        view='project_workflow_add_status',
+        name='projector_project_workflow_add_status'),
+
+    # Members
     url(r'^projects/(?P<project_slug>[-\w]+)/members/$',
         view='project_members',
         name='projector_project_members'),
@@ -48,6 +62,7 @@ urlpatterns += patterns('projector.views.project',
         view='project_members_manage',
         name='projector_project_members_manage'),
 
+    # Sources
     url(r'^projects/(?P<project_slug>[-\w]+)/repository/(?P<rel_repo_url>.*)$',
         view='project_browse_repository',
         name='projector_project_browse_repository'),
@@ -69,7 +84,7 @@ urlpatterns += patterns('projector.views.reports',
 )
 
 urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
+    url(r'^projects/(?P<project_slug>[-\w]+/?)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
 )        
 
 # ========== #

@@ -164,6 +164,21 @@ class Project(models.Model):
             {'project_slug': self.slug })
     
     @models.permalink
+    def get_workflow_url(self):
+        return ('projector_project_workflow_detail', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
+    def get_workflow_edit_url(self):
+        return ('projector_project_workflow_edit', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
+    def get_workflow_add_status_url(self):
+        return ('projector_project_workflow_add_status', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
     def get_browse_repo_url(self):
         return ('projector_project_browse_repository', (), {
             'project_slug': self.slug,
@@ -271,8 +286,16 @@ class Project(models.Model):
                 if created:
                     logging.debug("Project '%s': created %s"
                         % (self, transition))
+    
+    def get_transitions(self):
+        """
+        Returns queryset of ``Transition`` objects related with this project.
+        """
+        transitions = Transition.objects\
+            .filter(source__in=self.status_set.all())
+        return transitions
 
-class ProjectComponent(models.Model):
+class Component(models.Model):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=64)
     description = models.TextField(null=True, blank=True)
@@ -420,6 +443,7 @@ class Status(OrderedDictModel):
         verbose_name = _('status')
         verbose_name_plural = _('statuses')
         unique_together = ('project', 'name')
+        ordering = ['order']
     
     def __unicode__(self):
         return self.name
@@ -470,7 +494,7 @@ class AbstractTask(models.Model):
     owner = models.ForeignKey(User, verbose_name=_('owner'), related_name='owned_%(class)s', null=True, blank=True)
     deadline = models.DateField(_('deadline'), null=True, blank=True, help_text='YYYY-MM-DD')
     milestone = models.ForeignKey(Milestone, verbose_name=_('milestone'), null=True, blank=True)
-    component = models.ForeignKey(ProjectComponent, verbose_name=_('component'))
+    component = models.ForeignKey(Component, verbose_name=_('component'))
 
 
     def get_status(self):
@@ -712,19 +736,19 @@ new_task_types = (
 
 new_priorities = (
     {
-        'name': u'Blocker',
+        'name': u'Minor',
         'order': 1,
     },
     {
-        'name': u'Critical',
+        'name': u'Major',
         'order': 2,
     },
     {
-        'name': u'Major',
+        'name': u'Critical',
         'order': 3,
     },
     {
-        'name': u'Minor',
+        'name': u'Blocker',
         'order': 4,
     },
 )
@@ -804,14 +828,14 @@ def new_project_handler(instance, **kwargs):
         logging.debug("Project '%s': new project handler connected" % instance)
         membership = Membership.objects.create(project=instance,
             member=instance.author)
-        component, created = ProjectComponent.objects\
+        component, created = Component.objects\
             .get_or_create(project=instance, name=u'Global')
         
         if created:
             logging.debug("Created standard 'Global' component for project %s"
                 % instance.name)
         for component_info in new_components:
-            component, created = ProjectComponent.objects\
+            component, created = Component.objects\
                 .get_or_create(project = instance, **component_info)
             if created:
                 logging.debug("For project '%s' new component '%s' was craeted"

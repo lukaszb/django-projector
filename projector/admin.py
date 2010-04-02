@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext as _
 
 from projector.models import Status, Task, Priority,\
-    Project, ProjectCategory, TaskType, Milestone, ProjectComponent,\
+    Project, ProjectCategory, TaskType, Milestone, Component,\
     TaskRevision
 from projector.models import Membership
 
@@ -34,9 +34,11 @@ def author_editor_save_model(self, request, obj, form, change):
     return super(self.__class__, self).save_model(request, obj, form, change)
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display = ( 'id', 'name', 'order', 'is_resolved', )
+    list_display = ( 'id', 'name', 'order', 'is_resolved', 'project')
     list_display_links = ('id',)
     list_editable = ( 'name', 'order', 'is_resolved', )
+    list_filter = ('project',)
+    readonly_fields = ['project']
 
 class TaskAdminForm(LimitingModelForm):
     class Meta:
@@ -139,8 +141,8 @@ class TaskTypeInline(admin.TabularInline):
     model = TaskType
     extra = 1
 
-class ProjectComponentInline(admin.TabularInline):
-    model = ProjectComponent 
+class ComponentInline(admin.TabularInline):
+    model = Component 
     extra = 1
 
 class StatusInline(admin.TabularInline):
@@ -156,10 +158,10 @@ class ProjectAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description']    
     prepopulated_fields = {"slug": ("name",)}
 
-    inlines = [MilestoneInline, ProjectComponentInline, TaskTypeInline,
+    inlines = [MilestoneInline, ComponentInline, TaskTypeInline,
         StatusInline]
 
-class ProjectComponentAdmin(admin.ModelAdmin):
+class ComponentAdmin(admin.ModelAdmin):
     list_display = 'project', 'name', 'description'
     list_display_links = 'name',
     list_filter = 'project',
@@ -173,7 +175,7 @@ class TaskTypeAdmin(admin.ModelAdmin):
     search_field = ['name', 'project']
     
 
-#admin.site.register(Status, StatusAdmin)
+admin.site.register(Status, StatusAdmin)
 #admin.site.register(Priority, OrderedDictModelAdmin)
 admin.site.register(TaskType, TaskTypeAdmin)
 admin.site.register(Task, TaskAutocompleteAdmin)
@@ -181,6 +183,6 @@ admin.site.register(TaskRevision, TaskRevisionAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectCategory)
 admin.site.register(Membership)
-#admin.site.register(ProjectComponent)
+#admin.site.register(Component)
 #admin.site.register(Milestone) # Should be maintain with project itself
 

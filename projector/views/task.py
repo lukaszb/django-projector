@@ -21,13 +21,13 @@ from projector.forms import TaskForm, TaskEditForm, TaskCommentForm, UserByNameF
 from projector.permissions import ProjectPermission
 
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
+from richtemplates.shortcuts import get_first_or_None
 
 def task_details(request, project_slug, task_id, template_name='projector/task/details.html'):
     """
     Task details view.
     Users may update task here.
     """
-    logging.debug("task_details called")
     task = get_object_or_404(
         Task.objects.select_related('type', 'priority', 'status', 'owner',
             'author', 'editor', 'milestone', 'component', 'project'),
@@ -139,7 +139,6 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     """
     New Task creation view.
     """
-    logging.debug("task_create called")
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
@@ -148,16 +147,29 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     initial = {
         'owner': request.user.username, # form's owner is UserByNameField
     }
+    status = get_first_or_None(project.status_set)
+    type = get_first_or_None(project.tasktype_set)
+    priority = get_first_or_None(project.priority_set)
+    component = get_first_or_None(project.component_set)
+
+    for attr in (status, type, priority, component):
+        if attr is None:
+            messages.error(request, _("Statuses, task types, priorities or "
+                "components of this project are missing and we "
+                "cannot create new tasks. Ask site administrator for "
+                "help."))
+            return render_to_response(template_name, {}, RequestContext(request))
+
     instance = Task(
         project=project,
         author = request.user,
         author_ip = request.META['REMOTE_ADDR'],
         editor = request.user,
         editor_ip = request.META['REMOTE_ADDR'],
-        status = project.status_set.get(order=1),
-        type = project.tasktype_set.get(order=1),
-        priority = project.priority_set.get(order=1),
-        component = project.projectcomponent_set.all()[0],
+        status = status,
+        type = type,
+        priority = priority,
+        component = component,
     )
     form = TaskForm(request.POST or None, initial=initial, instance=instance)
     if request.method == 'POST':
@@ -184,7 +196,6 @@ def task_edit(request, project_slug, task_id, template_name='projector/task/crea
     """
     Edit Task meta information. task_details edits the rest.
     """
-    logging.debug("task_edit called")
     task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
 
     if request.method == 'POST':

@@ -88,7 +88,7 @@ class TaskForm(LimitingModelForm):
     
     class Meta:
         model = Task
-        exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip']
+        exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip', 'status']
         choices_limiting_fields = ['project']
 
     def clean(self):
@@ -157,4 +157,28 @@ class MilestoneForm(forms.ModelForm):
     class Meta:
         model = Milestone
         exclude = ['project', 'author']
+
+class StatusEditForm(forms.ModelForm):
+    
+    class Meta:
+        model = Status
+        exclude = ['project']
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        try:
+            Status.objects.get(name__iexact=cleaned_data['name'],
+                project=self.instance.project)
+        except Status.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError(_("Status with this name already "
+                "exists for this project"))
+        return cleaned_data
+
+class StatusForm(StatusEditForm):
+
+    class Meta:
+        model = Status
+        exclude = ['project', 'destinations']
 

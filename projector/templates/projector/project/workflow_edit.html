@@ -1,0 +1,34 @@
+{% extends "projector/project/details.html" %}
+
+{% load markup %}
+{% load i18n %}
+{% load permissions %}
+
+{% block col_main_title %}{{ project.name }}{% endblock %}
+
+{% block col_main_extra %}
+<div class="richtemplates-panel">    
+    <h5>{% trans "Workflow schema" %}</h5>
+    <div class="richtemplates-panel-content">
+        <ul class="nav-inline">
+            <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Back to workflow schema" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_workflow_edit_url }}">{% trans "Edit" %}</a></li>
+        </ul>
+
+        <form method="post" action=".">
+            {% csrf_token %}
+            <table>
+                {{ formset }}
+            </table>
+            <div>
+                <input id="id_submit" type="submit" name="submit"
+                    value="{% trans "Update" %}"/>
+                <input type="button" onclick="window.location='{% spaceless %}
+                    {{ project.get_workflow_url }}
+                    {% endspaceless %}'" value="{% trans "Cancel" %}"/>
+            </div>            
+        </form>
+    </div>
+</div>
+{% endblock col_main_extra %}
+
