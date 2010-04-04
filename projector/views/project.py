@@ -74,7 +74,7 @@ def project_list(request):
 
 def project_task_list(request, project_slug,
         template_name='projector/project/task_list.html'):
-    project = Project.objects.get(slug=project_slug)    
+    project = Project.objects.get(slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not check.has_perm('project_permission.view_tasks_project',
@@ -108,8 +108,9 @@ def project_create(request):
     if request.method == 'POST' and form.is_valid():
         project = form.save(commit=False)
         project.save()
+        project.create_workflow()
         return HttpResponseRedirect(project.get_absolute_url())
-    
+
     context = {
         'form' : form,
     }
@@ -307,7 +308,7 @@ def project_members(request, project_slug):
             raise PermissionDenied()
     memberships = Membership.objects\
         .filter(project=project)
-    
+
     context = {
         'project': project,
         'memberships': memberships,
@@ -326,7 +327,7 @@ def project_members_add(request, project_slug):
         project = project,
     )
     form = MembershipForm(request.POST or None, instance=membership)
-    
+
     if request.method == 'POST' and form.is_valid():
         logging.info("Saving member %s for project '%s'"
             % (form.instance.member, form.instance.project))
@@ -365,7 +366,7 @@ def project_members_manage(request, project_slug, username):
         for perm in permissions.checks if perm.endswith('_project')]
     logging.info("Available permissions for projects are:\n%s"
         % pprint.pformat(available_permissions))
-    
+
     # Fetch members' permissions for this project
     member_current_permissions = member\
         .granted_permissions\
@@ -454,7 +455,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     context = {
         'project': project,
     }
-    
+
     # Some custom logic here
     revision = request.GET.get('revision', None)
 
@@ -492,7 +493,7 @@ def project_changesets(request, project_slug):
     }
     try:
         engine = engine_from_url('hg://' + project.get_repo_path())
-        changeset_list = [engine.get_changeset(rev) for rev in 
+        changeset_list = [engine.get_changeset(rev) for rev in
             reversed(engine.revision_numbers)]
         context['changeset_list'] = changeset_list
         context['engine'] = engine

@@ -10,7 +10,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import slugify  
+from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.safestring import mark_safe
@@ -22,6 +22,7 @@ from django.template.defaultfilters import slugify
 
 from annoying.decorators import signals
 from authority.models import Permission
+from projector.conf import default_workflow
 from projector.utils import abspath, using_projector_profile
 from projector.settings import HG_ROOT_DIR, BANNED_PROJECT_NAMES
 from projector.exceptions import ProjectorError
@@ -36,7 +37,7 @@ class DictModel(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
     class Meta:
         abstract = True
         ordering = ('id',)
@@ -91,7 +92,7 @@ class Project(models.Model):
     #tags = TagField()
 
     objects = ProjectManager()
-    
+
     class WrongProjectNameError(ProjectorError): pass
 
     class Meta:
@@ -123,7 +124,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Project, self).save(*args, **kwargs)
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_details', (), {'project_slug' : self.slug })
@@ -162,7 +163,7 @@ class Project(models.Model):
     def get_milestones_add_url(self):
         return ('projector_project_milestones_add', (),
             {'project_slug': self.slug })
-    
+
     @models.permalink
     def get_workflow_url(self):
         return ('projector_project_workflow_detail', (),
@@ -204,11 +205,11 @@ class Project(models.Model):
 
     def get_closed_tasks(self):
         return self.get_tasks().filter(status__is_resolved=True)
-    
+
     def get_repo_path(self):
         repo_path = abspath(HG_ROOT_DIR, self.slug)
         return repo_path
-    
+
     def get_repo_url(self):
         """
         Returns full url of the project (with domain based on
@@ -244,7 +245,6 @@ class Project(models.Model):
                 "is one of the banned names:\n%s"
                 % (self.name, pprint.pformat(BANNED_PROJECT_NAMES)))
         super(Project, self).save(*args, **kwargs)
-        self.set_author_permissions()
 
     def set_author_permissions(self):
         """
@@ -273,10 +273,55 @@ class Project(models.Model):
                     project = self,
                     codename = perm)
 
-    def create_default_workflow(self):
+    def create_workflow(self, workflow=default_workflow):
+        """
+        Creates default workflow for the project. We need to create initial
+        member (author) and objects required to work on issues (components,
+        types, statuses with their transitions).
+
+        :param workflow: python object defining tuples of dicts with
+          information on project *metadata*; by default module
+          ``projector.conf.default_workflow`` is used - take a look at it if
+          you want to use your own object
+        """
+
+        membership = Membership.objects.create(project=self,
+            member=self.author)
+        self.set_author_permissions()
+
+        for component_info in default_workflow.components:
+            component, created = Component.objects\
+                .get_or_create(project = self, **component_info)
+            if created:
+                logging.debug("For project '%s' new component '%s' was craeted"
+                    % (component.project, component))
+        for task_type_info in default_workflow.task_types:
+            task, created = TaskType.objects\
+                .get_or_create(project = self, **task_type_info)
+            if created:
+                logging.debug("For project '%s' new task type '%s' was craeted"
+                    % (task.project, task))
+        for priority_info in default_workflow.priorities:
+            priority, created = Priority.objects\
+                .get_or_create(project = self, **priority_info)
+            if created:
+                logging.debug("For project '%s' new priority '%s' was created."
+                    % (priority.project, priority))
+
+        for status_info in default_workflow.statuses:
+            status, created = Status.objects\
+                .get_or_create(project = self, **status_info)
+            if created:
+                logging.debug("For project '%s' new status '%s' was created."
+                    % (status.project, status))
+        # Create necessary transitions
+        logging.debug("Creating transitions")
+        self.create_all_transitions()
+
+    def create_all_transitions(self):
         """
         Creates ``Transition`` objects linking all projects' statuses with
-        each other providing default *workflow* schema.
+        each other providing default task *workflow* schema.
         """
         statuses = self.status_set.all()
         for status in statuses:
@@ -286,7 +331,7 @@ class Project(models.Model):
                 if created:
                     logging.debug("Project '%s': created %s"
                         % (self, transition))
-    
+
     def get_transitions(self):
         """
         Returns queryset of ``Transition`` objects related with this project.
@@ -299,7 +344,7 @@ class Component(models.Model):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=64)
     description = models.TextField(null=True, blank=True)
-    
+
     class Meta:
         verbose_name = _('component')
         verbose_name_plural = _('components')
@@ -313,7 +358,6 @@ class Membership(models.Model):
     member = models.ForeignKey(User, verbose_name=_('member'))
     joined_at = models.DateTimeField(_('joined at'), auto_now_add=True)
     project = models.ForeignKey(Project, verbose_name=_('project'))
-    #permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'))
 
     def __unicode__(self):
         return u"%s@%s" % (self.member, self.project)
@@ -338,7 +382,7 @@ class Milestone(models.Model):
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
             datetime.timedelta(days=60))
     date_completed = models.DateField(_('date completed'), null=True, blank=True)
-    
+
     class Meta:
         ordering = ('created_at',)
         verbose_name = _('milestone')
@@ -347,7 +391,7 @@ class Milestone(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_milestone_detail', (), {
@@ -397,12 +441,12 @@ class TimelineEntry(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, editable=False)
     user = models.ForeignKey(User, verbose_name=_('user'), null=True, blank=True, editable=False)
     action = models.CharField(_('action'), max_length=256)
-    
+
     class Meta:
         ordering = ('-id',)
         verbose_name = _('timeline entry')
         verbose_name_plural = _('timeline entries')
-    
+
     def __unicode__(self):
         return self.action
 
@@ -411,10 +455,10 @@ class TimelineEntry(models.Model):
         formatted_date = datetime.datetime.strftime(description_date_format,
                 self.created_at)
         return "%s by %s at %s" % (self.action, self.author, formatted_date)
-    
+
 class Priority(OrderedDictModel):
     project = models.ForeignKey(Project)
-    
+
     class Meta:
         verbose_name = _('priority level')
         verbose_name_plural = _('priority levels')
@@ -423,10 +467,10 @@ class Priority(OrderedDictModel):
 class Status(OrderedDictModel):
     project = models.ForeignKey(Project)
     is_resolved = models.BooleanField(verbose_name=_('is resolved'), default=False)
-    is_task_action = models.BooleanField(verbose_name=_('is task action'), default=False)
+    is_initial = models.BooleanField(verbose_name=_('is task action'), default=False)
     destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
         through='Transition', symmetrical=False, null=True, blank=True)
-    
+
     def can_change_to(self, new_status):
         """
         Checks if ``Transition`` object with ``source`` set to ``self`` and
@@ -444,7 +488,7 @@ class Status(OrderedDictModel):
         verbose_name_plural = _('statuses')
         unique_together = ('project', 'name')
         ordering = ['order']
-    
+
     def __unicode__(self):
         return self.name
 
@@ -514,7 +558,7 @@ class Task(AbstractTask):
     edited_at = models.DateTimeField(_('edited at'), auto_now=True)
     editor = models.ForeignKey(User, verbose_name=_('editor'), blank=True, null=True)
     editor_ip = models.IPAddressField(blank=True)
-    
+
     class Meta:
         ordering = ('-id',)
         verbose_name = _('task')
@@ -523,7 +567,7 @@ class Task(AbstractTask):
 
     def __unicode__(self):
         return u'#%s %s' % (self.id, self.summary)
-    
+
     class CannotCalucalteIdError(Exception):
         pass
 
@@ -546,7 +590,7 @@ class Task(AbstractTask):
                 self.id = 1
         logging.debug("Task calulated id is %s" % self.id)
         return self.id
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('projector_task_details', (), {
@@ -570,7 +614,7 @@ class Task(AbstractTask):
             # Task update
             self.revision += 1
         return super(Task, self).save(*args, **kwargs)
-    
+
     CHANGESET_FIELDS = (
         'summary',
         'description',
@@ -582,7 +626,7 @@ class Task(AbstractTask):
         'priority',
         'type',
     )
-    
+
     def fetch_old(self):
         return Task.objects.get(pk=self.pk)
 
@@ -689,105 +733,6 @@ def request_new_profile(sender, instance, **kwargs):
         profile.save()
         logging.debug("Created profile's id: %s" % profile.id)
 
-new_components = (
-    {
-        'name': u'Global',
-    },
-)
-
-new_task_types = (
-    {
-        'name': u'Task',
-        'order': 1,
-    },
-    {
-        'name': u'Defect',
-        'order': 2,
-    },
-    {
-        'name': u'New feature',
-        'order': 3,
-    },
-    {
-        'name': u'Proposal',
-        'order': 4,
-    },
-    {
-        'name': u'Blocker',
-        'order': 5,
-    },
-)
-
-new_priorities = (
-    {
-        'name': u'Minor',
-        'order': 1,
-    },
-    {
-        'name': u'Major',
-        'order': 2,
-    },
-    {
-        'name': u'Critical',
-        'order': 3,
-    },
-    {
-        'name': u'Blocker',
-        'order': 4,
-    },
-)
-
-new_statuses = (
-    {
-        'name': u'New',
-        'order': 1,
-        'is_resolved': False,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Assigned',
-        'order': 2,
-        'is_resolved': False,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Need fix',
-        'order': 3,
-        'is_resolved': False,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Need feedback',
-        'order': 4,
-        'is_resolved': False,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Need unittest',
-        'order': 5,
-        'is_resolved': False,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Fixed',
-        'order': 6,
-        'is_resolved': True,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Closed',
-        'order': 7,
-        'is_resolved': True,
-        'is_task_action': False,
-    },
-    {
-        'name': u'Wrong',
-        'order': 8,
-        'is_resolved': True,
-        'is_task_action': False,
-    },
-)
-
 @signals.pre_save(sender=Project)
 def project_creation_listener(instance, **kwargs):
     if instance.pk is not None:
@@ -805,48 +750,4 @@ def project_creation_listener(instance, **kwargs):
     else:
         logging.debug("PROJECTOR_HG_ROOT_DIR is not set so we do NOT "
             "create repository to this project.")
-
-@signals.post_save(sender=Project)
-def new_project_handler(instance, **kwargs):
-    if kwargs['created'] is True:
-        logging.debug("Project '%s': new project handler connected" % instance)
-        membership = Membership.objects.create(project=instance,
-            member=instance.author)
-        component, created = Component.objects\
-            .get_or_create(project=instance, name=u'Global')
-        
-        if created:
-            logging.debug("Created standard 'Global' component for project %s"
-                % instance.name)
-        for component_info in new_components:
-            component, created = Component.objects\
-                .get_or_create(project = instance, **component_info)
-            if created:
-                logging.debug("For project '%s' new component '%s' was craeted"
-                    % (component.project, component))
-        for task_type_info in new_task_types:
-            task, created = TaskType.objects\
-                .get_or_create(project = instance, **task_type_info)
-            if created:
-                logging.debug("For project '%s' new task type '%s' was craeted"
-                    % (task.project, task))
-        for priority_info in new_priorities:
-            priority, created = Priority.objects\
-                .get_or_create(project = instance, **priority_info)
-            if created:
-                logging.debug("For project '%s' new priority '%s' was created."
-                    % (priority.project, priority))
-        statuses = []
-        for status_info in new_statuses:
-            status, created = Status.objects\
-                .get_or_create(project = instance, **status_info)
-            if created:
-                logging.debug("For project '%s' new status '%s' was created."
-                    % (status.project, status))
-                statuses.append(status)
-        # Create necessary transitions
-        logging.debug("Creating transitions")
-        instance.create_default_workflow()
-    else:
-        logging.debug("Project '%s': update handler connected" % instance)
 

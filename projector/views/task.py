@@ -33,7 +33,7 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
         Task.objects.select_related('type', 'priority', 'status', 'owner',
             'author', 'editor', 'milestone', 'component', 'project'),
         id=task_id, project__slug=project_slug)
-        
+
     # We create formset for comment here as comment is only optional
     CommentFormset = formset_factory(TaskCommentForm, extra=1)
 
@@ -82,7 +82,7 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
             return HttpResponseRedirect(task.get_absolute_url())
         else:
             logging.error(action_form.errors)
-    
+
     context = {
         'task' : task,
         'now' : datetime.datetime.now(),
@@ -106,7 +106,7 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     initial = {
         'owner': request.user.username, # form's owner is UserByNameField
     }
-    status = get_first_or_None(project.status_set)
+    status = get_first_or_None(project.status_set.filter(is_initial=True))
     type = get_first_or_None(project.tasktype_set)
     priority = get_first_or_None(project.priority_set)
     component = get_first_or_None(project.component_set)

@@ -90,6 +90,13 @@ class TaskForm(LimitingModelForm):
         exclude = ['author', 'author_ip', 'project', 'editor', 'editor_ip']
         choices_limiting_fields = ['project']
 
+    def __init__(self, *args, **kwargs):
+        super(TaskForm, self).__init__(*args, **kwargs)
+        # Update ``status`` field while creating new task
+        self.fields['status'].queryset = Status.objects.filter(
+            project=self.instance.project, is_initial=True)
+        self.fields['status'].empty_label=None
+
     def clean(self):
         cleaned_data = super(TaskForm, self).clean()
         if self.instance.id:
