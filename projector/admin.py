@@ -123,7 +123,7 @@ class TaskRevisionAdmin(admin.ModelAdmin):
     list_display = ( 'task', 'revision',
         'created_at', 'author', 'status', 'priority', 'type')
     #list_display_links = ('summary',)
-    #list_filter = ('project', 'type', 'priority', 'status')
+    list_filter = ('task', 'type', 'priority', 'status')
     date_hierarchy = 'created_at'
     save_on_top = True
     #search_fields = ['summary', 'description']

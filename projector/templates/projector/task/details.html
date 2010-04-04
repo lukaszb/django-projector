@@ -43,12 +43,10 @@
                     <th>{% trans "Task" %} Id</th>
                     <td>{{ task.id }}</td>
                 </tr>
-                {% comment %}
                 <tr>
                     <th>{% trans "Revision" %}</th>
                     <td>{{ task.revision }}</td>
                 </tr>
-                {% endcomment %}
                 <tr>
                     <th>{% trans "Project" %}</th>
                     <td class="show-tipsy" title="{{ task.project.description }}">
@@ -183,26 +181,18 @@
         <form action="." method="post" class="action-form">
 
         <fieldset id="task-comment">
-            <legend>{% trans "Comment" %}</legend>
+            <legend>{% trans "Quick action" %}</legend>
             {{ comment_formset.management_form }}
             {% for form in comment_formset.forms %}
                 <table class="form-table">
                     {% include "richtemplates/forms/form.html" %}
                 </table>
             {% endfor %}
-        </fieldset>
 
-        <fieldset id="task-action">
-            <legend>{% trans "Action" %}</legend>
+            {% with action_form as form %}
+                {{ form.as_p_rows }}
+            {% endwith %}
             
-            {{ action_form.as_p_rows }}
-            {% if action_form.errors %}
-            <ul class="errorlist">
-                {% for error in action_form.errors %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
             <p>
                 <input type="submit" value="{% trans "Submit" %}" />
             </p>

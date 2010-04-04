@@ -425,7 +425,7 @@ class Status(OrderedDictModel):
     is_resolved = models.BooleanField(verbose_name=_('is resolved'), default=False)
     is_task_action = models.BooleanField(verbose_name=_('is task action'), default=False)
     destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
-        through='Transition', symmetrical=False)
+        through='Transition', symmetrical=False, null=True, blank=True)
     
     def can_change_to(self, new_status):
         """
@@ -603,14 +603,6 @@ class Task(AbstractTask):
                 diff[field] = (old_val, new_val)
         return diff
 
-    def add_comment_to_current_revision(self, comment):
-        """
-        Adds given ``comment`` to the current TaskRevision (last revisioned).
-        """
-        self.taskrevision_set\
-            .filter(revision=self.revision)\
-            .update(comment=comment)
-
     def get_revisions(self, force_query=False):
         """
         Returns TaskRevision objects related to this Task instance.
@@ -634,6 +626,36 @@ class Task(AbstractTask):
 
     revisions = property(get_revisions)
 
+    def create_revision(self, comment=None):
+        """
+        Creates revision (instance of ``TaskRevision``) for this task.
+        """
+        logging.debug("TEMP: Going to create revision for task %s" % self)
+        logging.debug("TEMP: task current status is %s" % self.status)
+        revision_info = dict(
+            task = self,
+            author = self.editor,
+            author_ip = self.editor_ip,
+            created_at = self.edited_at,
+            revision = self.revision,
+            summary = self.summary,
+            description = self.description,
+            owner = self.owner,
+            type = self.type,
+            priority = self.priority,
+            status = self.status,
+            milestone = self.milestone,
+            component = self.component,
+            deadline = self.deadline,
+        )
+        if comment is not None:
+            revision_info['comment'] = comment
+        revision = TaskRevision.objects.create(**revision_info)
+        logging.debug("TaskRevision created: %s" % revision)
+        if hasattr(self, '_revisions'):
+            self._revisions.append(revision)
+        return revision
+
 class TaskRevision(AbstractTask):
     task = models.ForeignKey(Task)
     comment = models.TextField(_('comment'), max_length=3000,
@@ -645,44 +667,6 @@ class TaskRevision(AbstractTask):
 
     def __unicode__(self):
         return _("Revision ") + str(self.revision)
-
-@signals.pre_save(sender=Task)
-def update_task_handler_pre(instance, **kwargs):
-    #logging.debug("Signal pre_save\nInstance: %s\nkwargs:%s"
-    #    % (instance, pprint.pformat(kwargs)))
-    #logging.debug("Instance's dict:\n%s" % pprint.pformat(instance.__dict__))
-    pass
-
-@signals.post_save(sender=Task)
-def update_task_handler(instance, **kwargs):
-    """
-    Called every time Task.save method is called.
-    """
-    revision = TaskRevision.objects.create(
-        task = instance,
-        author = instance.editor,
-        author_ip = instance.editor_ip,
-        created_at = instance.edited_at,
-        revision = instance.revision,
-        summary = instance.summary,
-        description = instance.description,
-        owner = instance.owner,
-        type = instance.type,
-        priority = instance.priority,
-        status = instance.status,
-        milestone = instance.milestone,
-        component = instance.component,
-        deadline = instance.deadline,
-    )
-    logging.debug("TaskRevision created: %s" % revision)
-
-# ================= #
-# User profile part #
-# ================= #
-
-# If projector is kind of main application in your project
-# it's build-in user profile could be used as it provides
-# some nice user buffs
 
 # ==================== #
 # Signals and handlers #

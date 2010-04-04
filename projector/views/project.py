@@ -25,7 +25,7 @@ from authority.models import Permission
 from projector.models import Project, ProjectCategory, Membership, Task, \
     Milestone, Status, Transition
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm, \
-    StatusForm, StatusEditForm
+    StatusForm, StatusEditForm, StatusFormSet
 from projector.views.task import task_create
 from projector.permissions import ProjectPermission
 from projector.utils.simplehg import hgrepo_detail, is_mercurial
@@ -242,10 +242,7 @@ def project_workflow_edit(request, project_slug):
     Edits chosen project's workflow.
     """
     project = get_object_or_404(Project, slug=project_slug)
-    StatusEditFormset = modelformset_factory(Status,
-        fields=['name', 'order', 'destinations'],
-        extra=0)
-    formset = StatusEditFormset(request.POST or None, request.FILES or None,
+    formset = StatusFormSet(request.POST or None,
         queryset=Status.objects.filter(project=project))
     if request.method == 'POST':
         if formset.is_valid():
@@ -263,7 +260,9 @@ def project_workflow_edit(request, project_slug):
                 for destination in destinations:
                     Transition.objects.get_or_create(source=form.instance,
                         destination=destination)
-            #formset.save()
+        else:
+            msg = _("Errors occured while processing formset")
+            messages.error(request, msg)
     context = {
         'formset': formset,
         'project': project,

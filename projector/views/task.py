@@ -17,11 +17,12 @@ from django.utils.translation import ugettext as _
 from authority.decorators import permission_required_or_403
 
 from projector.models import Task, Status, Priority, Project
-from projector.forms import TaskForm, TaskEditForm, TaskCommentForm, UserByNameField
+from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.permissions import ProjectPermission
 
-from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 from richtemplates.shortcuts import get_first_or_None
+from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory,\
+    UserByNameField
 
 def task_details(request, project_slug, task_id, template_name='projector/task/details.html'):
     """
@@ -35,100 +36,58 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
         
     # We create formset for comment here as comment is only optional
     CommentFormset = formset_factory(TaskCommentForm, extra=1)
-    
+
+    check = ProjectPermission(request.user)
+    destinations = task.status.destinations.all()
+    # Init choices
     task_action_choices = [
         DynamicActionChoice(0, _("Don't change status")),
-        DynamicActionChoice(2, _("Resolve to"),
-            {
-                'resolve_to' : forms.ModelChoiceField(
-                    task.project.status_set.filter(is_resolved=True)),
-            }),
-        DynamicActionChoice(3, _("Assign to"),
-            { 'assign_to' : UserByNameField(max_length=256) }),
-        DynamicActionChoice(4, _("Reopen as"),
-            {
-                'reopen_as' : forms.ModelChoiceField(
-                    task.project.status_set\
-                            .filter(is_resolved=False)\
-                            .exclude(name='assigned'),
-                empty_label=None)
-            }),
     ]
-    if task.owner != request.user:
-        task_action_choices.insert(1, DynamicActionChoice(1, _("Accept task")))
-    
-    enabled_choices = [0]
-    if task.status.is_resolved:
-        enabled_choices += [4]
-    else:
-        enabled_choices += [1,2,3]
-    
-    TaskActionForm = DynamicActionFormFactory(task_action_choices, enabled_choices)
-    
+    if check.change_task_project(task.project):
+        if destinations:
+            task_action_choices.append(DynamicActionChoice(1, _("Change status"),
+                {'new_status': forms.ModelChoiceField(
+                    queryset=destinations.exclude(id=task.status.id),
+                    empty_label=None)
+                }))
+
+    TaskActionForm = DynamicActionFormFactory(task_action_choices)
+    action_form = TaskActionForm(request.POST or None, request.FILES or None)
+
+    comment_formset = CommentFormset(request.POST or None)
     if request.method == 'POST':
-        action_form = TaskActionForm(request.POST)
-        comment_formset = CommentFormset(request.POST)
 
         if action_form.is_valid() and comment_formset.is_valid():
-            task.editor = request.user
-            task.editor_ip = request.META['REMOTE_ADDR']
-            cleaned_data = action_form.cleaned_data
-            action_type = cleaned_data['action_type']
-            action = None
-
-            # Accept task
-            if action_type == 1:
-                task.status = Status.objects.get(id=2)
-                task.owner = request.user
-                action = _("Accepted by") + " '%s'" % request.user.username
-            # Resolve as ...
-            if action_type == 2:
-                task.status = cleaned_data['resolve_to']
-                action = _("Resolved to") + " '%s'" % task.status.name
-            # Assign to ...
-            if action_type == 3:
-                task.owner = cleaned_data['assign_to']
-                action = _("Assigned to") + " '%s'" % task.owner.username
-            # Reopen as ...
-            if action_type == 4:
-                task.status = cleaned_data['reopen_as']
-                action = _("Reopened as") + " '%s'" % task.status.name
-            
-            
-            if action:
-                messages.success(request, action)
-            else:
-                messages.warning(request, _("Task hasn't been changed."))
-            
             # Comment handler
             comment_form = comment_formset.forms[0]
             if comment_form.cleaned_data.has_key('comment'):
                 comment = comment_form.cleaned_data['comment']
-                messages.success(request, _("Comment added successfully."))
             else:
                 comment = None
-            if action or comment:
+            # Task handler
+            data = action_form.cleaned_data
+            task.editor = request.user
+            task.editor_ip = request.META['REMOTE_ADDR']
+            # action_type number as defined before at DynamicActionChoices
+            action_type = data['action_type']
+            if check.change_task_project(task.project):
+                if action_type == 1:
+                    task.status = data['new_status']
+            if action_type > 0 or comment:
+                messages.success(request, _("Task updated successfully"))
                 task.save()
-                if comment:
-                    task.add_comment_to_current_revision(comment)
+                task.create_revision(comment)
+            else:
+                messages.warning(request, _("There were no changes"))
             return HttpResponseRedirect(task.get_absolute_url())
         else:
             logging.error(action_form.errors)
-    else:
-        action_form = TaskActionForm()
-        comment_formset = CommentFormset()
-    
-    status_list = task.project.status_set.order_by('order')
-    resolve_status_list = status_list.filter(is_resolved=True)
-    reopen_status_list = status_list.filter(is_resolved=False)
     
     context = {
         'task' : task,
         'now' : datetime.datetime.now(),
         'action_form' : action_form,
         'comment_formset' : comment_formset,
-        'resolve_status_list' : resolve_status_list,
-        'reopen_status_list' : reopen_status_list,
     }
 
     return render_to_response(template_name, context, RequestContext(request))
@@ -181,6 +140,7 @@ def task_create(request, project_slug, template_name='projector/task/create.html
                 editor_ip = request.META['REMOTE_ADDR'],
                 #project = project,
             )
+            task.create_revision()
             messages.success(request, _("Task created succesfully."))
             return HttpResponseRedirect(task.get_absolute_url())
 
@@ -205,14 +165,13 @@ def task_edit(request, project_slug, task_id, template_name='projector/task/crea
                 editor=request.user,
                 editor_ip=request.META['REMOTE_ADDR'],
             )
-            if 'comment' in form.cleaned_data:
-                comment = form.cleaned_data['comment']
-                task.add_comment_to_current_revision(comment)
+            comment = form.cleaned_data.get('comment', None)
+            task.create_revision(comment)
             messages.success(request, _("Task updated successfully."))
             return HttpResponseRedirect(task.get_absolute_url())
     else:
         form = TaskEditForm(instance=task, initial={
-            'owner': task.owner.username,
+            'owner': task.owner and task.owner.username or None,
         })
 
     context = {
