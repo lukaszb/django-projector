@@ -8,10 +8,40 @@ and repository backend integration. Aimed to work with upcoming, version
 simple application which can be easily customized or plugged into
 existing systems.
 
+Features
+--------
+
+- Task tracker with full history of changes
+- Mercurial_ repository integration
+- Repository web browser (basic... really)
+- Customizable workflow for each project
+- Grouping tasks in milestones
+- Roadmap
+- Granual permissions management (see :ref:`authorization`)
+- Documents based on `restructuredText`_
+- Make use of `django-richtemplates`_ so templates are ready to use
+  out of the box
+- Full project schema scripts (provided by `Capo`_)
+- More to come
+
+Incoming
+--------
+
+Here are some additional points which are the target for future
+release.
+
+- Wiki per project
+- Other version control systems in backend (git_, subversion_...)
+- Charts, statistics, graphs, plots, analyzies
+- Functional timeline
+- Email notification
+- `django-piston`_ integration for RESTful API
+
 .. warning::
    This application is at early-development stage but we strongly encourage
    you to give it a try if you are looking for project management toolkit
-   for your Django_ based project.
+   for your Django_ based project. Still, it probably should **NOT** be used
+   in production as it wasn't fully tested and may contain security issues.
 
 ------------
 Installation
@@ -28,8 +58,7 @@ Documentation
 Online documentation for development version is available at
 http://packages.python.org/django-projector/.
 
-You may also build documentation for yourself but you would need Sphinx_
-for that. Go into ``docs/`` and run::
+You may also build documentation for yourself - go into ``docs/`` and run::
 
    make html
 

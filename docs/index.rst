@@ -21,10 +21,14 @@ Features
 - Task tracker with full history of changes
 - Mercurial_ repository integration
 - Repository web browser (basic... really)
+- Customizable workflow for each project
+- Grouping tasks in milestones
+- Roadmap
 - Granual permissions management (see :ref:`authorization`)
 - Documents based on `restructuredText`_
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
+- Full project schema scripts (provided by `Capo`_)
 - More to come
 
 Incoming
@@ -35,11 +39,10 @@ release.
 
 - Wiki per project
 - Other version control systems in backend (git_, subversion_...)
-- Customizable workflow for each project
 - Charts, statistics, graphs, plots, analyzies
-- Functional roadmap/timeline
+- Functional timeline
 - Email notification
-- `django-piston`_ integration
+- `django-piston`_ integration for RESTful API
 
 .. warning::
    This application is at early-development stage but we strongly encourage
@@ -73,3 +76,4 @@ Other topics
 .. _subversion: http://subversion.tigris.org/
 .. _git: http://git-scm.com/
 .. _trac: http://trac.edgewall.org/
+.. _capo: http://bitbucket.org/lukaszb/capo/
