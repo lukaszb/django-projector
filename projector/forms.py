@@ -15,33 +15,10 @@ from projector.models import Status
 from projector.models import Milestone
 from projector.settings import BANNED_PROJECT_NAMES
 
-from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField
+from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
+    UserByNameField
 
 import logging
-
-# Custom fields
-
-class UserByNameField(forms.CharField):
-    """
-    Allows to choose user by simple typing his or her
-    name instead of picking up from <select> tag.
-    """
-    def clean(self, value):
-        """
-        Returns user for whom task is beign assigned.
-        """
-        # Firstly, we have to clean as normal CharField
-        value = super(UserByNameField, self).clean(value)
-        # Now do the magic
-        username = value.strip()
-        if username == '':
-            return None
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise forms.ValidationError("No user found!")
-        logging.debug("Returns UserByNameField: %s" % user)
-        return user
 
 PUBLIC_RADIO_CHOICES = (
     (u'public', _("Public")),
@@ -203,69 +180,4 @@ class StatusFormSet(StatusFormSetBase):
         if form.instance.project:
             qs = qs.filter(project = form.instance.project)
             form['destinations'].field.queryset = qs
-
-class TaskActionFormError(Exception):
-    pass
-
-def TaskActionForm(data=None, instance=None):
-    if instance is None:
-        raise TaskActionFormError("instance parameter is required")
-
-    fields = {
-        'leave_status': forms.CharField(label=_("Leave status as %s"
-            % instance.status), widget=forms.HiddenInput),
-        'set_status': forms.ModelChoiceField(label=_("Set status to"),
-            empty_label=None,
-            queryset=instance.status.destinations.all())
-    }
-    # Removes requirements from all fields
-    for field_name, field in fields.items():
-        field.required = False
-        fields[field_name] = field
-
-    action_fields = ['leave_status', 'set_status']
-    action_group = 'action_type' #
-
-    if not set(action_fields).issubset(set(fields.keys())):
-        raise TaskActionFormError("Action fields have to be subset of "
-            "base fields")
-
-    action_type = forms.TypedChoiceField(
-        choices=[(i, field.label) for i, field in enumerate(fields.values())],
-        initial=1, # Hard coded :/
-        widget=forms.RadioSelect,
-        coerce=int
-    )
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        chosen_action = cleaned_data.get(action_group)
-        if chosen_action in [None, u'']:
-            raise forms.ValidationError(_("Choose action"))
-        return cleaned_data
-
-
-
-    def save(self, editor, editor_ip, commit=True):
-        if self.is_valid():
-            self.instance.editor = editor
-            self.instance.editor_ip = editor_ip
-            #self.instance.status = self.cleaned_data['status']
-            if commit:
-                self.instance.save()
-                return self.instance
-
-    FormClass = type("TaskActionForm", (forms.BaseForm, ),
-        {
-            'base_fields': {action_group: action_type},
-            'clean': clean,
-            'save': save,
-        }
-        )
-    form = FormClass(data)
-    form.instance = instance
-
-    return form
-
-
 

@@ -447,7 +447,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
             raise PermissionDenied()
 
 
-    if not project.repository_url:
+    if not project._get_repo_path():
         messages.error(request, _("Repository's url is not set! Please "
             "configure project preferences first."))
         #raise Http404
@@ -460,7 +460,7 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     revision = request.GET.get('revision', None)
 
     try:
-        engine = engine_from_url('hg://' + project.get_repo_path())
+        engine = engine_from_url('hg://' + project._get_repo_path())
         requested_node = engine.request(rel_repo_url, revision, fetch_content=True)
         context['root'] = requested_node
     except VCBrowserError, err:
@@ -492,7 +492,7 @@ def project_changesets(request, project_slug):
         'project': project,
     }
     try:
-        engine = engine_from_url('hg://' + project.get_repo_path())
+        engine = engine_from_url('hg://' + project._get_repo_path())
         changeset_list = [engine.get_changeset(rev) for rev in
             reversed(engine.revision_numbers)]
         context['changeset_list'] = changeset_list

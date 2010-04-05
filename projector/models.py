@@ -24,7 +24,7 @@ from annoying.decorators import signals
 from authority.models import Permission
 from projector.conf import default_workflow
 from projector.utils import abspath, using_projector_profile
-from projector.settings import HG_ROOT_DIR, BANNED_PROJECT_NAMES
+from projector import settings as projector_settings
 from projector.exceptions import ProjectorError
 from projector.managers import ProjectManager
 from richtemplates.forms import RichSkinChoiceField
@@ -77,15 +77,18 @@ class ProjectCategory(models.Model):
 
 class Project(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True)
-    category = models.ForeignKey(ProjectCategory, verbose_name=_('category'), null=True, blank=True)
+    category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
+        null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
     slug = models.SlugField(unique=True)
-    home_page_url = models.URLField(_("home page url "), null=True, blank=True, verify_exists=False)
-    repository_url = models.CharField(_('repository url'), max_length=256, null=True, blank=True)
+    home_page_url = models.URLField(_("home page url "), null=True, blank=True,
+        verify_exists=False)
     active = models.BooleanField(_('active'), default=True)
     public = models.BooleanField(_('public'), default=True)
-    members = models.ManyToManyField(User, verbose_name=_('members'), through="Membership")
-    author = models.ForeignKey(User, name=_('author'), related_name='created_projects')
+    members = models.ManyToManyField(User, verbose_name=_('members'),
+        through="Membership")
+    author = models.ForeignKey(User, name=_('author'),
+        related_name='created_projects')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
     outdated = models.BooleanField(_('outdated'), default=False)
@@ -139,7 +142,8 @@ class Project(models.Model):
 
     @models.permalink
     def get_members_add_url(self):
-        return ('projector_project_members_add', (), {'project_slug': self.slug })
+        return ('projector_project_members_add', (),
+            {'project_slug': self.slug })
 
     @models.permalink
     def get_members_manage_url(self, username):
@@ -206,8 +210,22 @@ class Project(models.Model):
     def get_closed_tasks(self):
         return self.get_tasks().filter(status__is_resolved=True)
 
-    def get_repo_path(self):
-        repo_path = abspath(HG_ROOT_DIR, self.slug)
+    def _get_homedir(self):
+        """
+        Returns directory containing all files related to this project.
+        """
+        homedir = abspath(projector_settings.PROJECTS_ROOT_DIR, str(self.id))
+        if not homedir.endswith('/'):
+            homedir += '/'
+        if os.path.exists(projector_settings.PROJECTS_ROOT_DIR) and \
+            not os.path.exists(homedir):
+            os.mkdir(homedir)
+            logging.debug("Project '%s': Created homedir at %s"
+                % (self, homedir))
+        return homedir
+
+    def _get_repo_path(self):
+        repo_path = abspath(self._get_homedir(), 'hg')
         return repo_path
 
     def get_repo_url(self):
@@ -240,10 +258,11 @@ class Project(models.Model):
         logging.info("Craeted timeline entry: %s" % obj)
 
     def save(self, *args, **kwargs):
-        if self.name.lower() in BANNED_PROJECT_NAMES:
+        if self.name.lower() in projector_settings.BANNED_PROJECT_NAMES:
             raise WrongProjectNameError("Project's '%r' cannot be used - it "
                 "is one of the banned names:\n%s"
-                % (self.name, pprint.pformat(BANNED_PROJECT_NAMES)))
+                % (self.name, pprint.pformat(
+                    projector_settings.BANNED_PROJECT_NAMES)))
         super(Project, self).save(*args, **kwargs)
 
     def set_author_permissions(self):
@@ -258,7 +277,8 @@ class Project(models.Model):
             # as superusers has all permissions
             return
         import itertools
-        from projector.permissions import ProjectPermission, get_or_create_permisson
+        from projector.permissions import ProjectPermission
+        from projector.permissions import get_or_create_permisson
         available_permissions = ProjectPermission.get_local_checks()
 
         perms = Permission.objects.for_user(self.author, self)
@@ -380,8 +400,9 @@ class Milestone(models.Model):
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
-            datetime.timedelta(days=60))
-    date_completed = models.DateField(_('date completed'), null=True, blank=True)
+        datetime.timedelta(days=projector_settings.DEFAULT_DEADLINE_DELTA))
+    date_completed = models.DateField(_('date completed'), null=True,
+        blank=True)
 
     class Meta:
         ordering = ('created_at',)
@@ -437,9 +458,12 @@ class Milestone(models.Model):
         return Decimal(100) - self.get_finished_tasks_count_as_percentage()
 
 class TimelineEntry(models.Model):
-    project = models.ForeignKey(Project, verbose_name=_('project'), editable=False)
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True, editable=False)
-    user = models.ForeignKey(User, verbose_name=_('user'), null=True, blank=True, editable=False)
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+        editable=False)
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True,
+        editable=False)
+    user = models.ForeignKey(User, verbose_name=_('user'), null=True,
+        blank=True, editable=False)
     action = models.CharField(_('action'), max_length=256)
 
     class Meta:
@@ -466,8 +490,10 @@ class Priority(OrderedDictModel):
 
 class Status(OrderedDictModel):
     project = models.ForeignKey(Project)
-    is_resolved = models.BooleanField(verbose_name=_('is resolved'), default=False)
-    is_initial = models.BooleanField(verbose_name=_('is task action'), default=False)
+    is_resolved = models.BooleanField(verbose_name=_('is resolved'),
+        default=False)
+    is_initial = models.BooleanField(verbose_name=_('is task action'),
+        default=False)
     destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
         through='Transition', symmetrical=False, null=True, blank=True)
 
@@ -526,8 +552,10 @@ class AbstractTask(models.Model):
     used in a different way - for TaskRevision they work as
     ``edited_at``, ``editor`` and ``editor_ip`` of Task model.
     """
-    created_at = models.DateTimeField(_('created at'), default=datetime.datetime.now, editable=False)
-    author = models.ForeignKey(User, verbose_name=_('author'), related_name='created_%(class)s', blank=True)
+    created_at = models.DateTimeField(_('created at'),
+        default=datetime.datetime.now, editable=False)
+    author = models.ForeignKey(User, verbose_name=_('author'),
+        related_name='created_%(class)s', blank=True)
     author_ip = models.IPAddressField(blank=True)
     revision = models.IntegerField(editable=False, default=0)
     summary = models.CharField(_('summary'), max_length=64)
@@ -535,9 +563,12 @@ class AbstractTask(models.Model):
     status = models.ForeignKey(Status, verbose_name=_('status'))
     priority = models.ForeignKey(Priority, verbose_name=_('priority'))
     type = models.ForeignKey(TaskType, verbose_name=_('task type'))
-    owner = models.ForeignKey(User, verbose_name=_('owner'), related_name='owned_%(class)s', null=True, blank=True)
-    deadline = models.DateField(_('deadline'), null=True, blank=True, help_text='YYYY-MM-DD')
-    milestone = models.ForeignKey(Milestone, verbose_name=_('milestone'), null=True, blank=True)
+    owner = models.ForeignKey(User, verbose_name=_('owner'),
+        related_name='owned_%(class)s', null=True, blank=True)
+    deadline = models.DateField(_('deadline'), null=True, blank=True,
+        help_text='YYYY-MM-DD')
+    milestone = models.ForeignKey(Milestone, verbose_name=_('milestone'),
+        null=True, blank=True)
     component = models.ForeignKey(Component, verbose_name=_('component'))
 
 
@@ -733,12 +764,12 @@ def request_new_profile(sender, instance, **kwargs):
         profile.save()
         logging.debug("Created profile's id: %s" % profile.id)
 
-@signals.pre_save(sender=Project)
-def project_creation_listener(instance, **kwargs):
-    if instance.pk is not None:
+@signals.post_save(sender=Project)
+def project_created_listener(instance, **kwargs):
+    if not kwargs.get('created', False):
         return
-    if HG_ROOT_DIR:
-        repo_path = instance.get_repo_path()
+    if projector_settings.PROJECTS_ROOT_DIR:
+        repo_path = instance._get_repo_path()
         logging.info("Creating new mercurial repository at %s" % repo_path)
         if os.path.exists(repo_path):
             logging.warn("Project '%s': cannot create repository "
@@ -746,8 +777,7 @@ def project_creation_listener(instance, **kwargs):
         else:
             repo = mercurial.hg.repository(mercurial.ui.ui(), repo_path,
                 create=True)
-        instance.repository_url = repo_path
     else:
-        logging.debug("PROJECTOR_HG_ROOT_DIR is not set so we do NOT "
+        logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
             "create repository to this project.")
 

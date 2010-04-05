@@ -16,7 +16,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_str 
+from django.utils.encoding import smart_str
 from django.views.generic.simple import direct_to_template
 
 from django.contrib.auth.models import User, AnonymousUser
@@ -35,14 +35,14 @@ class MercurialRequest(wsgirequest):
     """
     _already_responded = False
     _response_written = False
-    
+
     def __init__(self, request):
         """
         Initializes ``MercurialRequest`` and make necessary
         changes to the ``env`` attribute (which is ``META``
         attribute of the given request).
         """
-        
+
         # Before we set environment for mercurial
         # we need to fix (if needed) it's PATH_INFO
         if not request.META['PATH_INFO'].endswith == '/':
@@ -86,7 +86,7 @@ class MercurialRequest(wsgirequest):
 
             for key, value in self.headers:
                 self._response[key] = value
-            
+
             self._already_responded = True
             #self._headers = []
 
@@ -123,7 +123,7 @@ class MercurialServer(object):
         mercurial_request = MercurialRequest(request)
         response = mercurial_request.get_response(self._hgserve)
         return response
-        
+
 def get_mercurial_response(request, repo_path, name, baseurl, push_ssl='false',
     description='', contact='', allow_push=None, username=None):
     """
@@ -158,7 +158,7 @@ def hgrepo_detail(request, project_slug):
     if not is_mercurial(request):
         logging.warn("simplehg.hgrepo_detail request not from mercurial client!?")
         raise NotMercurialRequestError("Only mercurial requests are allowed here")
-    
+
     if project.is_public() and request.method == 'GET':
         logging.debug("Setting AnonymousUser user.")
         user = AnonymousUser()
@@ -166,7 +166,7 @@ def hgrepo_detail(request, project_slug):
         logging.debug("Calling basic_auth")
         user = basic_auth(request)
         request.user = user
-    
+
     # Check permissions
     if user:
         check = ProjectPermission(user)
@@ -190,7 +190,7 @@ def hgrepo_detail(request, project_slug):
 
     try:
         response = get_mercurial_response(request,
-            repo_path = project.get_repo_path(),
+            repo_path = project._get_repo_path(),
             name = project.name,
             contact = project.author.email,
             description = project.description,

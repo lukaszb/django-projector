@@ -4,9 +4,7 @@
 
 {% block extra_head %}
     {{ block.super }}
-    {#<script type="text/javascript" src="/static/js/projector/task_action_form.js"></script>#}
-    <script type="text/javascript" src="{{ MEDIA_URL }}richtemplates/js/action_form.js"></script>
-    {{ action_form.media }}
+    <script type="text/javascript" src="{{ RICHTEMPLATES_MEDIA_URL }}js/action_form.js"></script>
 {% endblock %}
 
 {% load i18n %}
@@ -49,9 +47,7 @@
                 </tr>
                 <tr>
                     <th>{% trans "Project" %}</th>
-                    <td class="show-tipsy" title="{{ task.project.description }}">
-                        <a href="{{ task.project.get_absolute_url }}">{{ task.project }}</a>
-                    </td>
+                    <td><a href="{{ task.project.get_absolute_url }}">{{ task.project }}</a></td>
                 </tr>
                 <tr>
                     <th>{% trans "Component" %}</th>
