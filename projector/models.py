@@ -80,7 +80,7 @@ def validate_project_name(name):
     Checks if this project name may be used.
     """
     if name.lower() in projector_settings.BANNED_PROJECT_NAMES:
-        raise ValidationError(_("Wrong name"))
+        raise ValidationError(_("This name is restricted"))
 
 class Project(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True,
@@ -88,7 +88,7 @@ class Project(models.Model):
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
         null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, validators=[validate_project_name])
     home_page_url = models.URLField(_("home page url "), null=True, blank=True,
         verify_exists=False)
     active = models.BooleanField(_('active'), default=True)
