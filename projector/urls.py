@@ -100,9 +100,3 @@ urlpatterns += patterns('',
         {'feed_dict': feeds}),
 )
 
-# ========================== #
-# restructuredText directive #
-# ========================== #
-
-#import rst_directive
-#print "rst_directive loaded"

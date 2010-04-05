@@ -47,12 +47,6 @@ class ProjectForm(forms.ModelForm):
         else:
             raise forms.ValidationError(_("Choose one of the given options"))
 
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        #if name in BANNED_PROJECT_NAMES:
-        #    raise forms.ValidationError(_("This name is restricted"))
-        return name
-
 class TaskCommentForm(forms.Form):
     comment = forms.CharField(label=_("Comment"), widget=forms.Textarea,
         required=False)

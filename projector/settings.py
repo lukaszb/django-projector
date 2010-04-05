@@ -33,3 +33,4 @@ else:
             % PROJECTS_ROOT_DIR)
 
 DEFAULT_DEADLINE_DELTA = 60 # In days
+

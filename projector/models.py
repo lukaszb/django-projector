@@ -100,11 +100,8 @@ class Project(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
     outdated = models.BooleanField(_('outdated'), default=False)
-    #tags = TagField()
 
     objects = ProjectManager()
-
-    class WrongProjectNameError(ProjectorError): pass
 
     class Meta:
         verbose_name = _('project')
@@ -134,6 +131,7 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
+        self.full_clean()
         super(Project, self).save(*args, **kwargs)
 
     @models.permalink
@@ -248,10 +246,6 @@ class Project(models.Model):
         else:
             prefix = 'https://'
         return ''.join((prefix, current_site.domain, self.get_absolute_url()))
-
-    def clean(self):
-        if self.name.lower in projector_settings.BANNED_PROJECT_NAMES:
-            raise ValidationError(_("This name is restricted"))
 
     def add_timeline_entry(self, action, author):
         """
