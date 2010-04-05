@@ -17,7 +17,7 @@ Features
 - Customizable workflow for each project
 - Grouping tasks in milestones
 - Roadmap
-- Granual permissions management (see :ref:`authorization`)
+- Granual permissions management
 - Documents based on `restructuredText`_
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
@@ -74,6 +74,13 @@ of the license with source distribution, at the root location, within
 .. _Trac: http://trac.edgewall.org/
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _MIT: http://www.opensource.org/licenses/mit-license.php
+.. _django-richtemplates: http://bitbucket.org/lukaszb/django-richtemplates/
+.. _django-piston: http://bitbucket.org/jespern/django-piston/
+.. _restructuredText: http://docutils.sourceforge.net/rst.html
+.. _mercurial: http://mercurial.selenic.com/
+.. _subversion: http://subversion.tigris.org/
+.. _git: http://git-scm.com/
+.. _capo: http://bitbucket.org/lukaszb/capo/
 
 .. [1] Don't get us wrong, Trac_ is great tool but we believe that
    django's pluggable applications are far easier to configure and
