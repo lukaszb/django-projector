@@ -49,8 +49,8 @@ class ProjectForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if name in BANNED_PROJECT_NAMES:
-            raise forms.ValidationError(_("Cannot use this name"))
+        #if name in BANNED_PROJECT_NAMES:
+        #    raise forms.ValidationError(_("This name is restricted"))
         return name
 
 class TaskCommentForm(forms.Form):

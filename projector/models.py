@@ -75,8 +75,16 @@ class ProjectCategory(models.Model):
         return ('projector_project_category_details', (), {
             'project_category_slug' : self.slug })
 
+def validate_project_name(name):
+    """
+    Checks if this project name may be used.
+    """
+    if name.lower() in projector_settings.BANNED_PROJECT_NAMES:
+        raise ValidationError(_("Wrong name"))
+
 class Project(models.Model):
-    name = models.CharField(_('name'), max_length=64, unique=True)
+    name = models.CharField(_('name'), max_length=64, unique=True,
+        validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
         null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
@@ -241,6 +249,9 @@ class Project(models.Model):
             prefix = 'https://'
         return ''.join((prefix, current_site.domain, self.get_absolute_url()))
 
+    def clean(self):
+        if self.name.lower in projector_settings.BANNED_PROJECT_NAMES:
+            raise ValidationError(_("This name is restricted"))
 
     def add_timeline_entry(self, action, author):
         """
@@ -256,14 +267,6 @@ class Project(models.Model):
         }
         obj = TimelineEntry.objects.create(**timeline_entry_info)
         logging.info("Craeted timeline entry: %s" % obj)
-
-    def save(self, *args, **kwargs):
-        if self.name.lower() in projector_settings.BANNED_PROJECT_NAMES:
-            raise WrongProjectNameError("Project's '%r' cannot be used - it "
-                "is one of the banned names:\n%s"
-                % (self.name, pprint.pformat(
-                    projector_settings.BANNED_PROJECT_NAMES)))
-        super(Project, self).save(*args, **kwargs)
 
     def set_author_permissions(self):
         """

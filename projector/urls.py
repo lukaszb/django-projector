@@ -29,7 +29,7 @@ urlpatterns += patterns('projector.views.project',
     # Milestones
     url(r'^projects/(?P<project_slug>[-\w]+)/milestones/$',
         view='project_milestones',
-        name='projector_project_milestones'),    
+        name='projector_project_milestones'),
     url(r'^projects/(?P<project_slug>[-\w]+)/milestones/create/$',
         view='project_milestones_add',
         name='projector_project_milestones_add'),
@@ -84,8 +84,8 @@ urlpatterns += patterns('projector.views.reports',
 )
 
 urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+/?)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
-)        
+    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
+)
 
 # ========== #
 # Feeds dict #
