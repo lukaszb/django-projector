@@ -29,6 +29,8 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
     Task details view.
     Users may update task here.
     """
+    logging.info("task_details: project_slug given is '%s'" % project_slug)
+    logging.info("task_details: task_id given is '%s'" % task_id)
     task = get_object_or_404(
         Task.objects.select_related('type', 'priority', 'status', 'owner',
             'author', 'editor', 'milestone', 'component', 'project'),

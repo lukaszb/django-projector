@@ -35,7 +35,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        exclude = ('members', 'author', 'editor', 'repository_url')
+        exclude = ('members', 'author', 'editor')
 
     def clean_public(self):
         data = self.cleaned_data['public']

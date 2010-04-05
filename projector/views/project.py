@@ -485,7 +485,7 @@ def project_changesets(request, project_slug):
         check = ProjectPermission(request.user)
         if not check.read_repository_project(project):
             raise PermissionDenied()
-    if not project.repository_url:
+    if not project._get_repo_path():
         messages.error(request, _("Repository's url is not set! Please "
             "configure project preferences first."))
     context = {

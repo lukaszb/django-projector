@@ -23,8 +23,8 @@ BANNED_PROJECT_NAMES += (
 
 PROJECTS_ROOT_DIR = getattr(settings, 'PROJECTOR_PROJECTS_ROOT_DIR', None)
 if PROJECTS_ROOT_DIR is None:
-    logging.debug("django-projector: PROJECTS_ROOT_DIR not set -"
-        "will not create repositories")
+    logging.debug("django-projector: RICHTEMPLATES_PROJECTS_ROOT_DIR not set "
+        "- will not create repositories")
 else:
     PROJECTS_ROOT_DIR = abspath(PROJECTS_ROOT_DIR)
     if not os.path.exists(PROJECTS_ROOT_DIR):
