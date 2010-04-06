@@ -21,7 +21,7 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Projects' tasks summary" %}</h5>
     <div class="richtemplates-panel-content">
-        <table class="datatable">
+        <table class="datatable centered">
             <caption>{% trans "Open tasks" %}</caption>
             <tr>
                 <th colspan="2">{% trans "By assignee" %}</th>
@@ -56,12 +56,31 @@
                 </td>
             </tr>
 
+            {% endfor %}
+
+            <tr>
+                <th colspan="2">{% trans "By component" %}</th>
+            </tr>
+            {% regroup project.get_open_tasks by component as tasks_by_component %}
+            {% for component in tasks_by_component %}
+            <tr>
+                <td>
+                    {{ component.grouper }}
+                </td>
+                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&component={{ component.grouper.id }}"
+                        class="block-link show-tipsy"
+                        title="{% trans "Show open tasks with component" %}
+                        {{ component.grouper }}">{{ component.list|length }}</a>
+                </td>
+            </tr>
+
+            {% endfor %}
+
             <tr>
                 <th>{% trans "All open tasks" %}</th>
                 <th><a href="{{ project.get_task_list_url }}?is_resolved=3"
                         class="block-link">{{ project.get_open_tasks.count }}</a></th>
             </tr>
-            {% endfor %}
         </table>
         {% comment %}
             {% chart  Pie3D  1 2 3 4 %}
@@ -88,6 +107,7 @@
             <li><a class="button-link" href="{{ project.get_edit_url }}">{% trans "Edit" %}</a></li>
             {% endifhasperm %}
             <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_components_url }}">{% trans "Components" %}</a></li>
             <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
             <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a></li>
             <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>

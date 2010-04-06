@@ -12,6 +12,7 @@ from projector.models import Project
 from projector.models import ProjectCategory
 from projector.models import Task
 from projector.models import Status
+from projector.models import Component
 from projector.models import Milestone
 from projector.settings import BANNED_PROJECT_NAMES
 
@@ -137,6 +138,12 @@ class MilestoneForm(forms.ModelForm):
     class Meta:
         model = Milestone
         exclude = ['project', 'author']
+
+class ComponentForm(forms.ModelForm):
+
+    class Meta:
+        model = Component
+        exclude = ['project']
 
 class StatusEditForm(forms.ModelForm):
 

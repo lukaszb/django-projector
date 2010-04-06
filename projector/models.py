@@ -22,6 +22,7 @@ from django.template.defaultfilters import slugify
 
 from annoying.decorators import signals
 from authority.models import Permission
+from autoslug import AutoSlugField
 from projector.conf import default_workflow
 from projector.utils import abspath, using_projector_profile
 from projector import settings as projector_settings
@@ -172,6 +173,16 @@ class Project(models.Model):
     @models.permalink
     def get_milestones_add_url(self):
         return ('projector_project_milestones_add', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
+    def get_components_url(self):
+        return ('projector_project_components', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
+    def get_component_add_url(self):
+        return ('projector_project_component_add', (),
             {'project_slug': self.slug })
 
     @models.permalink
@@ -360,6 +371,7 @@ class Project(models.Model):
 class Component(models.Model):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=64)
+    slug = AutoSlugField(max_length=64, populate_from='name')
     description = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -370,6 +382,20 @@ class Component(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('projector_project_component_detail', (), {
+            'project_slug': self.project.slug,
+            'component_slug': self.slug,
+        })
+
+    @models.permalink
+    def get_edit_url(self):
+        return ('projector_project_component_edit', (), {
+            'project_slug': self.project.slug,
+            'component_slug': self.slug,
+        })
 
 class Membership(models.Model):
     member = models.ForeignKey(User, verbose_name=_('member'))
@@ -392,7 +418,7 @@ class Membership(models.Model):
 class Milestone(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'))
     name = models.CharField(max_length=64)
-    slug = models.SlugField(unique=True)
+    slug = AutoSlugField(max_length=64, populate_from='name')
     description = models.TextField()
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -457,8 +483,7 @@ class Milestone(models.Model):
 class TimelineEntry(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'),
         editable=False)
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True,
-        editable=False)
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     user = models.ForeignKey(User, verbose_name=_('user'), null=True,
         blank=True, editable=False)
     action = models.CharField(_('action'), max_length=256)
@@ -584,7 +609,8 @@ class Task(AbstractTask):
     id = models.IntegerField(editable=False)
     project = models.ForeignKey(Project, verbose_name=_('project'))
     edited_at = models.DateTimeField(_('edited at'), auto_now=True)
-    editor = models.ForeignKey(User, verbose_name=_('editor'), blank=True, null=True)
+    editor = models.ForeignKey(User, verbose_name=_('editor'), blank=True,
+        null=True)
     editor_ip = models.IPAddressField(blank=True)
 
     class Meta:
@@ -738,7 +764,8 @@ class TaskRevision(AbstractTask):
         unique_together = ('revision', 'task')
 
     def __unicode__(self):
-        return _("Revision ") + str(self.revision)
+        return "#%d %s: Revision %d" % (self.task.id, self.task.summary,
+            self.revision)
 
 # ==================== #
 # Signals and handlers #

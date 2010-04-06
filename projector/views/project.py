@@ -24,9 +24,9 @@ from authority.forms import UserPermissionForm
 from authority.models import Permission
 
 from projector.models import Project, ProjectCategory, Membership, Task, \
-    Milestone, Status, Transition
+    Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm, \
-    StatusForm, StatusEditForm, StatusFormSet
+    StatusForm, StatusEditForm, StatusFormSet, ComponentForm
 from projector.views.task import task_create
 from projector.permissions import ProjectPermission
 from projector.utils.simplehg import hgrepo_detail, is_mercurial
@@ -168,7 +168,8 @@ def project_milestone_detail(request, project_slug, milestone_slug):
     Returns milestone detail view.
     """
     project = get_object_or_404(Project, slug=project_slug)
-    milestone = get_object_or_404(Milestone, slug=milestone_slug)
+    milestone = get_object_or_404(Milestone,
+        project=project, slug=milestone_slug)
     if project.is_private():
         check = ProjectPermission(user=request.user)
         if not check.view_project(project):
@@ -193,7 +194,7 @@ def project_milestones_add(request, project_slug):
         milestone = form.save()
         msg = _("Milestone added successfully")
         messages.success(request, msg)
-        return redirect(project.get_absolute_url())
+        return redirect(milestone.get_absolute_url())
     context = {
         'form': form,
         'project': project,
@@ -215,6 +216,85 @@ def project_milestone_edit(request, project_slug, milestone_slug):
         msg = _("Milestone updated successfully")
         messages.success(request, msg)
         return redirect(milestone.get_absolute_url())
+    context = {
+        'form': form,
+        'project': project,
+    }
+    return context
+
+@render_to('projector/project/component_list.html')
+def project_components(request, project_slug):
+    """
+    Returns components view.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(user=request.user)
+        if not check.view_project(project):
+            raise PermissionDenied()
+    component_list = project.component_set\
+        .annotate(Count('task'))
+    context = {
+        'project': project,
+        'component_list': component_list,
+    }
+    return context
+
+@render_to('projector/project/component_detail.html')
+def project_component_detail(request, project_slug, component_slug):
+    """
+    Returns component detail view.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    component = get_object_or_404(Component, project=project,
+        slug=component_slug)
+    if project.is_private():
+        check = ProjectPermission(user=request.user)
+        if not check.view_project(project):
+            raise PermissionDenied()
+    context = {
+        'project': project,
+        'component': component,
+    }
+    return context
+
+@permission_required_or_403('project_permission.change_project',
+    (Project, 'slug', 'project_slug'))
+@render_to('projector/project/component_add.html')
+def project_component_add(request, project_slug):
+    """
+    Adds component for project.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    component = Component(project=project)
+    form = ComponentForm(request.POST or None, instance=component)
+    if request.method == 'POST' and form.is_valid():
+        component = form.save()
+        msg = _("Component added successfully")
+        messages.success(request, msg)
+        return redirect(component.get_absolute_url())
+    context = {
+        'form': form,
+        'project': project,
+    }
+    return context
+
+@permission_required_or_403('project_permission.change_project',
+    (Project, 'slug', 'project_slug'))
+@render_to('projector/project/component_edit.html')
+def project_component_edit(request, project_slug, component_slug):
+    """
+    Edits chosen component.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    component = get_object_or_404(Component,
+        project=project, slug=component_slug)
+    form = ComponentForm(request.POST or None, instance=component)
+    if request.method == 'POST' and form.is_valid():
+        component = form.save()
+        msg = _("Milestone updated successfully")
+        messages.success(request, msg)
+        return redirect(component.get_absolute_url())
     context = {
         'form': form,
         'project': project,

@@ -1,0 +1,53 @@
+{% extends "projector/project/details.html" %}
+
+{% load i18n %}
+{% load permissions %}
+{% load richtemplates_tags %}
+
+{% block col_main_extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Project's components" %}</h5>
+    <div class="richtemplates-panel-content">
+    <ul class="nav-inline">
+        {% ifhasperm "project_permission.change_project" request.user project %}
+        <li><a class="button-link" href="{{ project.get_component_add_url }}">{% trans "Add component" %}</a></li>
+        {% endifhasperm %}        
+    </ul>    
+
+    {% load pagination_tags %}
+    {% load sorting_tags %}
+
+    {% autosort component_list %}
+    {% autopaginate component_list %}
+
+    <table class="datatable">
+        <thead class="datatable-thead">
+            <tr class="datatable-thead-subheader">
+                <th>{% anchor name _("Component") %}</th>
+                <th>{% anchor task__count _("Tasks") %}</th>
+            </tr>
+        </thead>
+        <tbody class="datatable-tbody">
+            {% for component in component_list %}
+            <tr class="{% cycle "odd" "even" %} hoverable">
+                <td><a class="block-link {% if component.description %}show-tipsy{% endif %}"
+                        href="{% url projector_project_component_detail project.slug component.slug %}"
+                        title="{{ component.description }}">{{ component.name }}</a>
+                </td>
+                <td><a class="block-link show-tipsy centered"
+                        title="{% trans "Show all related tasks" %}"
+                        href="{{ project.get_task_list_url }}?component={{ component.id }}"
+                        >{{ component.task__count }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+</div>
+</div>
+
+{% endblock %}
+

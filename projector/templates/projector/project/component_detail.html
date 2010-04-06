@@ -8,35 +8,34 @@
 
 {% block col_main_extra %}
 <div class="richtemplates-panel">    
-    <h5>{% trans "Milestone detail" %}</h5>
+    <h5>{% trans "Component detail" %}</h5>
     <div class="richtemplates-panel-content">
         <ul class="nav-inline">
-            <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Back to list" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_components_url }}">{% trans "Back to list" %}</a></li>
             {% ifhasperm "project_permission.change_project" request.user project %}
-            <li><a class="button-link" href="{{ milestone.get_edit_url }}">{% trans "Edit" %}</a></li>
+            <li><a class="button-link" href="{{ component.get_edit_url }}">{% trans "Edit" %}</a></li>
             {% endifhasperm %}
-            <li><a class="button-link" href="{{ milestone.get_tasks_url }}">{% trans "Show tasks" %}</a></li>
         </ul>
         <div class="richblock">
             <table class="richblock-properties">
                 <tbody>
                     <tr>
                         <th>{% trans "Name" %}</th>
-                        <td>{{ milestone.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% trans "Deadline" %}</th>
-                        <td>{{ milestone.deadline }}</td>
+                        <td>{{ component.name }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <h2>{% trans "Description" %}:</h2>
         <div class="block-rst">
-            {{ milestone.description|restructuredtext }}
+            {% if component.description %}
+            {{ component.description|restructuredtext }}
+            {% else %}
+            <ul class="messages">
+                <li class="message message-warning">{% trans "No description has been set" %}</li>
+            </ul>
+            {% endif %}
         </div>
-
-        {% include "projector/project/milestone_progress_table.html" %}
 
     </div>
 </div>

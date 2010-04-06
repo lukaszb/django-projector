@@ -53,6 +53,7 @@
                 <th>{% anchor deadline "Deadline" %}</th>
                 <th>{% anchor priority "Priority" %}</th>
                 <th>{% anchor type "Type" %}</th>
+                <th>{% anchor component "Component" %}</th>
                 <th>{% anchor status "Status" %}</th>
                 <th>{% anchor author "Reported by" %}</th>
                 <th>{% anchor owner "Owner" %}</th>
@@ -62,20 +63,21 @@
             {% for task in task_list %}
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td>{{ task.id }}</td>
-                <td><a class="block-link" href="{{ task.get_absolute_url }}">{{ task.summary }}</a></td>
-                <td>{{ task.milestone }}</td>
+                <td><a href="{{ task.get_absolute_url }}" class="block-link">{{ task.summary }}</a></td>
+                <td><a href="{{ task.milestone.get_absolute_url }}" class="block-link">{{ task.milestone }}</a></td>
                 <td>{{ task.created_at|date:"Y-m-d" }}</td>
                 <td>{{ task.edited_at|date:"Y-m-d" }}</td>
                 <td>{{ task.deadline|date:"Y-m-d" }}</td>
                 <td>{{ task.priority.name }}</td>
                 <td>{{ task.type }}</td>
+                <td><a href="{{ task.component.get_absolute_url }}" class="block-link">{{ task.component }}</a></td>
                 <td>
                     <span class="{% if task.status.is_resolved %}task-closed{% else %}task-open{% endif %}">
                         {{ task.status }}
                     </span>
                 </td>
-                <td>{{ task.author }}</td>
-                <td>{{ task.owner }}</td>
+                <td><a href="{{ task.author.get_absolute_url }}" class="block-link">{{ task.author }}</a></td>
+                <td><a href="{{ task.owner.get_absolute_url }}" class="block-link">{{ task.owner }}</a></td>
             </tr>
             {% endfor %}
         </tbody>

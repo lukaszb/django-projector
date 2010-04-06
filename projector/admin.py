@@ -45,15 +45,19 @@ class TaskAdminForm(LimitingModelForm):
         choices_limiting_fields = ['project']
         model = Task
 
+class TaskRevisionInline(admin.TabularInline):
+    model = TaskRevision
+    extra = 1
+
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ( 'pk', 'project', 'component', 'id', 'summary',
+    list_display = ( 'project', 'component', 'id', 'summary',
         'created_at', 'author', 'status', 'priority', 'type')
     list_display_links = ('summary',)
-    list_filter = ('project', 'type', 'priority', 'status')
+    list_filter = ('project',)
     date_hierarchy = 'created_at'
     save_on_top = True
-    search_fields = ['summary', 'description']
-    inlines = [AttachmentInlines]
+    search_fields = ['id', 'summary', 'description']
+    inlines = [TaskRevisionInline, AttachmentInlines]
     form = TaskAdminForm
 
     # Overrides save_model *method*
@@ -119,15 +123,6 @@ class TaskAutocompleteAdmin(TaskAdmin, ForeignKeyAutocompleteAdmin):
         'owner': ('username',),
     }
 
-class TaskRevisionAdmin(admin.ModelAdmin):
-    list_display = ( 'task', 'revision',
-        'created_at', 'author', 'status', 'priority', 'type')
-    #list_display_links = ('summary',)
-    list_filter = ('task', 'type', 'priority', 'status')
-    date_hierarchy = 'created_at'
-    save_on_top = True
-    #search_fields = ['summary', 'description']
-
 class OrderedDictModelAdmin(admin.ModelAdmin):
     list_display = ( 'id', 'name', 'order', 'description' )
     list_display_links = ( 'id', 'name' )
@@ -183,7 +178,6 @@ admin.site.register(Status, StatusAdmin)
 #admin.site.register(Priority, OrderedDictModelAdmin)
 admin.site.register(TaskType, TaskTypeAdmin)
 admin.site.register(Task, TaskAutocompleteAdmin)
-admin.site.register(TaskRevision, TaskRevisionAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectCategory)
 admin.site.register(Membership)

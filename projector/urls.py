@@ -40,6 +40,20 @@ urlpatterns += patterns('projector.views.project',
         view='project_milestone_edit',
         name='projector_project_milestone_edit'),
 
+    # Components
+    url(r'^projects/(?P<project_slug>[-\w]+)/components/$',
+        view='project_components',
+        name='projector_project_components'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/components/create/$',
+        view='project_component_add',
+        name='projector_project_component_add'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/$',
+        view='project_component_detail',
+        name='projector_project_component_detail'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/edit/$',
+        view='project_component_edit',
+        name='projector_project_component_edit'),
+
     # Workflow
     url(r'^projects/(?P<project_slug>[-\w]+)/workflow/$',
         view='project_workflow_detail',
@@ -70,13 +84,18 @@ urlpatterns += patterns('projector.views.project',
         view='project_changesets',
         name='projector_project_changesets'),
 
-    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/$', 'project_task_list', name='projector_task_list'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/$',
+        view='project_task_list',
+        name='projector_task_list'),
 )
 
 urlpatterns += patterns('projector.views.task',
-    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/create/$', 'task_create', name='projector_task_create'),
-    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/$', 'task_details', name='projector_task_details'),
-    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/edit/$', 'task_edit', name='projector_task_edit'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/create/$',
+        view='task_create', name='projector_task_create'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/$',
+        view='task_details', name='projector_task_details'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/edit/$',
+        view='task_edit', name='projector_task_edit'),
 )
 
 urlpatterns += patterns('projector.views.reports',
@@ -84,7 +103,8 @@ urlpatterns += patterns('projector.views.reports',
 )
 
 urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$', 'project_details', name='projector_project_details'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$',
+        view='project_details', name='projector_project_details'),
 )
 
 # ========== #

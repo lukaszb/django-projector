@@ -21,8 +21,9 @@ Requirements
 Following packages are needed to get ``django-projector`` working:
 
 - `Django`_ >= 1.2
-- `django-authority`_
 - `django-annoying`_
+- `django-authority`_
+- `django-autoslug`_
 - `django-attachments`_
 - `django-extensions`_
 - `django-pagination`_
@@ -40,8 +41,9 @@ Following packages are needed to get ``django-projector`` working:
     command, package uninstallation and others.
 
 .. _django: http://www.djangoproject.com
-.. _django-authority: http://bitbucket.org/jezdez/django-authority/
 .. _django-annoying: http://bitbucket.org/offline/django-annoying/
+.. _django-authority: http://bitbucket.org/jezdez/django-authority/
+.. _django-autoslug: http://bitbucket.org/neithere/django-autoslug/
 .. _django-attachments: http://github.com/bartTC/django-attachments 
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
 .. _django-pagination: http://code.google.com/p/django-pagination/
