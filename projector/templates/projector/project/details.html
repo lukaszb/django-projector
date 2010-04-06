@@ -3,6 +3,7 @@
 {% load markup %}
 {% load i18n %}
 {% load permissions %}
+{% load charts %}
 
 {% block extra_head %}{{ block.super }}
 <script type="text/javascript">
@@ -62,6 +63,13 @@
             </tr>
             {% endfor %}
         </table>
+        {% comment %}
+            {% chart  Pie3D  1 2 3 4 %}
+                {% size 100 200 %}
+                {% label A B "Opened tasks" "Closed tasks"  %}
+                {% color 00dd00 %}
+            {% endchart %}
+        {% endcomment %}
     </div>
 </div>
 

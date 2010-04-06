@@ -163,8 +163,9 @@ class StatusForm(StatusEditForm):
         exclude = ['project', 'destinations']
 
 StatusFormSetBase = modelformset_factory(Status,
+    exclude = ['description', 'project'],
     extra = 0,
-    fields = ['name', 'order', 'destinations'])
+)
 
 class StatusFormSet(StatusFormSetBase):
 

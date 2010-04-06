@@ -24,7 +24,8 @@ from richtemplates.shortcuts import get_first_or_None
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory,\
     UserByNameField
 
-def task_details(request, project_slug, task_id, template_name='projector/task/details.html'):
+def task_details(request, project_slug, task_id,
+    template_name='projector/task/details.html'):
     """
     Task details view.
     Users may update task here.
@@ -96,7 +97,8 @@ def task_details(request, project_slug, task_id, template_name='projector/task/d
 
 @permission_required_or_403('project_permission.add_task_project',
     (Project, 'slug', 'project_slug'))
-def task_create(request, project_slug, template_name='projector/task/create.html'):
+def task_create(request, project_slug,
+    template_name='projector/task/create.html'):
     """
     New Task creation view.
     """
@@ -116,9 +118,9 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     for attr in (status, type, priority, component):
         if attr is None:
             messages.error(request, _("Statuses, task types, priorities or "
-                "components of this project are missing and we "
-                "cannot create new tasks. Ask site administrator for "
-                "help."))
+                "components of this project are missing or no initial status "
+                "is defined and we cannot create new tasks. Ask site "
+                "administrator for help."))
             return render_to_response(template_name, {}, RequestContext(request))
 
     instance = Task(
@@ -135,7 +137,8 @@ def task_create(request, project_slug, template_name='projector/task/create.html
     form = TaskForm(request.POST or None, initial=initial, instance=instance)
     if request.method == 'POST':
         if form.errors:
-            logging.error("Form has following errors:\n%s" % pprint.pformat(form.errors))
+            logging.error("Form has following errors:\n%s"
+                % pprint.pformat(form.errors))
         if form.is_valid():
             task = form.save(
                 editor = request.user,
@@ -154,7 +157,8 @@ def task_create(request, project_slug, template_name='projector/task/create.html
 
 @permission_required_or_403('project_permission.change_task_project',
     (Project, 'slug', 'project_slug'))
-def task_edit(request, project_slug, task_id, template_name='projector/task/create.html'):
+def task_edit(request, project_slug, task_id,
+    template_name='projector/task/create.html'):
     """
     Edit Task meta information. task_details edits the rest.
     """

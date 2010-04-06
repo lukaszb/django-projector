@@ -4,7 +4,8 @@ import pprint
 from django.conf import settings
 from django.contrib import auth
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required,\
+    user_passes_test
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q

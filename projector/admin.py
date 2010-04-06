@@ -22,7 +22,7 @@ def author_editor_save_model(self, request, obj, form, change):
     """
 
     logging.debug("%s.save_model method called!" % self.__class__.__name__)
-    
+
     if getattr(obj, 'pk', None) is None:
         # Its a new instance so we need to
         # set author and author_ip fields
@@ -67,7 +67,7 @@ class TaskAdmin(admin.ModelAdmin):
         """
 
         logging.debug("%s.save_model method called!" % self.__class__.__name__)
-        
+
         if getattr(obj, 'pk', None) is None:
             # Its a new instance so we need to
             # set author and author_ip fields
@@ -142,11 +142,15 @@ class TaskTypeInline(admin.TabularInline):
     extra = 1
 
 class ComponentInline(admin.TabularInline):
-    model = Component 
+    model = Component
     extra = 1
 
 class StatusInline(admin.TabularInline):
     model = Status
+    extra = 1
+
+class PriorityInline(admin.TabularInline):
+    model = Priority
     extra = 1
 
 class ProjectAdmin(admin.ModelAdmin):
@@ -155,11 +159,11 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     list_filter = ('category', 'active', 'public', 'outdated')
     save_on_top = True
-    search_fields = ['name', 'description']    
+    search_fields = ['name', 'description']
     prepopulated_fields = {"slug": ("name",)}
 
     inlines = [MilestoneInline, ComponentInline, TaskTypeInline,
-        StatusInline]
+        StatusInline, PriorityInline]
 
 class ComponentAdmin(admin.ModelAdmin):
     list_display = 'project', 'name', 'description'
@@ -173,7 +177,7 @@ class TaskTypeAdmin(admin.ModelAdmin):
     list_display_links = ['name']
     list_filter = ['project']
     search_field = ['name', 'project']
-    
+
 
 admin.site.register(Status, StatusAdmin)
 #admin.site.register(Priority, OrderedDictModelAdmin)

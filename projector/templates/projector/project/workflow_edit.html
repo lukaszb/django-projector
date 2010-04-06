@@ -17,8 +17,11 @@
 
         <form method="post" action=".">
             {% csrf_token %}
-            <table>
-                {{ formset }}
+            {{ formset.management_form }}
+            <table class="form-table">
+            {% for form in formset.forms %}
+                {% include "richtemplates/forms/form.html" %}
+            {% endfor %}
             </table>
             <div>
                 <input id="id_submit" type="submit" name="submit"

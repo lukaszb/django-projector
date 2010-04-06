@@ -306,26 +306,26 @@ class Project(models.Model):
             member=self.author)
         self.set_author_permissions()
 
-        for component_info in default_workflow.components:
+        for component_info in workflow.components:
             component, created = Component.objects\
                 .get_or_create(project = self, **component_info)
             if created:
                 logging.debug("For project '%s' new component '%s' was craeted"
                     % (component.project, component))
-        for task_type_info in default_workflow.task_types:
+        for task_type_info in workflow.task_types:
             task, created = TaskType.objects\
                 .get_or_create(project = self, **task_type_info)
             if created:
                 logging.debug("For project '%s' new task type '%s' was craeted"
                     % (task.project, task))
-        for priority_info in default_workflow.priorities:
+        for priority_info in workflow.priorities:
             priority, created = Priority.objects\
                 .get_or_create(project = self, **priority_info)
             if created:
                 logging.debug("For project '%s' new priority '%s' was created."
                     % (priority.project, priority))
 
-        for status_info in default_workflow.statuses:
+        for status_info in workflow.statuses:
             status, created = Status.objects\
                 .get_or_create(project = self, **status_info)
             if created:
@@ -489,7 +489,7 @@ class Status(OrderedDictModel):
     project = models.ForeignKey(Project)
     is_resolved = models.BooleanField(verbose_name=_('is resolved'),
         default=False)
-    is_initial = models.BooleanField(verbose_name=_('is task action'),
+    is_initial = models.BooleanField(verbose_name=_('is initial'),
         default=False)
     destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
         through='Transition', symmetrical=False, null=True, blank=True)
