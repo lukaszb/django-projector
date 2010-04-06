@@ -68,6 +68,7 @@ class TaskForm(LimitingModelForm):
         self.fields['status'].queryset = Status.objects.filter(
             project=self.instance.project, is_initial=True)
         self.fields['status'].empty_label=None
+        self.fields['owner'].queryset = self.instance.project.members.all()
 
     def clean(self):
         cleaned_data = super(TaskForm, self).clean()
