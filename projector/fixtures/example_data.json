@@ -1,0 +1,1336 @@
+[
+    {
+        "pk": 1, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "admin", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2010-04-06 17:07:51", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$6fd4a$8e258e6d430566b22a78f49873fd0b6d194fd8be", 
+            "email": "a@a.pl", 
+            "date_joined": "2010-04-06 22:52:55"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "john", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2010-04-06 15:58:34", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$eb78e$1b6f1da74117bb02b47da6c6f8d22f2848ba20b3", 
+            "email": "", 
+            "date_joined": "2010-04-06 15:58:34"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "jack", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2010-04-06 15:58:43", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$bd401$29f615a677417ed5cacaf6bbdcaa5128328c551b", 
+            "email": "", 
+            "date_joined": "2010-04-06 15:58:43"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.userprofile", 
+        "fields": {
+            "user": 1, 
+            "activation_token": "", 
+            "skin": ""
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.userprofile", 
+        "fields": {
+            "user": 2, 
+            "activation_token": "", 
+            "skin": ""
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.userprofile", 
+        "fields": {
+            "user": 3, 
+            "activation_token": "", 
+            "skin": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.project", 
+        "fields": {
+            "category": null, 
+            "name": "My first project", 
+            "author": 1, 
+            "created_at": "2010-04-06 15:53:58", 
+            "modified_at": "2010-04-06 15:53:58", 
+            "public": true, 
+            "home_page_url": "", 
+            "active": true, 
+            "outdated": false, 
+            "slug": "my-first-project", 
+            "description": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.component", 
+        "fields": {
+            "project": 1, 
+            "description": null, 
+            "name": "global", 
+            "slug": "global"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.membership", 
+        "fields": {
+            "member": 1, 
+            "project": 1, 
+            "joined_at": "2010-04-06 15:53:58"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.membership", 
+        "fields": {
+            "member": 3, 
+            "project": 1, 
+            "joined_at": "2010-04-06 16:14:05"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.milestone", 
+        "fields": {
+            "date_completed": null, 
+            "description": "First milestone", 
+            "author": 1, 
+            "created_at": "2010-04-06 15:57:41", 
+            "project": 1, 
+            "deadline": "2010-06-05", 
+            "slug": "ver-0-1-0", 
+            "name": "ver 0-1-0"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 1, 
+            "order": 1, 
+            "name": "minor", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 1, 
+            "order": 2, 
+            "name": "major", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 1, 
+            "order": 3, 
+            "name": "critical", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 1, 
+            "order": 4, 
+            "name": "blocker", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "new", 
+            "is_resolved": false, 
+            "project": 1, 
+            "is_initial": true, 
+            "order": 1, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "assigned", 
+            "is_resolved": false, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 2, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "need fix", 
+            "is_resolved": false, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 3, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "need feedback", 
+            "is_resolved": false, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 4, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "need unittest", 
+            "is_resolved": false, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 5, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "fixed", 
+            "is_resolved": true, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 6, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "closed", 
+            "is_resolved": true, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 7, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "wrong", 
+            "is_resolved": true, 
+            "project": 1, 
+            "is_initial": false, 
+            "order": 8, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 3, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 4, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 5, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 6, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 53, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 54, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 55, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 56, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 7, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 58, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 59, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 3
+        }
+    }, 
+    {
+        "pk": 60, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 4
+        }
+    }, 
+    {
+        "pk": 61, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 5
+        }
+    }, 
+    {
+        "pk": 62, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 6
+        }
+    }, 
+    {
+        "pk": 63, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 7
+        }
+    }, 
+    {
+        "pk": 64, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 8, 
+            "destination": 8
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 1, 
+            "order": 1, 
+            "name": "task", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 1, 
+            "order": 2, 
+            "name": "bug", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 1, 
+            "order": 3, 
+            "name": "new feature", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 1, 
+            "order": 4, 
+            "name": "proposal", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.task", 
+        "fields": {
+            "status": 1, 
+            "project": 1, 
+            "description": "More, more, **MORE**", 
+            "author": 1, 
+            "edited_at": "2010-04-06 16:12:42", 
+            "created_at": "2010-04-06 16:12:28", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Another one", 
+            "priority": 1, 
+            "editor_ip": "127.0.0.1", 
+            "deadline": null, 
+            "editor": 1, 
+            "milestone": null, 
+            "owner": null, 
+            "type": 1, 
+            "id": 4, 
+            "revision": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.task", 
+        "fields": {
+            "status": 1, 
+            "project": 1, 
+            "description": "Some description", 
+            "author": 1, 
+            "edited_at": "2010-04-06 16:11:51", 
+            "created_at": "2010-04-06 15:59:01", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Third task", 
+            "priority": 1, 
+            "editor_ip": "127.0.0.1", 
+            "deadline": null, 
+            "editor": 1, 
+            "milestone": 1, 
+            "owner": null, 
+            "type": 1, 
+            "id": 3, 
+            "revision": 3
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.task", 
+        "fields": {
+            "status": 1, 
+            "project": 1, 
+            "description": "Some description", 
+            "author": 1, 
+            "edited_at": "2010-04-06 15:58:14", 
+            "created_at": "2010-04-06 15:58:14", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Second task", 
+            "priority": 1, 
+            "editor_ip": "127.0.0.1", 
+            "deadline": null, 
+            "editor": 1, 
+            "milestone": 1, 
+            "owner": 1, 
+            "type": 1, 
+            "id": 2, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.task", 
+        "fields": {
+            "status": 1, 
+            "project": 1, 
+            "description": "Some description", 
+            "author": 1, 
+            "edited_at": "2010-04-06 15:58:00", 
+            "created_at": "2010-04-06 15:58:00", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "First task", 
+            "priority": 1, 
+            "editor_ip": "127.0.0.1", 
+            "deadline": null, 
+            "editor": 1, 
+            "milestone": 1, 
+            "owner": null, 
+            "type": 1, 
+            "id": 1, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": null, 
+            "task": 4, 
+            "description": "More, more, **MORE**", 
+            "author": 1, 
+            "created_at": "2010-04-06 16:12:28", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Another one", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": null, 
+            "owner": null, 
+            "type": 1, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": "No comments...\r\n", 
+            "task": 4, 
+            "description": "More, more, **MORE**", 
+            "author": 1, 
+            "created_at": "2010-04-06 16:12:42", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Another one", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": null, 
+            "owner": null, 
+            "type": 1, 
+            "revision": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": null, 
+            "task": 3, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 15:59:01", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Third task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": 3, 
+            "type": 1, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": "", 
+            "task": 3, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 16:10:31", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Third task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": 2, 
+            "type": 1, 
+            "revision": 1
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": "", 
+            "task": 3, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 16:11:06", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Third task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": 3, 
+            "type": 1, 
+            "revision": 2
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": "", 
+            "task": 3, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 16:11:51", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Third task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": null, 
+            "type": 1, 
+            "revision": 3
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": null, 
+            "task": 2, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 15:58:14", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "Second task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": 1, 
+            "type": 1, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.taskrevision", 
+        "fields": {
+            "status": 1, 
+            "comment": null, 
+            "task": 1, 
+            "description": "Some description", 
+            "author": 1, 
+            "created_at": "2010-04-06 15:58:00", 
+            "component": 1, 
+            "author_ip": "127.0.0.1", 
+            "summary": "First task", 
+            "priority": 1, 
+            "deadline": null, 
+            "milestone": 1, 
+            "owner": null, 
+            "type": 1, 
+            "revision": 0
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:15", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.add_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:15"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:15", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.browse_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:15"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:15", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.change_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:15"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:15", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.delete_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:15"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.view_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.view_members_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.add_member_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.change_member_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.delete_member_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.view_tasks_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.add_task_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.change_task_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "authority.permission", 
+        "fields": {
+            "date_requested": "2010-04-06 16:14:16", 
+            "group": null, 
+            "creator": 1, 
+            "object_id": 1, 
+            "user": 3, 
+            "content_type": [
+                "projector", 
+                "project"
+            ], 
+            "codename": "project_permission.read_repository_project", 
+            "approved": true, 
+            "date_approved": "2010-04-06 16:14:16"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "sites.site", 
+        "fields": {
+            "domain": "localhost:8000", 
+            "name": "localhost:8000"
+        }
+    }
+]
