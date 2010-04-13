@@ -103,7 +103,7 @@ urlpatterns += patterns('projector.views.reports',
 )
 
 urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+)/?\??[-\w=\?\&/]*$',
+    url(r'^projects/(?P<project_slug>[-\w]+)/$',
         view='project_details', name='projector_project_details'),
 )
 

@@ -117,7 +117,6 @@ class MercurialServer(object):
         for key, value in webinfo.items():
             if value is not None:
                 self.ui_config('web', key, value)
-                #self._hgserve.repo.ui.setconfig('web', key, smart_str(value))
 
     def get_response(self, request):
         mercurial_request = MercurialRequest(request)
