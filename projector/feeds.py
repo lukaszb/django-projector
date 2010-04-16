@@ -13,3 +13,4 @@ class LatestProjectsFeed(Feed):
             .filter(public=True)\
             [:5] # Limiting query
 
+

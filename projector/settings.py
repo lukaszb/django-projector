@@ -6,10 +6,8 @@ abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
 USE_PYGMENTS = getattr(settings, 'PROJECTOR_USE_PYGMENTS', False)
 
-HG_BASIC_AUTH_REALM = getattr(settings, 'PROJECTOR_HG_BASIC_AUTH_REALM', 'Projector Basic Auth')
-HG_PUSH_SSL = getattr(settings, 'PROJECTOR_HG_PUSH_SSL', None)
-if HG_PUSH_SSL is None:
-    HG_PUSH_SSL = settings.DEBUG and 'false' or 'true'
+BASIC_AUTH_REALM = getattr(settings, 'PROJECTOR_BASIC_AUTH_REALM',
+    'Projector Basic Auth')
 
 BANNED_PROJECT_NAMES = getattr(settings, 'PROJECTOR_BANNED_PROJECT_NAMES', ())
 BANNED_PROJECT_NAMES += (
@@ -33,4 +31,7 @@ else:
             % PROJECTS_ROOT_DIR)
 
 DEFAULT_DEADLINE_DELTA = 60 # In days
+
+ALWAYS_ALLOW_READ_PUBLIC_PROJECTS = getattr(settings,
+    'PROJECTOR_ALWAYS_ALLOW_READ_PUBLIC_PROJECTS', False)
 

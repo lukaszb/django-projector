@@ -1,40 +1,36 @@
 import logging
 import pprint
 
-from django.conf import settings
-from django.contrib import auth
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required,\
-    user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
-from django.forms.models import modelformset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
-from django.utils.http import urlquote
-from django.views.generic import list_detail, create_update
 
 from annoying.decorators import render_to
 
 from authority.decorators import permission_required_or_403
-from authority.forms import UserPermissionForm
 from authority.models import Permission
 
-from projector.models import Project, ProjectCategory, Membership, Task, \
+from projector.models import Project, Membership, Task, \
     Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm, \
-    StatusForm, StatusEditForm, StatusFormSet, ComponentForm
-from projector.views.task import task_create
+    StatusForm, StatusFormSet, ComponentForm
 from projector.permissions import ProjectPermission
-from projector.utils.simplehg import hgrepo_detail, is_mercurial
 from projector.filters import TaskFilter
+from projector import settings as projector_settings
 
 from richtemplates.shortcuts import get_first_or_None
 
-from urlparse import urljoin
+from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial,\
+    log_error, basic_auth, ask_basic_auth
+from vcs.web.simplevcs import settings as simplevcs_settings
+from vcs.web.simplevcs.exceptions import NotMercurialRequest
 
 def project_details(request, project_slug,
         template_name='projector/project/details.html'):
@@ -44,23 +40,76 @@ def project_details(request, project_slug,
     normal and mercurial request, as mercurial requests has it's own
     permission requirements.
     """
-    project = get_object_or_404(Project, slug=project_slug)
-    if is_mercurial(request):
-        return hgrepo_detail(request, project.slug)
-    last_part = request.path.split('/')[-1]
-    if last_part and last_part != project_slug:
-        raise Http404("Not a mercurial request and path longer than should "
-            "be: %s" % request.path)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    context = {
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
+    try:
+        project = get_object_or_404(Project, slug=project_slug)
+        if is_mercurial(request):
+            return _project_detail_hg(request, project)
+        last_part = request.path.split('/')[-1]
+        if last_part and last_part != project_slug:
+            raise Http404("Not a mercurial request and path longer than should "
+                "be: %s" % request.path)
+        if project.is_private():
+            check = ProjectPermission(user=request.user)
+            if not check.view_project(project):
+                raise PermissionDenied()
+        context = {
+            'project': project,
+        }
+        return render_to_response(template_name, context, RequestContext(request))
+    except Exception, err:
+        log_error(err)
+        raise err
 
 project_details.csrf_exempt = True
+
+def _project_detail_hg(request, project):
+    """
+    Wrapper for vcs.web.simplevcs.views.hgserve view as before we go any further
+    we need to check permissions.
+    TODO: Should use higher level simplevcs method
+    """
+    #realm = projector_settings.BASIC_AUTH_REALM
+    if not is_mercurial(request):
+        msg = "_project_detail_hg called for non mercurial request"
+        logging.error(msg)
+        raise NotMercurialRequest(msg)
+
+    if request.method not in ('GET', 'POST'):
+        raise NotMercurialRequest("Only GET/POST methods are allowed, got %s"
+            % request.method)
+    # Allow to read from public projects
+    if project.is_public() and request.method == 'GET' and \
+        projector_settings.ALWAYS_ALLOW_READ_PUBLIC_PROJECTS:
+        return get_mercurial_response(request,
+            repo_path=project._get_repo_path())
+
+    # Check if user have been already authorized or ask to
+    request.user = basic_auth(request)
+    if request.user is None:
+        return ask_basic_auth(request)
+    print request.user
+
+    check = ProjectPermission(request.user)
+
+    if project.is_private() and request.method == 'GET' and\
+        not check.read_repository_project(project):
+        raise PermissionDenied("User %s cannot read repository for "
+            "project %s" % (request.user, project))
+    elif request.method == 'POST' and\
+        not check.write_repository_project(project):
+        raise PermissionDenied("User %s cannot write to repository "
+            "for project %s" % (request.user, project))
+
+    mercurial_info = {
+        'repo_path': project._get_repo_path(),
+        'push_ssl': simplevcs_settings.PUSH_SSL,
+    }
+
+    if request.user and request.user.is_active:
+        mercurial_info['allow_push'] = request.user.username
+
+    response = get_mercurial_response(request, **mercurial_info)
+    return response
 
 @render_to('projector/project/list.html')
 def project_list(request):
@@ -86,7 +135,8 @@ def project_task_list(request, project_slug,
             .select_related('priority', 'status', 'author', 'project')
     filters = TaskFilter(request.GET,
         queryset=task_list, project=project)
-    if request.GET and 'id' in request.GET and request.GET['id'] and filters.qs.count() == 1:
+    if request.GET and 'id' in request.GET and request.GET['id'] and \
+        filters.qs.count() == 1:
         task = filters.qs[0]
         messages.info(request, _("One task matched - redirecting..."))
         return redirect(task.get_absolute_url())

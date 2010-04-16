@@ -1,5 +1,4 @@
 import os
-import pprint
 import datetime
 import logging
 import mercurial
@@ -11,26 +10,20 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.safestring import mark_safe
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
-from django.template.defaultfilters import slugify
 
 from annoying.decorators import signals
 from authority.models import Permission
 from autoslug import AutoSlugField
 from projector.conf import default_workflow
-from projector.utils import abspath, using_projector_profile
+from projector.utils import abspath
 from projector import settings as projector_settings
-from projector.exceptions import ProjectorError
 from projector.managers import ProjectManager
-from richtemplates.forms import RichSkinChoiceField
 from richtemplates.utils import get_user_profile_model
-from tagging.fields import TagField
 
 class DictModel(models.Model):
     name = models.CharField(_('name'), max_length=32)
@@ -291,7 +284,6 @@ class Project(models.Model):
 
         perms = Permission.objects.for_user(self.author, self)
         perms_set = itertools.chain(perms.values_list('codename'))
-        check = ProjectPermission(self.author)
         for perm in available_permissions:
             if not perm in perms_set:
                 logging.debug("Project '%s': adding '%s' permission for user "
@@ -313,8 +305,7 @@ class Project(models.Model):
           you want to use your own object
         """
 
-        membership = Membership.objects.create(project=self,
-            member=self.author)
+        Membership.objects.create(project=self, member=self.author)
         self.set_author_permissions()
 
         for component_info in workflow.components:
@@ -799,7 +790,7 @@ def project_created_listener(instance, **kwargs):
             logging.warn("Project '%s': cannot create repository "
                 "as path '%s' already exists" % (instance, repo_path))
         else:
-            repo = mercurial.hg.repository(mercurial.ui.ui(), repo_path,
+            mercurial.hg.repository(mercurial.ui.ui(), repo_path,
                 create=True)
     else:
         logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
