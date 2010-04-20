@@ -1,5 +1,4 @@
 import re
-import logging
 
 from django.conf import settings
 from django.utils.encoding import smart_str, force_unicode
@@ -17,11 +16,14 @@ def restructuredtext(value):
         from docutils.core import publish_parts
     except ImportError:
         if settings.DEBUG:
-            raise template.TemplateSyntaxError("Error in {% restructuredtext %} filter: The Python docutils library isn't installed.")
+            raise template.TemplateSyntaxError("Error in {% restructuredtext %}"
+                "filter: The Python docutils library isn't installed.")
         return force_unicode(value)
     else:
-        docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
-        parts = publish_parts(source=smart_str(value), writer_name="html4css1", settings_overrides=docutils_settings)
+        docutils_settings = getattr(settings,
+            "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
+        parts = publish_parts(source=smart_str(value), writer_name="html4css1",
+            settings_overrides=docutils_settings)
         return mark_safe(force_unicode(parts["fragment"]))
 
 @register.filter
@@ -47,6 +49,7 @@ def changeset_message(value, project=None, path=None):
                 archon = '<span class="show-tipsy" title="%s">#%d</span>'\
                     % (notask_message, id)
             return archon
+        #import pdb; pdb.set_trace()
         value = re.sub(r'#(\d+)', repl, value)
     if path:
         raise NotImplementedError

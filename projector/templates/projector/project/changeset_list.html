@@ -20,7 +20,7 @@
         <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
     </ul>    
     
-    {% autopaginate repository %}
+    {% autopaginate repository 10 %}
 
     {% paginate %}
 

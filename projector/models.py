@@ -208,6 +208,9 @@ class Project(models.Model):
 
     def get_task(self, id):
         queryset = Task.objects.filter(project=self)
+        if not queryset:
+            # queryset at this point may be evaluated to empty list
+            raise Task.DoesNotExist
         return queryset.get(id=id)
 
     def get_tasks(self):
