@@ -36,7 +36,8 @@
         <tbody class="datatable-tbody">
             {% for changeset in repository %}
             <tr class="{% cycle "odd" "even" %} hoverable">
-                <td>{{ changeset.revision }}</td>
+                <td><a class="browser-changeset block-link"
+                       href="#">{{ changeset.revision }}</a></td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}
                 </td>

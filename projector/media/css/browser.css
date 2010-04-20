@@ -4,7 +4,7 @@
 	text-decoration: none;
 }
 .browser-dir {
-    background-image: url("../../richtemplates/img/icons/folder.png");
+    background-image: url("../img/folder.png");
     background-repeat: no-repeat;
     padding-left: 20px;
 	padding-top: 5px;
@@ -13,7 +13,17 @@
 	text-align: left;
 }
 .browser-file {
-    background-image: url("../../richtemplates/img/icons/page.png");
+    background-image: url("../img/page.png");
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    padding-top: 5px;
+    height: 16px;
+	display: block;
+	text-align: left;
+}
+
+.browser-changeset {
+    background-image: url("../img/cog.png");
     background-repeat: no-repeat;
     padding-left: 20px;
     padding-top: 5px;
