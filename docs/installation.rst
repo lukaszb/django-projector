@@ -26,10 +26,11 @@ Following packages are needed to get ``django-projector`` working:
 - `django-autoslug`_
 - `django-attachments`_
 - `django-extensions`_
-- `django-pagination`_
+- `django-pagination`_ (preferred 1.0.5 as 1.0.6 is bugged)
 - `django-richtemplates`_
 - `django-sorting`_
 - `django-tagging`_
+- `vcs`_
 - `docutils`_
 - `Pygments`_
 - `Mercurial`_ >= 1.5
@@ -53,3 +54,5 @@ Following packages are needed to get ``django-projector`` working:
 .. _docutils: http://docutils.sourceforge.net/
 .. _pygments: http://pygments.org/
 .. _mercurial: http://mercurial.selenic.com/
+.. _vcs: http://bitbucket.org/marcinkuzminski/vcs/
+
