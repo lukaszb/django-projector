@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load richtemplates_tags %}
+{% load native %}
 
 {% if root.is_file %}
     {% block head_css %}{{ block.super }}
@@ -27,39 +28,57 @@
         <table class="code-browser">
             <thead>
                 <tr>
-                    <th colspan="5">{% path_breadcrumbs request.META.PATH_INFO %}</th>
-                </tr>
-                <tr>
-                    <th class="name">{% trans "Name" %}</th>
-                    <th class="size">{% trans "Size" %}</th>
-                    <th class="rev">{% trans "Revision" %}</th>
-                    <th class="age">{% trans "Age" %}</th>
-                    <th class="last-author">{% trans "Last committer" %}</th>
+                    <th class="width-50 lefted">{% trans "Name" %}</th>
+                    <th class="width-10 righted">{% trans "Size" %}</th>
+                    <th class="width-10 righted">{% trans "Revision" %}</th>
+                    <th class="width-15 righted">{% trans "Last modified" %}</th>
+                    <th class="width-15 righted">{% trans "Last committer" %}</th>
                 </tr>
             </thead>
             <tbody>
+
+                {% if root.parent %}
+                <tr class="even hoverable">
+                    <td>
+                        <a class="browser-dir"
+                            href="{% url projector_project_browse_repository project.slug root.parent.path %}">..</a>
+                    </td>
+                    <td class="righted"></td>
+                    <td class="righted width-10"></td>
+                    <td class="righted width-10">
+                    </td>
+                    <td class="righted width-10"></td>
+                </tr>
+                {% endif %}
+
                 {% for node in root.nodes %}
-                <tr class="{% cycle 'odd' 'even' %} hoverable">
+                <tr class="{% cycle "odd" "even" %} hoverable">
                     <td>
                         <a class="{% if node.is_dir %}browser-dir{% else %}browser-file{% endif %}"
-                            href="{% url projector_project_browse_repository project.slug node.url %}">{{ node.name }}</a>
+                            href="{% url projector_project_browse_repository project.slug node.path %}"
+                            >{{ node.name }}</a>
                     </td>
-                    <td class="centered">{% if node.is_file %}{{ node.info.size|filesizeformat }}{% endif %}</td>
-                    <td class="centered">{{ node.info.revision }}</td>
-                    <td class="centered">
+                    {% if node.is_dir %}
+                    <td></td><td></td><td></td><td></td>
+                    {% else %}
+                    <td class="righted">{% if node.is_file %}{{ node.size|filesizeformat }}{% endif %}</td>
+                    <td class="righted">{{ node.last_changeset.revision }}</td>
+                    <td class="righted">
                         <span class="show-tooltip"
-                            title="{{ node.info.date|date:"Y-m-d" }} {{ node.info.date|date:"H:i:s" }}">
-                        {{ node.info.date|timesince }}
+                            title="{{ node.last_changeset.date|date:"Y-m-d" }} {{ node.last_changeset.date|date:"H:i:s" }}">
+                        {{ node.last_changeset.date|timesince }} ago
                         </span>
                     </td>
-                    <td class="centered">{{ node.info.author|tooltip:"20" }}</td>
+                    <td class="righted">{{ node.last_changeset.author|tooltip:"20" }}</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
+        {% endif %}
+        {% if root.is_file %}
         <div class="codeblock">
-            {{ root.get_pygmentized|safe }}
+            {% highlight root.content root.lexer_alias linenos=true cssclass="code-highlight" %}
         </div>
         {% endif %}
     </div>

@@ -1,21 +1,15 @@
 from django import forms
-from django.forms.util import ErrorList
 from django.forms.models import modelformset_factory
-from django.contrib.admin import widgets
-from django.contrib.auth.models import User
-from django.contrib.formtools.wizard import FormWizard
-from django.shortcuts import render_to_response
 from django.utils.translation import ugettext as _
 
 from projector.models import Membership
 from projector.models import Project
-from projector.models import ProjectCategory
 from projector.models import Task
 from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
-from projector.settings import BANNED_PROJECT_NAMES
 
+from vcs.web.simplevcs.models import Repository
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     UserByNameField
 
@@ -36,7 +30,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        exclude = ('members', 'author', 'editor')
+        exclude = ('members', 'author', 'editor', 'repository')
 
     def clean_public(self):
         data = self.cleaned_data['public']

@@ -1,5 +1,4 @@
 from django.conf.urls.defaults import *
-from django.conf import settings
 
 from projector.feeds import LatestProjectsFeed
 
@@ -8,8 +7,12 @@ urlpatterns = patterns('projector.views',
 )
 
 urlpatterns += patterns('projector.views.project_category',
-    url(r'^categories/$', 'project_category_list', name='projector_project_category_list'),
-    url(r'^categories/create/$', 'project_category_create', name='projector_project_category_create'),
+    url(r'^categories/$',
+        view='project_category_list',
+        name='projector_project_category_list'),
+    url(r'^categories/create/$',
+        view='project_category_create',
+        name='projector_project_category_create'),
     url(r'^categories/(?P<project_category_slug>[-\w]+)/$',
         'project_category_details', name='projector_project_category_details'),
 )

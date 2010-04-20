@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load richtemplates_tags %}
+{% load pagination_tags %}
 {% load projector_tags %}
 
 {% if root.is_file %}
@@ -19,29 +20,35 @@
         <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
     </ul>    
     
+    {% autopaginate repository %}
+
+    {% paginate %}
+
     <table class="datatable">
         <thead class="datatable-thead">
             <tr class="datatable-thead-subheader lefted">
-                <th>{% trans "Revision" %}</th>
-                <th>{% trans "Commited at" %}</th>
-                <th>{% trans "Author" %}</th>
-                <th>{% trans "Message" %}</th>
+                <th class="width-5">{% trans "Revision" %}</th>
+                <th class="width-15">{% trans "Commited at" %}</th>
+                <th class="width-10">{% trans "Author" %}</th>
+                <th class="width-70">{% trans "Message" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
-            {% for changeset in changeset_list %}
+            {% for changeset in repository %}
             <tr class="{% cycle "odd" "even" %} hoverable">
-                <td>{{ changeset.revno }}</td>
+                <td>{{ changeset.revision }}</td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}
                 </td>
                 <td>{{ changeset.author|tooltip:"15" }}</td>
-                <td style="width:60%">{{ changeset.message|changeset_message:project }}</td>
+                <td>{{ changeset.message|changeset_message:project|tooltip:"60" }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
         
+    {% paginate %}
+
 </div>
 </div>
 

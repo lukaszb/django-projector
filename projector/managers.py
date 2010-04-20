@@ -1,10 +1,8 @@
-import logging
-
 from django.db import models
 from django.db.models import Q
 
 class ProjectManager(models.Manager):
-    
+
     def projects_for_user(self, user=None):
         """
         Returns queryset of Project instances available
@@ -24,5 +22,4 @@ class ProjectManager(models.Manager):
         if ids:
             qs = qs.filter(pk__in=ids)
         return qs
-
 

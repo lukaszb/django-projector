@@ -1,14 +1,12 @@
-import logging
-
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
-from projector.models import Project, Status, Transition
+from projector.models import Project, Transition
 
 class ProjectorStatusTransition(TestCase):
-    
+
     def setUp(self):
         name = u'ProjectorStatusTransition'
         self.admin = User.objects.create_superuser(
@@ -21,8 +19,11 @@ class ProjectorStatusTransition(TestCase):
             slug=slugify(name),
             author=self.admin,
         )
+        if craeted:
+            self.project.create_workflow()
+
         Transition.objects.filter(
-            Q(source__project=self.project) | 
+            Q(source__project=self.project) |
             Q(destination__project=self.project))\
             .delete()
 
@@ -34,7 +35,7 @@ class ProjectorStatusTransition(TestCase):
         for src in statuses:
             for dst in statuses:
                 self.assertFalse(src.can_change_to(dst))
-    
+
     def test_transition(self):
         s1, s2 = self.project.status_set.all()[:2]
         t1 = Transition.objects.create(source=s1, destination=s2)
@@ -45,6 +46,6 @@ class ProjectorStatusTransition(TestCase):
         self.assertTrue(s2.can_change_to(s1))
 
 
-        
+
 
 

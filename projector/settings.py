@@ -12,11 +12,19 @@ BASIC_AUTH_REALM = getattr(settings, 'PROJECTOR_BASIC_AUTH_REALM',
 BANNED_PROJECT_NAMES = getattr(settings, 'PROJECTOR_BANNED_PROJECT_NAMES', ())
 BANNED_PROJECT_NAMES += (
     'accounts',
+    'add',
     'admin',
-    'registration',
-    'users',
+    'api',
+    'author', 'authors',
+    'category', 'categories',
     'create',
     'edit',
+    'issue', 'issues',
+    'projects', 'projector',
+    'register', 'registration',
+    'task', 'tasks',
+    'update',
+    'user', 'users',
 )
 
 PROJECTS_ROOT_DIR = getattr(settings, 'PROJECTOR_PROJECTS_ROOT_DIR', None)

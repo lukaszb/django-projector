@@ -1,14 +1,12 @@
 import os
 import datetime
 import logging
-import mercurial
-import mercurial.ui
-import mercurial.hg
 
 from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+#from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -24,6 +22,7 @@ from projector.utils import abspath
 from projector import settings as projector_settings
 from projector.managers import ProjectManager
 from richtemplates.utils import get_user_profile_model
+from vcs.web.simplevcs.models import Repository
 
 class DictModel(models.Model):
     name = models.CharField(_('name'), max_length=32)
@@ -94,6 +93,8 @@ class Project(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
     outdated = models.BooleanField(_('outdated'), default=False)
+    repository = models.ForeignKey(Repository, null=True, blank=True,
+        verbose_name=_("repository"), default=None)
 
     objects = ProjectManager()
 
@@ -782,17 +783,18 @@ def request_new_profile(sender, instance, **kwargs):
 @signals.post_save(sender=Project)
 def project_created_listener(instance, **kwargs):
     if not kwargs.get('created', False):
+        # This listener is aimed for newly created projects only
         return
     if projector_settings.PROJECTS_ROOT_DIR:
+        # Hardcoding repository creation process until more backends
+        # are available from ``vcs``
         repo_path = instance._get_repo_path()
+        type = 'hg'
         logging.info("Creating new mercurial repository at %s" % repo_path)
-        if os.path.exists(repo_path):
-            logging.warn("Project '%s': cannot create repository "
-                "as path '%s' already exists" % (instance, repo_path))
-        else:
-            mercurial.hg.repository(mercurial.ui.ui(), repo_path,
-                create=True)
+        repository = Repository.objects.create(path=repo_path, type=type)
+        instance.repository = repository
+        instance.save()
     else:
         logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
-            "create repository to this project.")
+            "create repository for this project.")
 

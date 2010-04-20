@@ -3,7 +3,6 @@ import pprint
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
@@ -27,6 +26,7 @@ from projector import settings as projector_settings
 
 from richtemplates.shortcuts import get_first_or_None
 
+from vcs import VCSError
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial,\
     log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs import settings as simplevcs_settings
@@ -55,7 +55,8 @@ def project_details(request, project_slug,
         context = {
             'project': project,
         }
-        return render_to_response(template_name, context, RequestContext(request))
+        return render_to_response(template_name, context,
+            RequestContext(request))
     except Exception, err:
         log_error(err)
         raise err
@@ -561,14 +562,6 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     """
     Handles project's repository browser.
     """
-    try:
-        from vcbrowser import engine_from_url
-        from vcbrowser.engine.base import VCBrowserError, EngineError
-    except ImportError, err:
-        messages.error(request, repr(err))
-        messages.info(request, "vcbrowser is available at "
-            "http://code.google.com/p/python-vcbrowser/")
-        return {}
 
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
@@ -581,7 +574,6 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     if not project._get_repo_path():
         messages.error(request, _("Repository's url is not set! Please "
             "configure project preferences first."))
-        #raise Http404
 
     context = {
         'project': project,
@@ -591,13 +583,10 @@ def project_browse_repository(request, project_slug, rel_repo_url):
     revision = request.GET.get('revision', None)
 
     try:
-        engine = engine_from_url('hg://' + project._get_repo_path())
-        requested_node = engine.request(rel_repo_url, revision, fetch_content=True)
-        context['root'] = requested_node
-    except VCBrowserError, err:
+        node = project.repository.request(rel_repo_url, revision)
+        context['root'] = node
+    except VCSError, err:
         messages.error(request, repr(err))
-    except EngineError, err:
-        messages.error(request, str(err))
     return context
 
 @render_to('projector/project/changeset_list.html')
@@ -605,12 +594,6 @@ def project_changesets(request, project_slug):
     """
     Returns repository's changesets view.
     """
-    try:
-        from vcbrowser import engine_from_url
-        from vcbrowser.engine.base import VCBrowserError, EngineError
-    except ImportError, err:
-        messages.error(request, str(err))
-        return {}
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
@@ -622,14 +605,13 @@ def project_changesets(request, project_slug):
     context = {
         'project': project,
     }
-    try:
-        engine = engine_from_url('hg://' + project._get_repo_path())
-        changeset_list = [engine.get_changeset(rev) for rev in
-            reversed(engine.revision_numbers)]
-        context['changeset_list'] = changeset_list
-        context['engine'] = engine
-    except VCBrowserError, err:
-        messages.error(request, str(err))
-    except EngineError, err:
-        messages.error(request, str(err))
+    changeset_list = project.repository.get_changesets(limit=20)
+    changeset_list = list(changeset_list)
+    context['changeset_list'] = changeset_list
+    context['repository'] = project.repository
+    #except VCBrowserError, err:
+    #    messages.error(request, str(err))
+    #except EngineError, err:
+    #    messages.error(request, str(err))
     return context
+
