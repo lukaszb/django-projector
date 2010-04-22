@@ -196,9 +196,8 @@ class Project(models.Model):
 
     @models.permalink
     def get_browse_repo_url(self):
-        return ('projector_project_browse_repository', (), {
+        return ('projector_project_sources', (), {
             'project_slug': self.slug,
-            'rel_repo_url': '',
         })
 
     @models.permalink

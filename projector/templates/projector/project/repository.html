@@ -23,6 +23,15 @@
         <div class="browser-breadcrumbs">
             {% path_breadcrumbs request.META.PATH_INFO 3 %}
         </div>
+
+        <ul class="messages">
+            <li class="message message-info">
+                {% trans "Committed by" %} {{ changeset.author }}
+                <span class="show-tipsy" title="{{ changeset.date }}">{{ changeset.date|timesince }}</span>
+                {% trans "ago" %}<br/><br/>
+                {{ changeset.message }}
+            </li>
+        </ul>        
         
         {% if root.is_dir %}
         <table class="code-browser">
@@ -41,7 +50,7 @@
                 <tr class="even hoverable">
                     <td>
                         <a class="browser-dir"
-                            href="{% url projector_project_browse_repository project.slug root.parent.path %}">..</a>
+                            href="{% url projector_project_sources_browse project.slug changeset.id root.parent.path %}">..</a>
                     </td>
                     <td class="righted"></td>
                     <td class="righted width-10"></td>
@@ -55,18 +64,23 @@
                 <tr class="{% cycle "odd" "even" %} hoverable">
                     <td>
                         <a class="{% if node.is_dir %}browser-dir{% else %}browser-file{% endif %}"
-                            href="{% url projector_project_browse_repository project.slug node.path %}"
+                           href="{% url projector_project_sources_browse project.slug node.changeset.id node.path %}"
                             >{{ node.name }}</a>
                     </td>
                     {% if node.is_dir %}
                     <td></td><td></td><td></td><td></td>
                     {% else %}
                     <td class="righted">{% if node.is_file %}{{ node.size|filesizeformat }}{% endif %}</td>
-                    <td class="righted">{{ node.last_changeset.revision }}</td>
                     <td class="righted">
-                        <span class="show-tooltip"
+                        <a class="show-tipsy"
+                           href="{% url projector_project_sources_browse project.slug node.last_changeset.id '' %}"
+                           title="{% trans "Browse revision's content" %}"
+                           >{{ node.last_changeset.revision }}</a>
+                    </td>
+                    <td class="righted">
+                        <span class="show-tipsy"
                             title="{{ node.last_changeset.date|date:"Y-m-d" }} {{ node.last_changeset.date|date:"H:i:s" }}">
-                        {{ node.last_changeset.date|timesince }} ago
+                        {{ node.last_changeset.date|timesince }} {% trans "ago" %}
                         </span>
                     </td>
                     <td class="righted">{{ node.last_changeset.author|tooltip:"20" }}</td>

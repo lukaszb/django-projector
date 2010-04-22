@@ -81,13 +81,6 @@
                         class="block-link">{{ project.get_open_tasks.count }}</a></th>
             </tr>
         </table>
-        {% comment %}
-            {% chart  Pie3D  1 2 3 4 %}
-                {% size 100 200 %}
-                {% label A B "Opened tasks" "Closed tasks"  %}
-                {% color 00dd00 %}
-            {% endchart %}
-        {% endcomment %}
     </div>
 </div>
 
@@ -116,22 +109,18 @@
         </ul>
         
         <ul class="messages">
-            <li class="message message-info">Clone repository:
+            <li class="message message-info">{% trans "Clone repository" %}:
             <input id="id_project_repository_url" value="hg clone {{ project.get_repo_url }}"
                 size="{{ project.get_repo_url|length|add:'11' }}"
                 onblur="this.value='hg clone {{ project.get_repo_url }}';"/></li>
-        </ul>
-
-        
-        {% if "://example.com" in project.get_repo_url %}
-        <ul class="messages">
+            {% if "://example.com" in project.get_repo_url %}
             <li class="message message-warning">
                 {% trans "Repository URL seems to be broken. Maybe you have forgotten to " %}
-                <a href="{% url admin:sites_site_change 1 %}">{% trans "set site" %}</a> at admin panel?
+                <a href="{% url admin:sites_site_change 1 %}">{% trans "set site" %}</a>{% trans "at admin panel?" %}
             </li>
+            {% endif %}
         </ul>
-        {% endif %}
-
+    
     </div>
 </div>
     {% block col_main_extra %}

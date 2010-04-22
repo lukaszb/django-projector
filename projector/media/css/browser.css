@@ -3,6 +3,7 @@
 	color: #333;
 	text-decoration: none;
 }
+
 .browser-dir {
     background-image: url("../img/folder.png");
     background-repeat: no-repeat;
@@ -30,7 +31,22 @@
     height: 16px;
 	display: block;
 	text-align: left;
+    text-decoration: none;
 }
+.browser-changeset:hover {
+    text-decoration: underline;
+}
+
+.browser-zoom {
+    background-image: url("../img/zoom.png");
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    padding-top: 5px;
+    height: 16px;
+	display: block;
+	text-align: left;
+}
+
 
 table.code-browser { width: 100%; }
 table.code-browser thead th.size { width: 70px; }

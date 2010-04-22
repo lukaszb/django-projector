@@ -9,7 +9,6 @@ from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
 
-from vcs.web.simplevcs.models import Repository
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     UserByNameField
 

@@ -3,6 +3,12 @@
 {% load i18n %}
 {% load pagination_tags %}
 {% load sorting_tags %}
+{% load native %}
+
+{% block extra_head %}{{ block.super }}
+    {{ form.media }}
+    {% autocomplete_field form.member %}
+{% endblock %}
 
 {% block col_main_extra %}
 <div class="richtemplates-panel">

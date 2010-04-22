@@ -80,12 +80,15 @@ urlpatterns += patterns('projector.views.project',
         name='projector_project_members_manage'),
 
     # Sources
-    url(r'^projects/(?P<project_slug>[-\w]+)/repository/(?P<rel_repo_url>.*)$',
-        view='project_browse_repository',
-        name='projector_project_browse_repository'),
     url(r'^projects/(?P<project_slug>[-\w]+)/src/changesets/$',
         view='project_changesets',
         name='projector_project_changesets'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='project_browse_repository',
+        name='projector_project_sources_browse'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/src/$',
+        view='project_browse_repository',
+        name='projector_project_sources'),
 
     url(r'^projects/(?P<project_slug>[-\w]+)/tasks/$',
         view='project_task_list',

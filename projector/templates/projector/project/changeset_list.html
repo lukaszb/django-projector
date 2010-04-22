@@ -30,7 +30,8 @@
                 <th class="width-5">{% trans "Revision" %}</th>
                 <th class="width-15">{% trans "Commited at" %}</th>
                 <th class="width-10">{% trans "Author" %}</th>
-                <th class="width-70">{% trans "Message" %}</th>
+                <th class="width-55">{% trans "Message" %}</th>
+                <th class="width-15">{% trans "Action" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
@@ -43,6 +44,10 @@
                 </td>
                 <td>{{ changeset.author|tooltip:"15" }}</td>
                 <td>{{ changeset.message|changeset_message:project|tooltip:"60" }}</td>
+                <td><a class="browser-zoom block-link show-tipsy"
+                       href="{% url projector_project_sources_browse project.slug changeset.id '' %}"
+                       title="{% trans "Browse revision's content" %}"></a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

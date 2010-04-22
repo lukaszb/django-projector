@@ -1,14 +1,10 @@
 import datetime
-import pprint
 import logging
-import django_filters
 
 from django.shortcuts import render_to_response, get_object_or_404
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.views.generic import list_detail
 from django.forms.formsets import formset_factory
 from django import forms
 from django.contrib import messages
@@ -16,13 +12,12 @@ from django.utils.translation import ugettext as _
 
 from authority.decorators import permission_required_or_403
 
-from projector.models import Task, Status, Priority, Project
+from projector.models import Task, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.permissions import ProjectPermission
 
 from richtemplates.shortcuts import get_first_or_None
-from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory,\
-    UserByNameField
+from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
 def task_details(request, project_slug, task_id,
     template_name='projector/task/details.html'):
@@ -137,13 +132,13 @@ def task_create(request, project_slug,
     form = TaskForm(request.POST or None, initial=initial, instance=instance)
     if request.method == 'POST':
         if form.errors:
-            logging.error("Form has following errors:\n%s"
-                % pprint.pformat(form.errors))
+            #logging.error("Form has following errors:\n%s"
+            #    % pprint.pformat(form.errors))
+            pass
         if form.is_valid():
             task = form.save(
                 editor = request.user,
                 editor_ip = request.META['REMOTE_ADDR'],
-                #project = project,
             )
             task.create_revision()
             messages.success(request, _("Task created succesfully."))

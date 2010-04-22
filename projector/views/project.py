@@ -26,11 +26,11 @@ from projector import settings as projector_settings
 
 from richtemplates.shortcuts import get_first_or_None
 
-from vcs import VCSError
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial,\
     log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
+from vcs.web.simplevcs.views import browse_repository
 
 def project_details(request, project_slug,
         template_name='projector/project/details.html'):
@@ -555,8 +555,8 @@ def project_members_manage(request, project_slug, username):
     }
     return context
 
-@render_to('projector/project/repository.html')
-def project_browse_repository(request, project_slug, rel_repo_url):
+def project_browse_repository(request, project_slug, rel_repo_url='',
+        revision='tip', template_name='projector/project/repository.html'):
     """
     Handles project's repository browser.
     """
@@ -568,24 +568,20 @@ def project_browse_repository(request, project_slug, rel_repo_url):
             not check.read_repository_project(project):
             raise PermissionDenied()
 
-
     if not project._get_repo_path():
         messages.error(request, _("Repository's url is not set! Please "
             "configure project preferences first."))
 
-    context = {
-        'project': project,
+    repo_info = {
+        'repository': project.repository,
+        'revision': revision,
+        'node_path': rel_repo_url,
+        'template_name': template_name,
+        'extra_context': {
+            'project': project,
+        },
     }
-
-    # Some custom logic here
-    revision = request.GET.get('revision', None)
-
-    try:
-        node = project.repository.request(rel_repo_url, revision)
-        context['root'] = node
-    except VCSError, err:
-        messages.error(request, repr(err))
-    return context
+    return browse_repository(request, **repo_info)
 
 @render_to('projector/project/changeset_list.html')
 def project_changesets(request, project_slug):
@@ -603,13 +599,6 @@ def project_changesets(request, project_slug):
     context = {
         'project': project,
     }
-    changeset_list = project.repository.get_changesets(limit=20)
-    changeset_list = list(changeset_list)
-    context['changeset_list'] = changeset_list
     context['repository'] = project.repository
-    #except VCBrowserError, err:
-    #    messages.error(request, str(err))
-    #except EngineError, err:
-    #    messages.error(request, str(err))
     return context
 
