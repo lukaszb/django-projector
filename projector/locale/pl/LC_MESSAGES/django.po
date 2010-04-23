@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-25 03:55+0100\n"
-"PO-Revision-Date: 2010-03-24 22:08\n"
+"POT-Creation-Date: 2010-04-24 00:26+0200\n"
+"PO-Revision-Date: 2010-04-23 17:43\n"
 "Last-Translator: <a@a.pl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,15 +16,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Translated-Using: django-rosetta 0.5.3\n"
 
-#: admin.py:81
+#: admin.py:87
 msgid "Task details"
 msgstr "Szczegóły zadania"
 
-#: admin.py:94
+#: admin.py:100
 msgid "Author & editor"
 msgstr "Autor i edytor"
 
-#: admin.py:100
+#: admin.py:106
 msgid ""
 "This are readonly fields. In Django 1.2\n"
 "                they will be probably really uneditable. For now, they are\n"
@@ -32,299 +32,535 @@ msgid ""
 "                at the time of pushing data into database."
 msgstr "To są pola tylko-do-odczytu. W Django 1.2 prawdopodobnie będą faktycznie nieedytowalne. Na razie tu pozostaną, lecz nawet jeśli zostaną zmienione, będą nadpisane w momencie wstrzykiwania danych do bazy."
 
-#: filters.py:12
+#: filters.py:14
 msgid "All"
 msgstr "Wszystko"
 
-#: forms.py:47 templates/projector/project/details.html:80
+#: forms.py:18 templates/projector/project/details.html:149
 msgid "Public"
 msgstr "Publiczny"
 
-#: forms.py:48 templates/projector/project/details.html:82
+#: forms.py:19 templates/projector/project/details.html:151
 msgid "Private"
 msgstr "Prywatny"
 
-#: forms.py:52 templates/projector/project/members_manage.html:52
-#: templates/projector/project/milestone_detail.html:21
-#: templates/projector/project/repository.html:33
+#: forms.py:23 templates/projector/accounts/user_list.html:33
+#: templates/projector/project/component_detail.html:23
+#: templates/projector/project/members_manage.html:52
+#: templates/projector/project/milestone_detail.html:24
+#: templates/projector/project/repository.html:40
 msgid "Name"
 msgstr "Nazwa"
 
-#: forms.py:53 templates/projector/project/details.html:77
+#: forms.py:24 templates/projector/project/details.html:146
 msgid "Visibility"
 msgstr "Widoczność"
 
-#: forms.py:71
+#: forms.py:42
 msgid "Choose one of the given options"
 msgstr "Wybierz jedną z opcji"
 
-#: forms.py:76
-msgid "Cannot use this name"
-msgstr "Nie można użyć tej nazwy"
-
-#: forms.py:80 templates/projector/task/details.html:172
+#: forms.py:45 forms.py:94
 msgid "Comment"
 msgstr "Komentarz"
 
-#: forms.py:84
+#: forms.py:49
 msgid "Owner"
 msgstr "Właściciel"
 
-#: forms.py:96
+#: forms.py:50 forms.py:89 forms.py:128
+#: templates/projector/accounts/user_homepage.html:54
+#: templates/projector/project/milestone_detail.html:28
+#: templates/projector/task/details.html:86
+msgid "Deadline"
+msgstr "Termin"
+
+#: forms.py:70
 msgid "No changes made"
 msgstr "Nie zmieniono"
 
-#: forms.py:126
+#: forms.py:92 templates/projector/project/component_detail.html:29
+#: templates/projector/project/details.html:158
+#: templates/projector/project/milestone_detail.html:34
+#: templates/projector/task/details.html:121
+msgid "Description"
+msgstr "Opis"
+
+#: forms.py:110
 msgid "Member"
 msgstr "Członek"
 
-#: forms.py:139
+#: forms.py:123
 msgid "This user is already member of this project"
 msgstr "Użytkownik jest już członkiem tego projektu"
 
-#: models.py:32 models.py:53 models.py:76
+#: forms.py:156
+msgid "Status with this name already exists for this project"
+msgstr "Status o tej nazwie już istnieje dla tego projektu"
+
+#: models.py:28 models.py:49 models.py:79
 msgid "name"
 msgstr "nazwa"
 
-#: models.py:33 models.py:78 models.py:396
+#: models.py:29 models.py:83 models.py:578
 msgid "description"
 msgstr "opis"
 
-#: models.py:46
+#: models.py:42
 msgid "order"
 msgstr "porządek"
 
-#: models.py:55 models.py:83
+#: models.py:51 models.py:88
 msgid "public"
 msgstr "publiczny"
 
-#: models.py:59 models.py:96 models.py:265 models.py:282 models.py:336
-#: models.py:411 templates/projector/project/create.html:24
+#: models.py:55 models.py:102 models.py:397 models.py:413 models.py:478
+#: models.py:604 templates/projector/project/create.html:24
 #: templates/projector/project/edit.html:25
 msgid "project"
 msgstr "projekt"
 
-#: models.py:60
+#: models.py:56
 msgid "project categories"
 msgstr "kategorie projektów"
 
-#: models.py:77
+#: models.py:76
+msgid "This name is restricted"
+msgstr "Niedozwolona nazwa"
+
+#: models.py:81
 msgid "category"
 msgstr "kategoria"
 
-#: models.py:80
+#: models.py:85
 msgid "home page url "
 msgstr "Adres strony głównej"
 
-#: models.py:81
-msgid "repository url"
-msgstr "URL repozytorium"
-
-#: models.py:82
+#: models.py:87
 msgid "active"
 msgstr "aktywny"
 
-#: models.py:84
+#: models.py:89
 msgid "members"
 msgstr "członekowie"
 
-#: models.py:85 models.py:286 models.py:392
+#: models.py:91 models.py:417 models.py:573
 msgid "author"
 msgstr "autor"
 
-#: models.py:86 models.py:287 models.py:337 models.py:391
+#: models.py:93 models.py:418 models.py:480 models.py:571
 msgid "created at"
 msgstr "utworzone"
 
-#: models.py:87
+#: models.py:94
 msgid "modified at"
 msgstr "zmodyfikowany"
 
-#: models.py:88
+#: models.py:95
 msgid "outdated"
 msgstr "nieaktualne"
 
 #: models.py:97
+msgid "repository"
+msgstr "repozytorium"
+
+#: models.py:103
 msgid "projects"
 msgstr "projekty"
 
-#: models.py:254 models.py:403
+#: models.py:372 models.py:588
 msgid "component"
 msgstr "Komponent"
 
-#: models.py:255
+#: models.py:373
 msgid "components"
 msgstr "Komponenty"
 
-#: models.py:263
+#: models.py:395
 msgid "member"
 msgstr "członek"
 
-#: models.py:264
+#: models.py:396
 msgid "joined at"
 msgstr "dołączył w"
 
-#: models.py:288 models.py:401
+#: models.py:419 models.py:584
 msgid "deadline"
 msgstr "termin"
 
-#: models.py:290
+#: models.py:421
 msgid "date completed"
 msgstr "data zakończenia"
 
-#: models.py:294 models.py:402
+#: models.py:426 models.py:586
 msgid "milestone"
 msgstr "kamień milowy"
 
-#: models.py:295
+#: models.py:427
 msgid "milestones"
 msgstr "kamienie milowe"
 
-#: models.py:338 models.py:621
+#: models.py:481 extras/users/models.py:12
 msgid "user"
 msgstr "użytkownik"
 
-#: models.py:339
+#: models.py:483
 msgid "action"
 msgstr "akcja"
 
-#: models.py:343
+#: models.py:487
 msgid "timeline entry"
 msgstr "wpis harmonogramu"
 
-#: models.py:344
+#: models.py:488
 msgid "timeline entries"
 msgstr "wpisy harmonogramu"
 
-#: models.py:359
+#: models.py:503
 msgid "priority level"
 msgstr "poziom priorytetu"
 
-#: models.py:360
+#: models.py:504
 msgid "priority levels"
 msgstr "poziomy priorytetów"
 
-#: models.py:365
+#: models.py:509
 msgid "is resolved"
 msgstr "czy rowziązany"
 
-#: models.py:366
-msgid "is task action"
-msgstr "czy akcja zadania"
+#: models.py:511
+msgid "is initial"
+msgstr "jest początkowy"
 
-#: models.py:369 models.py:397
+#: models.py:513
+msgid "destinations"
+msgstr "docelowe"
+
+#: models.py:529 models.py:579
 msgid "status"
 msgstr "status"
 
-#: models.py:370
+#: models.py:530
 msgid "statuses"
 msgstr "statusy"
 
-#: models.py:380 models.py:399
+#: models.py:543
+msgid "source status"
+msgstr "status źródłowy"
+
+#: models.py:546
+msgid "destination status"
+msgstr "status docelowy"
+
+#: models.py:549
+msgid "transition"
+msgstr "przejście"
+
+#: models.py:550
+msgid "transitions"
+msgstr "przejścia"
+
+#: models.py:560 models.py:581
 msgid "task type"
 msgstr "typ zadania"
 
-#: models.py:381
+#: models.py:561
 msgid "task types"
 msgstr "typy zadań"
 
-#: models.py:395
+#: models.py:577
 msgid "summary"
 msgstr "podsumowanie"
 
-#: models.py:398
+#: models.py:580
 msgid "priority"
 msgstr "priorytet"
 
-#: models.py:400
+#: models.py:582
 msgid "owner"
 msgstr "właściciel"
 
-#: models.py:412
+#: models.py:605
 msgid "edited at"
 msgstr "Zaktualizowano"
 
-#: models.py:413
+#: models.py:606
 msgid "editor"
 msgstr "edytor"
 
-#: models.py:418 templates/projector/task/create.html:5
-#: templates/projector/task/create.html:14
+#: models.py:612 templates/projector/task/create.html:11
+#: templates/projector/task/create.html:21
 msgid "task"
 msgstr "zadanie"
 
-#: models.py:419
+#: models.py:613
 msgid "tasks"
 msgstr "zadania"
 
-#: models.py:572
+#: models.py:753
 msgid "comment"
 msgstr "komentarz"
 
-#: models.py:580
-msgid "Revision "
-msgstr "Rewizja"
-
-#: models.py:622
+#: extras/users/models.py:13
 msgid "activation_token"
 msgstr "token aktywacyjny"
 
-#: models.py:626
+#: extras/users/models.py:14
+msgid "Color schema"
+msgstr "schemat kolorów"
+
+#: extras/users/models.py:18
 msgid "user profile"
 msgstr "profil użytkownika"
 
-#: models.py:627
+#: extras/users/models.py:19
 msgid "user profiles"
 msgstr "profile użytkowników"
 
-#: templates/projector/home.html:19
-msgid "Project Categories"
-msgstr "Kategorie projektów"
+#: extras/users/views.py:26
+msgid "You are not logged in. You may view only public content of this website"
+msgstr "Nie jesteś zalogowany. Możesz obejrzeć tylko publiczną zawartość tej strony."
 
-#: templates/projector/home.html:20
-msgid "Project Category Add"
-msgstr "Dodaj kategorię projektów"
+#: extras/users/views.py:62
+msgid "Profile updated successfully"
+msgstr "Pomyślnie zaktualizowano profil"
 
-#: templates/projector/home.html:22
+#: templates/projector/home.html:15
+msgid "Projector homepage"
+msgstr "Strona główna"
+
+#: templates/projector/home.html:16 templates/projector/home.html.py:31
 msgid "Projects"
 msgstr "Projekty"
 
-#: templates/projector/home.html:23
+#: templates/projector/home.html:28
+msgid "Project Categories"
+msgstr "Kategorie projektów"
+
+#: templates/projector/home.html:29
+msgid "Project Category Add"
+msgstr "Dodaj kategorię projektów"
+
+#: templates/projector/home.html:32
 msgid "Project Add"
 msgstr "Dodaj projekt"
 
-#: templates/projector/project/changesets.html:15
-#: templates/projector/project/repository.html:14
+#: templates/projector/accounts/profile.html:8
+#: templates/projector/accounts/profile.html:29
+#: templates/projector/accounts/user_homepage.html:9
+#: templates/projector/accounts/user_homepage.html:30
+msgid "User"
+msgstr "Użytkownik"
+
+#: templates/projector/accounts/profile.html:12
+#: templates/projector/accounts/user_homepage.html:13
+msgid "Show your public profile"
+msgstr "Pokaż swój profil publiczny"
+
+#: templates/projector/accounts/profile.html:13
+#: templates/projector/project/component_detail.html:16
+#: templates/projector/project/details.html:99
+#: templates/projector/project/milestone_detail.html:16
+#: templates/projector/project/workflow_detail.html:15
+#: templates/projector/project/workflow_edit.html:15
+#: templates/projector/task/details.html:34
+msgid "Edit"
+msgstr "Edycja"
+
+#: templates/projector/accounts/profile.html:23
+#: templates/projector/accounts/profile_edit.html:5
+msgid "User profile"
+msgstr "Profil użytkownika"
+
+#: templates/projector/accounts/profile.html:33
+#: templates/projector/accounts/user_homepage.html:34
+msgid "Full name"
+msgstr "Pełna nazwa"
+
+#: templates/projector/accounts/profile.html:43
+msgid "Member of projects"
+msgstr "Członkowie projektu"
+
+#: templates/projector/accounts/profile.html:47
+#: templates/projector/project/details.html:134
+#: templates/projector/task/details.html:49
+msgid "Project"
+msgstr "Projekt"
+
+#: templates/projector/accounts/profile.html:48
+#: templates/projector/project/details.html:138
+msgid "Category"
+msgstr "Kategoria"
+
+#: templates/projector/accounts/user_homepage.html:24
+msgid "Your homepage"
+msgstr "Twoja strona domowa"
+
+#: templates/projector/accounts/user_homepage.html:45
+msgid "Tasks to do"
+msgstr "Zadania do wykonania"
+
+#: templates/projector/accounts/user_homepage.html:52
+#: templates/projector/task/details.html:107 templatetags/projector_tags.py:42
+msgid "Status"
+msgstr "Status"
+
+#: templates/projector/accounts/user_homepage.html:55
+#: templates/projector/task/details.html:71 templatetags/projector_tags.py:41
+msgid "Summary"
+msgstr "Podsumowanie"
+
+#: templates/projector/accounts/user_homepage.html:71
+msgid "Click to edit and set deadline"
+msgstr "Kliknij by zaktualizować i ustawić termin"
+
+#: templates/projector/accounts/user_homepage.html:71
+msgid "Not set"
+msgstr "Nie ustawiono"
+
+#: templates/projector/accounts/user_list.html:8
+#: templates/projector/project/list.html:8
+msgid "Projects statistics"
+msgstr "Statystyki projektów"
+
+#: templates/projector/accounts/user_list.html:12
+#: templates/projector/project/list.html:12
+msgid "All projects count"
+msgstr "Liczba projektów"
+
+#: templates/projector/accounts/user_list.html:20
+#: templates/projector/project/list.html:20
+msgid "Projects List"
+msgstr "Lista projektów"
+
+#: templates/projector/accounts/user_list.html:34
+msgid "First name"
+msgstr "Imię"
+
+#: templates/projector/accounts/user_list.html:35
+msgid "Last name"
+msgstr "Nazwisko"
+
+#: templates/projector/accounts/user_list.html:36
+msgid "Joined"
+msgstr "Dołączył w"
+
+#: templates/projector/project/changeset_list.html:16
+#: templates/projector/project/repository.html:15
 msgid "Project's repository browser"
 msgstr "Przeglądanie repozytorium projektu"
 
-#: templates/projector/project/changesets.html:18
-#: templates/projector/project/details.html:34
-#: templates/projector/project/repository.html:17
+#: templates/projector/project/changeset_list.html:19
+#: templates/projector/project/details.html:107
+#: templates/projector/project/repository.html:18
 msgid "Sources"
 msgstr "Źródła"
 
-#: templates/projector/project/changesets.html:19
-#: templates/projector/project/repository.html:18
+#: templates/projector/project/changeset_list.html:20
+#: templates/projector/project/repository.html:19
 msgid "Changesets"
 msgstr "Zmiany"
 
-#: templates/projector/project/changesets.html:23
-#: templates/projector/project/repository.html:35
-#: templates/projector/task/details.html:48
+#: templates/projector/project/changeset_list.html:30
+#: templates/projector/project/repository.html:42
+#: templates/projector/task/details.html:45
 msgid "Revision"
 msgstr "Rewizja"
 
-#: templates/projector/project/changesets.html:23
-#, fuzzy
-msgid "commited at"
-msgstr "popełnione w"
+#: templates/projector/project/changeset_list.html:31
+msgid "Commited at"
+msgstr "Popełnione w"
 
-#: templates/projector/project/changesets.html:24
-#: templates/projector/task/details.html:22
-#: templates/projector/task/details.html:132
-msgid "by"
-msgstr "przez"
+#: templates/projector/project/changeset_list.html:32
+#: templates/projector/project/details.html:142
+msgid "Author"
+msgstr "Autor"
+
+#: templates/projector/project/changeset_list.html:33
+msgid "Message"
+msgstr "Wiadomość"
+
+#: templates/projector/project/changeset_list.html:34
+msgid "Action"
+msgstr "Akcja"
+
+#: templates/projector/project/changeset_list.html:43
+#: templates/projector/project/repository.html:31
+#: templates/projector/project/repository.html:83
+msgid "ago"
+msgstr "temu"
+
+#: templates/projector/project/changeset_list.html:49
+#: templates/projector/project/repository.html:77
+msgid "Browse revision's content"
+msgstr "Przeglądaj zawartość rewizji"
+
+#: templates/projector/project/component_add.html:17
+#: templates/projector/project/component_list.html:14
+msgid "Add component"
+msgstr "Dodaj komponent"
+
+#: templates/projector/project/component_add.html:26
+msgid "Create component"
+msgstr "Stwórz komponent"
+
+#: templates/projector/project/component_add.html:29
+#: templates/projector/project/component_edit.html:21
+#: templates/projector/project/create.html:31
+#: templates/projector/project/edit.html:32
+#: templates/projector/project/members_add.html:27
+#: templates/projector/project/milestone_add.html:29
+#: templates/projector/project/milestone_edit.html:21
+#: templates/projector/project/workflow_add_status.html:21
+#: templates/projector/project/workflow_edit.html:31
+#: templates/projector/task/create.html:23
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: templates/projector/project/component_detail.html:11
+msgid "Component detail"
+msgstr "Szczegóły komponentu"
+
+#: templates/projector/project/component_detail.html:14
+#: templates/projector/project/milestone_detail.html:14
+msgid "Back to list"
+msgstr "Wróć do listy"
+
+#: templates/projector/project/component_detail.html:35
+msgid "No description has been set"
+msgstr "Brak opisu"
+
+#: templates/projector/project/component_edit.html:9
+msgid "Edit component"
+msgstr "Edytuj komponent"
+
+#: templates/projector/project/component_edit.html:18
+#: templates/projector/project/edit.html:25
+#: templates/projector/project/milestone_edit.html:18
+#: templates/projector/project/workflow_edit.html:28
+#: templates/projector/task/create.html:11
+#: templates/projector/task/create.html:21
+msgid "Update"
+msgstr "Aktualizuj"
+
+#: templates/projector/project/component_list.html:10
+msgid "Project's components"
+msgstr "Komponenty projektu"
+
+#: templates/projector/project/component_list.html:27
+#: templates/projector/task/details.html:53
+msgid "Component"
+msgstr "Komponent"
+
+#: templates/projector/project/component_list.html:28
+#: templates/projector/project/milestone_list.html:28
+msgid "Tasks"
+msgstr "Zadania"
+
+#: templates/projector/project/component_list.html:39
+#: templates/projector/project/milestone_list.html:39
+msgid "Show all related tasks"
+msgstr "Pokaż wszystkie powiązane zadania"
 
 #: templates/projector/project/create.html:14
 #: templates/projector/project/list.html:25
@@ -332,103 +568,104 @@ msgid "Create new project"
 msgstr "Stwórz nowy projekt"
 
 #: templates/projector/project/create.html:24
-#: templates/projector/task/create.html:14
+#: templates/projector/task/create.html:21
 msgid "Create"
 msgstr "Utwórz"
 
-#: templates/projector/project/create.html:31
-#: templates/projector/project/edit.html:32
-#: templates/projector/project/members_add.html:21
-#: templates/projector/project/milestone_add.html:21
-#: templates/projector/project/milestone_edit.html:21
-#: templates/projector/task/create.html:16
-msgid "Cancel"
-msgstr "Anuluj"
+#: templates/projector/project/details.html:21
+msgid "Projects' tasks summary"
+msgstr "Podsumowanie zadań projektu"
+
+#: templates/projector/project/details.html:24
+msgid "Open tasks"
+msgstr "Otwarte zadania"
 
 #: templates/projector/project/details.html:26
-#: templates/projector/project/details.html:59
+msgid "By assignee"
+msgstr "Po przypisaniu"
+
+#: templates/projector/project/details.html:36
+msgid "Show open tasks for user"
+msgstr "Pokaż otwarte zadania użytkownika"
+
+#: templates/projector/project/details.html:43
+msgid "By status"
+msgstr "Po statusie"
+
+#: templates/projector/project/details.html:53
+msgid "Show open tasks with status"
+msgstr "Pokaż otwarte zadania ze statusem"
+
+#: templates/projector/project/details.html:61
+msgid "By component"
+msgstr "Po komponencie"
+
+#: templates/projector/project/details.html:71
+msgid "Show open tasks with component"
+msgstr "Pokaż otwarte zadania z komponentem"
+
+#: templates/projector/project/details.html:79
+msgid "All open tasks"
+msgstr "Wszystkie otwarte zadania"
+
+#: templates/projector/project/details.html:97
+#: templates/projector/project/details.html:128
 msgid "Project details"
 msgstr "Szczegóły projektu"
 
-#: templates/projector/project/details.html:27
+#: templates/projector/project/details.html:101
 msgid "Milestones"
 msgstr "Kamienie milowe"
 
-#: templates/projector/project/details.html:29
-#: templates/projector/project/milestone_detail.html:14
-#: templates/projector/task/details.html:36
-msgid "Edit"
-msgstr "Edycja"
+#: templates/projector/project/details.html:102
+msgid "Components"
+msgstr "Komponenty"
 
-#: templates/projector/project/details.html:31
+#: templates/projector/project/details.html:103
 msgid "Task list"
 msgstr "Lista zadań"
 
-#: templates/projector/project/details.html:32
+#: templates/projector/project/details.html:104
+msgid "Workflow"
+msgstr "Przepływ pracy"
+
+#: templates/projector/project/details.html:105
 msgid "Members"
 msgstr "Członkowie"
 
-#: templates/projector/project/details.html:49
+#: templates/projector/project/details.html:112
+msgid "Clone repository"
+msgstr "Klonuj repozytorium"
+
+#: templates/projector/project/details.html:118
 msgid "Repository URL seems to be broken. Maybe you have forgotten to "
 msgstr "URL do repozytorium jest nieprawidłowe. Może zapomniałeś"
 
-#: templates/projector/project/details.html:50
+#: templates/projector/project/details.html:119
 msgid "set site"
 msgstr "o ustawieniu obiektu Site"
 
-#: templates/projector/project/details.html:65
-#: templates/projector/task/details.html:53
-msgid "Project"
-msgstr "Projekt"
+#: templates/projector/project/details.html:119
+msgid "at admin panel?"
+msgstr "w panelu administratora?"
 
-#: templates/projector/project/details.html:69
-msgid "Category"
-msgstr "Kategoria"
-
-#: templates/projector/project/details.html:73
-msgid "Author"
-msgstr "Autor"
-
-#: templates/projector/project/details.html:89
-#: templates/projector/project/milestone_detail.html:25
-#: templates/projector/task/details.html:119
-msgid "Description"
-msgstr "Opis"
-
-#: templates/projector/project/details.html:94
+#: templates/projector/project/details.html:163
 msgid "Roadmap"
 msgstr "Mapa zadań"
 
-#: templates/projector/project/details.html:96
+#: templates/projector/project/details.html:165
 msgid "deadline set to"
 msgstr "termin ustawiony"
 
-#: templates/projector/project/details.html:106
-#: templates/projector/project/milestone_detail.html:42
-#: templates/projector/project/milestone_list.html:53
-msgid "Done"
-msgstr "Wykonano"
-
-#: templates/projector/project/details.html:115
-#: templates/projector/project/milestone_detail.html:50
-#: templates/projector/project/milestone_list.html:62
-msgid "Left"
-msgstr "Pozostało"
-
-#: templates/projector/project/details.html:125
-#: templates/projector/project/milestone_detail.html:59
-msgid "No tasks for this milestone were found"
-msgstr "Brak zadań dla tego kroku milowego"
-
-#: templates/projector/project/details.html:130
+#: templates/projector/project/details.html:169
 msgid "No milestones defined yet"
 msgstr "Nie zdefiniowano jeszcze kroków milowych"
 
-#: templates/projector/project/details.html:134
+#: templates/projector/project/details.html:173
 msgid "Timeline"
 msgstr "wpis harmonogramu"
 
-#: templates/projector/project/details.html:141
+#: templates/projector/project/details.html:180
 msgid "No timeline entries defined yet"
 msgstr "Brak wpisów"
 
@@ -436,32 +673,13 @@ msgstr "Brak wpisów"
 msgid "Project's edit panel"
 msgstr "Panel edytowania projektu"
 
-#: templates/projector/project/edit.html:25
-#: templates/projector/project/milestone_edit.html:18
-#: templates/projector/task/create.html:5
-#: templates/projector/task/create.html:14
-msgid "Update"
-msgstr "Aktualizuj"
-
-#: templates/projector/project/list.html:8
-msgid "Projects statistics"
-msgstr "Statystyki projektów"
-
-#: templates/projector/project/list.html:12
-msgid "All projects count"
-msgstr "Liczba projektów"
-
-#: templates/projector/project/list.html:20
-msgid "Projects List"
-msgstr "Lista projektów"
-
 #: templates/projector/project/members.html:21
 #: templates/projector/project/members_manage.html:41
 msgid "Add new member"
 msgstr "Dodaj użytkownika"
 
 #: templates/projector/project/members.html:26
-#: templates/projector/project/task_list.html:43
+#: templates/projector/project/task_list.html:42
 msgid "There is no such page!"
 msgstr "Nie ma takiej strony!"
 
@@ -478,11 +696,11 @@ msgstr "Właściciel ma wszystkie uprawnienia"
 msgid "Manage"
 msgstr "Zarządzaj"
 
-#: templates/projector/project/members_add.html:9
+#: templates/projector/project/members_add.html:15
 msgid "Add member"
 msgstr "Dodaj członka"
 
-#: templates/projector/project/members_add.html:18
+#: templates/projector/project/members_add.html:24
 #: templates/projector/task/details.html:193
 msgid "Submit"
 msgstr "Wyślij"
@@ -513,12 +731,12 @@ msgstr "Zaznacz wszystko"
 msgid "Deselect all"
 msgstr "Odznacz wszystko"
 
-#: templates/projector/project/milestone_add.html:9
+#: templates/projector/project/milestone_add.html:17
 #: templates/projector/project/milestone_list.html:14
 msgid "Add milestone"
 msgstr "Dodaj kamień milowy"
 
-#: templates/projector/project/milestone_add.html:18
+#: templates/projector/project/milestone_add.html:26
 msgid "Create milestone"
 msgstr "Stwórz kamień milowy"
 
@@ -526,7 +744,7 @@ msgstr "Stwórz kamień milowy"
 msgid "Milestone detail"
 msgstr "Szczegóły kamienia milowego"
 
-#: templates/projector/project/milestone_detail.html:15
+#: templates/projector/project/milestone_detail.html:18
 msgid "Show tasks"
 msgstr "Pokaż zadania"
 
@@ -539,110 +757,137 @@ msgid "Project's milestones"
 msgstr "Kamienie milowe projektu"
 
 #: templates/projector/project/milestone_list.html:27
-#: templates/projector/task/details.html:65
+#: templates/projector/task/details.html:61
 msgid "Milestone"
 msgstr "Kamień milowy"
-
-#: templates/projector/project/milestone_list.html:28
-msgid "Tasks"
-msgstr "Zadania"
 
 #: templates/projector/project/milestone_list.html:29
 msgid "Progress"
 msgstr "Postęp"
 
-#: templates/projector/project/milestone_list.html:39
-msgid "Show all related tasks"
-msgstr "Pokaż wszystkie powiązane zadania"
+#: templates/projector/project/milestone_progress_table.html:12
+msgid "Done"
+msgstr "Wykonano"
 
-#: templates/projector/project/repository.html:34
+#: templates/projector/project/milestone_progress_table.html:22
+msgid "Left"
+msgstr "Pozostało"
+
+#: templates/projector/project/milestone_progress_table.html:32
+msgid "No tasks for this milestone were found"
+msgstr "Brak zadań dla tego kroku milowego"
+
+#: templates/projector/project/repository.html:29
+msgid "Committed by"
+msgstr "Popełnione przez"
+
+#: templates/projector/project/repository.html:41
 msgid "Size"
 msgstr "Rozmiar"
 
-#: templates/projector/project/repository.html:36
-msgid "Age"
-msgstr "Wiek"
+#: templates/projector/project/repository.html:43
+msgid "Last modified"
+msgstr "Ostatnio zmodyfikowano"
 
-#: templates/projector/project/repository.html:37
+#: templates/projector/project/repository.html:44
 msgid "Last committer"
 msgstr "Ostatni autor"
 
-#: templates/projector/project/task_list.html:39
+#: templates/projector/project/task_list.html:10
+msgid "Task search"
+msgstr "Szukaj zadań"
+
+#: templates/projector/project/task_list.html:33
+msgid "Project's task list"
+msgstr "Lista zadań projektu"
+
+#: templates/projector/project/task_list.html:36
+msgid "Task List"
+msgstr "Lista zadań"
+
+#: templates/projector/project/task_list.html:38
 msgid "Create new task"
 msgstr "Stwórz nowe zadanie"
 
-#: templates/projector/task/create.html:5
+#: templates/projector/project/workflow_add_status.html:9
+#: templates/projector/project/workflow_detail.html:16
+msgid "Add status"
+msgstr "Dodaj status"
+
+#: templates/projector/project/workflow_add_status.html:18
+msgid "Create status"
+msgstr "Stwórz status"
+
+#: templates/projector/project/workflow_detail.html:11
+#: templates/projector/project/workflow_edit.html:11
+msgid "Workflow schema"
+msgstr "Schemat przepływu pracy"
+
+#: templates/projector/project/workflow_edit.html:14
+msgid "Back to workflow schema"
+msgstr "Wróć do przepływu pracy"
+
+#: templates/projector/task/create.html:11
 msgid "Create new"
 msgstr "Utwórz"
 
-#: templates/projector/task/details.html:22
+#: templates/projector/task/details.html:20
+#: templates/projector/task/details.html:134
+msgid "by"
+msgstr "przez"
+
+#: templates/projector/task/details.html:20
 msgid "at"
 msgstr "na"
 
-#: templates/projector/task/details.html:32
-#: templates/projector/task/details.html:43
+#: templates/projector/task/details.html:30
+#: templates/projector/task/details.html:41
 msgid "Task"
 msgstr "Zadanie"
 
-#: templates/projector/task/details.html:33
+#: templates/projector/task/details.html:31
 msgid "opened for"
 msgstr "Otwarty"
 
-#: templates/projector/task/details.html:35
+#: templates/projector/task/details.html:33
 msgid "Return to task list"
 msgstr "Powrót do listy zadań"
 
 #: templates/projector/task/details.html:57
-msgid "Component"
-msgstr "Komponent"
-
-#: templates/projector/task/details.html:61
 msgid "Type"
 msgstr "Typ"
 
-#: templates/projector/task/details.html:69 templatetags/projector_tags.py:39
-msgid "Summary"
-msgstr "Podsumowanie"
-
-#: templates/projector/task/details.html:73
+#: templates/projector/task/details.html:75
 msgid "Reported by"
 msgstr "Zaraportowano przez"
 
-#: templates/projector/task/details.html:77
+#: templates/projector/task/details.html:79
 msgid "Reported date"
 msgstr "Data zaraportowania"
 
-#: templates/projector/task/details.html:81
+#: templates/projector/task/details.html:83
 msgid "Last modified at"
 msgstr "Ostatnio zmodyfikowano przez"
 
-#: templates/projector/task/details.html:84
-msgid "Deadline"
-msgstr "Termin"
-
-#: templates/projector/task/details.html:97 views/task.py:91
+#: templates/projector/task/details.html:99
 msgid "Assigned to"
 msgstr "Przypisany do"
 
-#: templates/projector/task/details.html:101
+#: templates/projector/task/details.html:103
 msgid "Priority"
 msgstr "Priorytet"
 
-#: templates/projector/task/details.html:105 templatetags/projector_tags.py:40
-msgid "Status"
-msgstr "Status"
-
-#: templates/projector/task/details.html:128
+#: templates/projector/task/details.html:130
 msgid "History"
 msgstr "Historia"
 
-#: templates/projector/task/details.html:152
+#: templates/projector/task/details.html:160
 msgid "Attachments"
 msgstr "Załączniki"
 
-#: templates/projector/task/details.html:182
-msgid "Action"
-msgstr "Akcja"
+#: templates/projector/task/details.html:180
+msgid "Quick action"
+msgstr "Szybka akcja"
 
 #: templates/projector/task/details.html:200
 msgid "If you want to contribute, please"
@@ -652,31 +897,47 @@ msgstr "Jeśli chcesz przyczynić się do rozwoju, proszę"
 msgid "login"
 msgstr "zalugj się"
 
-#: templatetags/projector_tags.py:46
+#: templatetags/projector_tags.py:48
 msgid "There is no such task for this project"
 msgstr "Nie ma takiego zadania"
 
-#: views/project.py:78
+#: views/project.py:140
 msgid "One task matched - redirecting..."
 msgstr "Znaleziono jedno zadania - przekierowuję..."
 
-#: views/project.py:122
+#: views/project.py:185
 msgid "Project edited successfully"
 msgstr "Pomyślnie zaktualizowano projekt"
 
-#: views/project.py:180
+#: views/project.py:244
 msgid "Milestone added successfully"
 msgstr "Pomyślnie dodano kamień milowy"
 
-#: views/project.py:201
+#: views/project.py:265 views/project.py:344
 msgid "Milestone updated successfully"
 msgstr "Pomyślnie zaktualizowano kamień milowy"
 
-#: views/project.py:270
+#: views/project.py:322
+msgid "Component added successfully"
+msgstr "Pomyślnie dodano komponent"
+
+#: views/project.py:380
+msgid "Workflow updated successfully"
+msgstr "Pomyślnie zaktualizowano przepływ zadań"
+
+#: views/project.py:395
+msgid "Errors occured while processing formset"
+msgstr "Pojawiły się błędy podczas przetwarzania formularzy"
+
+#: views/project.py:418
+msgid "Status added successfully"
+msgstr "Pomyślnie dodano status"
+
+#: views/project.py:488
 msgid "Project owner's membership cannot be modified. He/She has all permissions for this project."
 msgstr "Członkostwo właściciela projektu nie może być zmodyfikowane. Właściciel zawsze posiada wszystkie uprawnienia dla swojego projektu."
 
-#: views/project.py:363 views/project.py:401
+#: views/project.py:572 views/project.py:597
 msgid "Repository's url is not set! Please configure project preferences first."
 msgstr "Nie ustawiono lokacji repozytorium! Zaktualizuj właściwości projektu."
 
@@ -688,56 +949,63 @@ msgstr "Moduł"
 msgid "is not available"
 msgstr "nie jest dostępny"
 
-#: views/task.py:40
+#: views/task.py:42
 msgid "Don't change status"
 msgstr "Nie zmieniaj statusu"
 
-#: views/task.py:41
-msgid "Resolve to"
-msgstr "Rozwiąż jako"
-
 #: views/task.py:46
-msgid "Assign to"
-msgstr "Przypisany do"
+msgid "Change status"
+msgstr "Zmień status"
 
-#: views/task.py:48
-msgid "Reopen as"
-msgstr "Otwórz jako"
+#: views/task.py:75
+msgid "Task updated successfully"
+msgstr "Pomyślnie zaktualizowano zadanie"
 
-#: views/task.py:58
-msgid "Accept task"
-msgstr "Zaakceptuj zadanie"
+#: views/task.py:79
+msgid "There were no changes"
+msgstr "Brak zmian"
 
-#: views/task.py:83
-msgid "Accepted by"
-msgstr "Zaakcepotwany przez"
+#: views/task.py:115
+msgid "Statuses, task types, priorities or components of this project are missing or no initial status is defined and we cannot create new tasks. Ask site administrator for help."
+msgstr "Brakuje statusów, typów zadań, priorytetów lub komponentów dla tego projektu lub status początkowy nie został zdefiniowany i nie można utworzyć nowego zadania. Zapytaj administratora strony o pomoc."
 
-#: views/task.py:87
-msgid "Resolved to"
-msgstr "Rozwiązany"
-
-#: views/task.py:95
-msgid "Reopened as"
-msgstr "Ponownie otwarto jako"
-
-#: views/task.py:101
-msgid "Task hasn't been changed."
-msgstr "Zadanie nie zostało zmienione"
-
-#: views/task.py:107
-msgid "Comment added successfully."
-msgstr "Pomyślnie dodano komentarz"
-
-#: views/task.py:172
+#: views/task.py:144
 msgid "Task created succesfully."
 msgstr "Pomyślnie utworzono zadanie"
 
-#: views/task.py:200
+#: views/task.py:171
 msgid "Task updated successfully."
 msgstr "Pomyślnie zaktualizowano zadanie"
 
-#~ msgid "Browse repository"
-#~ msgstr "Przeglądanie repozytorium"
+#~ msgid "Cannot use this name"
+#~ msgstr "Nie można użyć tej nazwy"
+
+#~ msgid "Revision "
+#~ msgstr "Rewizja"
+
+#~ msgid "Age"
+#~ msgstr "Wiek"
+
+#~ msgid "Resolve to"
+#~ msgstr "Rozwiąż jako"
+
+#~ msgid "Assign to"
+#~ msgstr "Przypisany do"
+
+#~ msgid "Accept task"
+#~ msgstr "Zaakceptuj zadanie"
+
+#~ msgid "Accepted by"
+#~ msgstr "Zaakcepotwany przez"
+
+#~ msgid "Resolved to"
+#~ msgstr "Rozwiązany"
+
+#~ msgid "Reopened as"
+#~ msgstr "Ponownie otwarto jako"
+
+#~ msgid "Task hasn't been changed."
+#~ msgstr "Zadanie nie zostało zmienione"
 
 #~ msgid "created_at"
 #~ msgstr "utworzono"
@@ -763,9 +1031,6 @@ msgstr "Pomyślnie zaktualizowano zadanie"
 #~ msgid "Task count"
 #~ msgstr "Liczba zadań"
 
-#~ msgid "Created at"
-#~ msgstr "Utworzono"
-
 #~ msgid "No changeset entires found"
 #~ msgstr "Nie znaleziono wpisów zmian"
 
@@ -780,6 +1045,3 @@ msgstr "Pomyślnie zaktualizowano zadanie"
 
 #~ msgid "revision number"
 #~ msgstr "numer rewizji"
-
-#~ msgid "task revisions"
-#~ msgstr "korekty zadania"
