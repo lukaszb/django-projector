@@ -560,18 +560,15 @@ def project_browse_repository(request, project_slug, rel_repo_url='',
     """
     Handles project's repository browser.
     """
-
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not request.user.is_authenticated() or \
             not check.read_repository_project(project):
             raise PermissionDenied()
-
     if not project._get_repo_path():
         messages.error(request, _("Repository's url is not set! Please "
             "configure project preferences first."))
-
     repo_info = {
         'repository': project.repository,
         'revision': revision,

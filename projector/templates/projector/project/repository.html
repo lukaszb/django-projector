@@ -9,6 +9,42 @@
     {% endblock %}
 {% endif %}
 
+{% block col_left %}{{ block.super }}
+<div class="richtemplates-panel">
+    <h5>{% trans "Node's information" %}</h5>
+    <div class="richtemplates-panel-content">
+        <div class="richblock">
+            <table class="richblock-properties">
+                <tbody>
+                    <tr>
+                        <th>{% trans "Path" %}</th>
+                        <td>{{ root.path }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Revision" %}</th>
+                        <td>{{ root.changeset.raw_id }}</td>
+                    </tr>
+                    {% if root.is_file %}
+                    <tr>
+                        <th>{% trans "Size" %}</th>
+                        <td>{% if root.is_file %}{{ root.size|filesizeformat }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Last committer" %}</th>
+                        <td>{{ root.last_changeset.author|tooltip:"20" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Last modified" %}</th>
+                        <td>{{ root.last_changeset.date }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block col_main_extra %}
 
 <div class="richtemplates-panel">

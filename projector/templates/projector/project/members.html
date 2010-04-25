@@ -11,11 +11,11 @@
 {% autopaginate memberships %}
 
 <div class="richtemplates-panel">
-    <h5>Project's members</h5>
+    <h5>{% trans "Project's members" %}</h5>
     <div class="richtemplates-panel-content">
         {# Task list: {{ task_list }} #}
     <h1>{{ project.name }}</h1>
-    <h2>Membership</h2>
+    <h2>{% trans "Membership" %}</h2>
     <ul class="nav-inline">
         {% ifhasperm "project_permission.add_member_project" request.user project %}
         <li><a class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a></li>
