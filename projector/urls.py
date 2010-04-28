@@ -79,6 +79,17 @@ urlpatterns += patterns('projector.views.project',
         view='project_members_manage',
         name='projector_project_members_manage'),
 
+    # Teams
+    url(r'^projects/(?P<project_slug>[-\w]+)/teams/$',
+        view='project_teams',
+        name='projector_project_teams'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/teams/add/$',
+        view='project_teams_add',
+        name='projector_project_teams_add'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/teams/(?P<name>\w+)/$',
+        view='project_teams_manage',
+        name='projector_project_teams_manage'),
+
     # Sources
     url(r'^projects/(?P<project_slug>[-\w]+)/src/changesets/$',
         view='project_changesets',

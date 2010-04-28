@@ -40,23 +40,51 @@
                 </tbody>
             </table>
         </div>
-        <h3>{% trans "Member of projects" %}</h3>
-        <table class="datatable">
-            <thead class="datatable-thead">
-                <tr class="datatable-thead-subheader">
-                    <th>{% trans "Project" %}</th>
-                    <th>{% trans "Category" %}</th>
-                </tr>
-            </thead>
-            <tbody class="datatable-tbody">
-                {% for project in profile.user.project_set.all %}
-                <tr class="{% cycle "odd" "even" %} hoverable">
-                    <td><a class="block-link" href="{{ project.get_absolute_url }}">{{ project.name }}</a></td>
-                    <td>{{ project.category|default:"-" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="richtabs">
+            <ul>
+                <li><a href="#projects"><span>{% trans "Projects" %}</span></a></li>
+                <li><a href="#teams">{% trans "Teams" %}</a></li>
+            </ul>
+        
+            <div id="projects">
+                <h3>{% trans "Member of projects" %}</h3>
+                <table class="datatable">
+                    <thead class="datatable-thead">
+                        <tr class="datatable-thead-subheader">
+                            <th>{% trans "Project" %}</th>
+                            <th>{% trans "Category" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="datatable-tbody">
+                        {% for project in profile.user.project_set.all %}
+                        <tr class="{% cycle "odd" "even" %} hoverable">
+                            <td><a class="block-link" href="{{ project.get_absolute_url }}">{{ project.name }}</a></td>
+                            <td>{{ project.category|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="teams">
+                <h3>{% trans "Member of teams" %}</h3>
+                <table class="datatable">
+                    <thead class="datatable-thead">
+                        <tr class="datatable-thead-subheader">
+                            <th>{% trans "Team" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="datatable-tbody">
+                        {% for team in teams %}
+                        <tr class="{% cycle "odd" "even" %} hoverable">
+                            <td><a class="block-link" href="#">{{ team.group }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

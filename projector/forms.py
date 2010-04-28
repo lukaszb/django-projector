@@ -1,8 +1,10 @@
 from django import forms
 from django.forms.models import modelformset_factory
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import Group
 
 from projector.models import Membership
+from projector.models import Team
 from projector.models import Project
 from projector.models import Task
 from projector.models import Status
@@ -10,7 +12,7 @@ from projector.models import Component
 from projector.models import Milestone
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
-    UserByNameField
+    UserByNameField, ModelByNameField
 
 import logging
 
@@ -29,7 +31,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        exclude = ('members', 'author', 'editor', 'repository')
+        exclude = ('members', 'author', 'editor', 'repository', 'teams')
 
     def clean_public(self):
         data = self.cleaned_data['public']
@@ -40,6 +42,23 @@ class ProjectForm(forms.ModelForm):
             return False
         else:
             raise forms.ValidationError(_("Choose one of the given options"))
+
+    def clean_teams(self):
+        # Not used with ``teams`` field excluded
+        data = self.cleaned_data['teams']
+        logging.info(data)
+        teams = [Team(group=group) for group in
+            data]
+        return teams
+
+    def save(self, commit=True):
+        instance = super(ProjectForm, self).save(commit=False)
+        if commit:
+            instance.save()
+            for team in self.cleaned_data.get('teams', ()):
+                team.project = instance
+                team.save()
+        return instance
 
 class TaskCommentForm(forms.Form):
     comment = forms.CharField(label=_("Comment"), widget=forms.Textarea,
@@ -124,6 +143,26 @@ class MembershipForm(LimitingModelForm):
                 "this project"))
         return member
 
+class TeamForm(LimitingModelForm):
+    group = ModelByNameField(queryset=Group.objects.all,
+        max_length=64, label=_("Group"))
+
+    class Meta:
+        model = Team
+        exclude = ['project']
+        choices_limiting_fields = ['project']
+
+    def clean_group(self, commit=True):
+        group = self.cleaned_data['group']
+        if Team.objects.filter(
+            group = group,
+            project = self.instance.project,
+        ).count() > 0:
+            raise forms.ValidationError(_("This group is already a team "
+                "of this project"))
+        return group
+
+
 class MilestoneForm(forms.ModelForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
@@ -145,17 +184,17 @@ class StatusEditForm(forms.ModelForm):
         model = Status
         exclude = ['project']
 
-    def clean(self):
-        cleaned_data = self.cleaned_data
+    def clean_name(self):
+        name = self.cleaned_data['name']
         try:
-            Status.objects.get(name__iexact=cleaned_data['name'],
+            Status.objects.get(name__iexact=name,
                 project=self.instance.project)
         except Status.DoesNotExist:
             pass
         else:
             raise forms.ValidationError(_("Status with this name already "
                 "exists for this project"))
-        return cleaned_data
+        return name
 
 class StatusForm(StatusEditForm):
 

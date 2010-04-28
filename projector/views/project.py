@@ -16,19 +16,20 @@ from annoying.decorators import render_to
 from authority.decorators import permission_required_or_403
 from authority.models import Permission
 
-from projector.models import Project, Membership, Task, \
-    Milestone, Status, Transition, Component
-from projector.forms import ProjectForm, MembershipForm, MilestoneForm, \
-    StatusForm, StatusFormSet, ComponentForm
-from projector.permissions import ProjectPermission
+from projector.models import Project, Membership, Team, Task
+from projector.models import Milestone, Status, Transition, Component
+from projector.forms import ProjectForm, MembershipForm, MilestoneForm
+from projector.forms import StatusForm, StatusFormSet, ComponentForm
+from projector.forms import TeamForm
+from projector.permissions import ProjectPermission, get_or_create_permisson
 from projector.filters import TaskFilter
 from projector import settings as projector_settings
 
 from richtemplates.shortcuts import get_first_or_None
 
-from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial,\
-    log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs import settings as simplevcs_settings
+from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
+from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
 from vcs.web.simplevcs.views import browse_repository
 
@@ -156,11 +157,9 @@ def project_create(request):
     )
     form = ProjectForm(request.POST or None, instance=project)
     if request.method == 'POST' and form.is_valid():
-        project = form.save(commit=False)
-        project.save()
+        project = form.save()
         project.create_workflow()
         return HttpResponseRedirect(project.get_absolute_url())
-
     context = {
         'form' : form,
     }
@@ -424,11 +423,16 @@ def project_workflow_add_status(request, project_slug):
     }
     return context
 
+# ========================== #
+# Membership - user & groups #
+# ========================== #
 
-@render_to('projector/project/members.html')
-def project_members(request, project_slug):
+# Members
+
+def project_members(request, project_slug,
+        template_name='projector/project/members.html'):
     """
-    Shows/updates project's members view.
+    Shows/updates project's members and groups view.
     """
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private():
@@ -436,19 +440,18 @@ def project_members(request, project_slug):
         if not check.has_perm('project_permission.view_members_project',
             project):
             raise PermissionDenied()
-    memberships = Membership.objects\
-        .filter(project=project)
+    memberships = Membership.objects.filter(project=project)
 
     context = {
         'project': project,
         'memberships': memberships,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_member_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/members_add.html')
-def project_members_add(request, project_slug):
+def project_members_add(request, project_slug,
+        template_name='projector/project/members_add.html'):
     """
     Adds member for a project.
     """
@@ -470,7 +473,7 @@ def project_members_add(request, project_slug):
         'project': form.instance.project,
         'form': form,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_member_project',
     (Project, 'slug', 'project_slug'))
@@ -554,6 +557,116 @@ def project_members_manage(request, project_slug, username):
         'available_permissions': available_permissions,
     }
     return context
+
+# Teams
+
+def project_teams(request, project_slug,
+        template_name='projector/project/teams/home.html'):
+    """
+    Shows/updates project's teams view.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(request.user)
+        if not check.has_perm('project_permission.view_teams_project',
+            project):
+            raise PermissionDenied()
+    teams = Team.objects.filter(project=project)
+
+    context = {
+        'project': project,
+        'teams': teams,
+    }
+    return render_to_response(template_name, context, RequestContext(request))
+
+@permission_required_or_403('project_permission.add_team_project',
+    (Project, 'slug', 'project_slug'))
+def project_teams_add(request, project_slug,
+        template_name='projector/project/teams/create.html'):
+    """
+    Adds team for a project.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    team = Team(
+        project = project,
+    )
+    form = TeamForm(request.POST or None, instance=team)
+
+    if request.method == 'POST' and form.is_valid():
+        logging.info("Saving team %s for project '%s'"
+            % (form.instance.group, form.instance.project))
+        form.save()
+        return redirect(project.get_teams_url())
+    elif form.errors:
+        logging.error("Form contains errors:\n%s" % form.errors)
+
+    context = {
+        'project': form.instance.project,
+        'form': form,
+    }
+    return render_to_response(template_name, context, RequestContext(request))
+
+@permission_required_or_403('project_permission.change_team_project',
+    (Project, 'slug', 'project_slug'))
+def project_teams_manage(request, project_slug, name,
+        template_name='projector/project/teams/edit.html'):
+    """
+    Manages settings and permissions of project's team.
+    """
+    team = get_object_or_404(Team,
+        project__slug=project_slug, group__name=name)
+    project = team.project
+    group = team.group
+    check = ProjectPermission(group=team.group)
+
+    form = TeamForm(request.POST or None, instance=team)
+    available_permissions = check.get_local_checks()
+    logging.info("Available permissions for projects are:\n%s"
+        % pprint.pformat(available_permissions))
+
+    logging.info("Current %s's permissions:" % group)
+    for perm in team.perms:
+        logging.info("%s | Approved is %s" % (perm, perm.approved))
+
+    team_short_perms = [perm.codename.split('.')[-1] for perm in team.perms]
+
+    if request.method == 'POST':
+        granted_perms = request.POST.getlist('perms')
+        logging.debug("POST'ed perms: %s" % granted_perms)
+        for perm in available_permissions:
+            logging.info("Permisson %s | Team %s has it: %s"
+                % (perm, team, perm in team.perms))
+            perm_codename = '.'.join((check.label, perm))
+            if perm in granted_perms and not perm in team_short_perms:
+                # Grant perm
+                logging.debug("Granting permission %s for team %s"
+                    % (perm_codename, team))
+                get_or_create_permisson(
+                    perm_codename,
+                    project,
+                    group = team.group,
+                    approved = True,
+                    creator = request.user,
+                )
+            if perm not in granted_perms and perm in team_short_perms:
+                # Disable perm
+                logging.debug("Disabling permission %s for team %s"
+                    % (perm_codename, team))
+                try:
+                    team.perms.get(codename=perm_codename).delete()
+                except Permission.DoesNotExist:
+                    pass
+        return redirect(team.get_absolute_url())
+
+    context = {
+        'project': project,
+        'form': form,
+        'team': team,
+        'available_permissions': available_permissions,
+        'team_short_perms': team_short_perms,
+    }
+    return render_to_response(template_name, context, RequestContext(request))
+
 
 def project_browse_repository(request, project_slug, rel_repo_url='',
         revision='tip', template_name='projector/project/repository.html'):

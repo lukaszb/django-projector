@@ -1,3 +1,4 @@
+import os
 from django.conf import global_settings
 
 DATABASES = {
@@ -49,13 +50,13 @@ MIDDLEWARE_CLASSES = (
     'projector.utils.simplehg.PaginationMiddleware',
 )
 
-DJALOG_LEVEL = logging.INFO
+DJALOG_LEVEL = 5
 DJALOG_USE_COLORS = True
 DJALOG_FORMAT = "[%(levelname)s] %(message)s"
 ROOT_URLCONF = 'projector.tests.urls'
 TEMPLATE_CONTEXT_PROCESSORS = global_settings + (
-    #'django.core.context_processors.csrf',
     'django.core.context_processors.request',
+    'richtemplates.context_processors.media',
 )
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',

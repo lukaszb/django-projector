@@ -103,6 +103,7 @@
             <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
             <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a></li>
             <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
+            <li><a class="button-link" href="{{ project.get_teams_url }}">{% trans "Teams" %}</a></li>
             {% if project.get_repo_url %}
                 <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
             {% endif %}

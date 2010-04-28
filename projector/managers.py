@@ -23,3 +23,13 @@ class ProjectManager(models.Manager):
             qs = qs.filter(pk__in=ids)
         return qs
 
+class TeamManager(models.Manager):
+
+    def for_user(self, user=None):
+        """
+        Returns queryset of Team instances of groups for given user.
+        """
+        queryset = self.get_query_set()
+        queryset = queryset.filter(group__user=user)
+        return queryset
+

@@ -6,9 +6,8 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-#from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.tokens import default_token_generator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -19,8 +18,9 @@ from authority.models import Permission
 from autoslug import AutoSlugField
 from projector.conf import default_workflow
 from projector.utils import abspath
+from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
-from projector.managers import ProjectManager
+from projector.managers import ProjectManager, TeamManager
 from richtemplates.utils import get_user_profile_model
 from vcs.web.simplevcs.models import Repository
 
@@ -88,6 +88,8 @@ class Project(models.Model):
     public = models.BooleanField(_('public'), default=True)
     members = models.ManyToManyField(User, verbose_name=_('members'),
         through="Membership")
+    teams = models.ManyToManyField(Group, verbose_name=_('teams'),
+        through="Team", null=True, blank=True)
     author = models.ForeignKey(User, name=_('author'),
         related_name='created_projects')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -102,6 +104,7 @@ class Project(models.Model):
         verbose_name = _('project')
         verbose_name_plural = _('projects')
         ordering = ['name']
+        get_latest_by = 'created_at'
         permissions = (
             ('can_read_repository', 'Can read repository'),
             ('can_write_to_repository', 'Can write to repository'),
@@ -150,6 +153,20 @@ class Project(models.Model):
     def get_members_manage_url(self, username):
         return ('projector_project_members_manage', (),
             {'project_slug': self.slug, 'username': username})
+
+    @models.permalink
+    def get_teams_url(self):
+        return ('projector_project_teams', (), {'project_slug': self.slug})
+
+    @models.permalink
+    def get_teams_add_url(self):
+        return ('projector_project_teams_add', (),
+            {'project_slug': self.slug })
+
+    @models.permalink
+    def get_teams_manage_url(self, name):
+        return ('projector_project_teams_manage', (),
+            {'project_slug': self.slug, 'name': name})
 
     @models.permalink
     def get_create_task_url(self):
@@ -371,7 +388,7 @@ class Component(models.Model):
     class Meta:
         verbose_name = _('component')
         verbose_name_plural = _('components')
-        unique_together = ('project', 'name')
+        unique_together = ('project', 'slug')
         ordering = ('name',)
 
     def __unicode__(self):
@@ -393,8 +410,8 @@ class Component(models.Model):
 
 class Membership(models.Model):
     member = models.ForeignKey(User, verbose_name=_('member'))
-    joined_at = models.DateTimeField(_('joined at'), auto_now_add=True)
     project = models.ForeignKey(Project, verbose_name=_('project'))
+    joined_at = models.DateTimeField(_('joined at'), auto_now_add=True)
 
     def __unicode__(self):
         return u"%s@%s" % (self.member, self.project)
@@ -409,10 +426,36 @@ class Membership(models.Model):
             'username': self.member.username,
         })
 
+class Team(models.Model):
+    group = models.ForeignKey(Group, verbose_name=_('group'))
+    project = models.ForeignKey(Project, verbose_name=_('project'))
+    joined_at = models.DateTimeField(_('joined at'), auto_now_add=True)
+
+    objects = TeamManager()
+
+    def __unicode__(self):
+        return u"[%s]@%s" % (self.group, self.project)
+
+    class Meta:
+        unique_together = ('project', 'group')
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('projector_project_teams_manage', (), {
+            'project_slug': self.project.slug,
+            'name': self.group.name,
+        })
+
+    @LazyProperty
+    def perms(self):
+        from projector.permissions import get_perms
+        return get_perms(self.group, self.project)
+
 class Milestone(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'))
     name = models.CharField(max_length=64)
-    slug = AutoSlugField(max_length=64, populate_from='name')
+    slug = AutoSlugField(max_length=64, populate_from='name',
+        unique_with='project')
     description = models.TextField()
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -425,7 +468,7 @@ class Milestone(models.Model):
         ordering = ('created_at',)
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
-        unique_together = ('project', 'name')
+        #unique_together = ('project', 'slug')
 
     def __unicode__(self):
         return self.name

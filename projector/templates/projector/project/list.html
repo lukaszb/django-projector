@@ -44,9 +44,11 @@
         <tbody class="datatable-tbody">
             {% for project in project_list %}
             <tr class="{% cycle "odd" "even" %} hoverable">
-                <td><a class="block-link" href="{{ project.get_absolute_url }}">{{ project.name }}</a></td>
+                <td><a href="{{ project.get_absolute_url }}"
+                       class="block-link" >{{ project.name }}</a></td>
                 <td>{{ project.category|default:"-" }}</td>
-                <td>{{ project.author }}</td>
+                <td><a href="{% url projector_users_profile_detail project.author.username %}"
+                       class="block-link">{{ project.author }}</a></td>
                 <td>{{ project.created_at|date:"Y-m-d" }}</td>
                 <td>{{ project.task__count }}</td>
             </tr>

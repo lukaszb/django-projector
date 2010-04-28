@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -7,11 +6,9 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 from annoying.decorators import render_to
-from projector.models import Project, Task
+from projector.models import Team
 from projector.extras.users.forms import UserProfileForm
-from richtemplates.utils import get_user_profile_model
 
-@login_required
 @render_to('projector/accounts/user_list.html')
 def user_list(request):
     user_list = User.objects.all()
@@ -38,12 +35,15 @@ def user_homepage(request):
     }
     return context
 
-@login_required
 @render_to('projector/accounts/profile.html')
 def profile_detail(request, username):
+    """
+    Public profile of the given user.
+    """
     user = get_object_or_404(User, username=username)
     context = {
         'profile': user.get_profile(),
+        'teams': Team.objects.for_user(user)
     }
     return context
 

@@ -23,10 +23,9 @@
 {% block col_main_extra %}
 
 <div class="richtemplates-panel">
-    <h5>{% trans "Project's member" %}</h5>
+    <h5>{% trans "Project's team" %}</h5>
     <div class="richtemplates-panel-content">
-        {# Task list: {{ task_list }} #}
-    <h1>{% trans "Manage member" %} {{ membership.member }}</h1>
+    <h1>{% trans "Manage team" %} {{ membership.member }}</h1>
     
     {% if project.is_public %}
         <ul class="messages">
@@ -38,7 +37,9 @@
     {% endif %}
 
     <ul class="nav-inline">
-        <li><a class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a></li>
+        {% ifhasperm "project_permission.add_team_project" request.user project %}
+        <li><a class="button-link" href="{{ project.get_teams_add_url }}">{% trans "Add new team" %}</a></li>
+        {% endifhasperm %}
     </ul>
 
     <form id="id_form_perms" action="." method="post">
@@ -55,21 +56,19 @@
             </tr>
         </thead>
         <tbody class="datatable-tbody">
-            {% get_permissions membership.project for membership.member as "my_permissions" %}
             {% for permission in available_permissions %}
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td class="centered">
-                    {% ifhasperm permission membership.member project %}
+                    {% if permission in team_short_perms %}
                         <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-yes.gif" />
                     {% else %}
                         <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-no.gif" />
-                    {% endifhasperm %}
+                    {% endif %}
                 </td>
                 <td>{{ permission }}</td>
                 <td class="centered">
-                {% if permission in my_permissions %}YES!!!{% endif %}
                     <input type="checkbox" value="{{ permission }}" name="perms"
-                    {% ifhasperm permission membership.member project %} checked="checked"{% endifhasperm %}/>
+                    {% if permission in team_short_perms %} checked="checked"{% endif %}/>
                 </td>
             </tr>
             {% endfor %}
@@ -82,7 +81,7 @@
     </p>
     </form>
     </div>
+
 </div>
 {% endblock %}
-
 

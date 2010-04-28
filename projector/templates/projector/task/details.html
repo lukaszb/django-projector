@@ -12,8 +12,9 @@
 
 {% block col_left %}{{ block.super }}
 <div class="richtemplates-panel">
-    <h5>Task changes</h5>
+    <h5>{% trans "Task changes" %}</h5>
     <div class="richtemplates-panel-content">
+        {% if task.revisions|length > 1 %}
         <ul class="nav-vertical">
             {% for revision in task.revisions %}
             {% if not forloop.first %}
@@ -21,6 +22,11 @@
             {% endif %}
             {% endfor %}
         </ul>
+        {% else %}
+        <ul class="messages">
+            <li class="message message-warning">{% trans "No revisions yet" %}</li>
+        </ul>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

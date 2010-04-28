@@ -15,17 +15,12 @@
     <div class="richtemplates-panel-content">
         {# Task list: {{ task_list }} #}
     <h1>{{ project.name }}</h1>
-    <h2>{% trans "Membership" %}</h2>
+    <h2>{% trans "Members" %}</h2>
     <ul class="nav-inline">
         {% ifhasperm "project_permission.add_member_project" request.user project %}
         <li><a class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a></li>
         {% endifhasperm %}
     </ul>
-    {% if invalid_page %}
-        <div class="messages">
-            <p class="error">{% trans "There is no such page!" %}</p>
-        </div>
-    {% else %}
     <table class="datatable">
         <thead class="datatable-thead">
             <tr class="datatable-thead-subheader">
@@ -50,7 +45,7 @@
         </tbody>
     </table>
     {% paginate %}
-    {% endif %}
+
 </div>
 </div>
 {% endblock %}
