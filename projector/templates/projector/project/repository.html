@@ -60,6 +60,7 @@
             {% path_breadcrumbs request.META.PATH_INFO 3 %}
         </div>
 
+        {% if changeset %}
         <ul class="messages">
             <li class="message message-info">
                 {% trans "Committed by" %} {{ changeset.author }}
@@ -67,7 +68,8 @@
                 {% trans "ago" %}<br/><br/>
                 {{ changeset.message }}
             </li>
-        </ul>        
+        </ul>
+        {% endif %}
         
         {% if root.is_dir %}
         <table class="code-browser">
@@ -128,7 +130,7 @@
         {% endif %}
         {% if root.is_file %}
         <div class="codeblock">
-            {% highlight root.content root.lexer_alias linenos=true cssclass="code-highlight" %}
+            {% highlight root.content root.lexer_alias linenos=true anchorlinenos=true lineanchors=line cssclass="code-highlight" %}
         </div>
         {% endif %}
     </div>

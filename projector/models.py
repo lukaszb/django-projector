@@ -765,8 +765,6 @@ class Task(AbstractTask):
         """
         Creates revision (instance of ``TaskRevision``) for this task.
         """
-        logging.debug("TEMP: Going to create revision for task %s" % self)
-        logging.debug("TEMP: task current status is %s" % self.status)
         revision_info = dict(
             task = self,
             author = self.editor,
@@ -835,7 +833,7 @@ def project_created_listener(instance, **kwargs):
         # are available from ``vcs``
         repo_path = instance._get_repo_path()
         type = 'hg'
-        logging.info("Creating new mercurial repository at %s" % repo_path)
+        logging.info("Initializing new mercurial repository at %s" % repo_path)
         repository = Repository.objects.create(path=repo_path, type=type)
         instance.repository = repository
         instance.save()

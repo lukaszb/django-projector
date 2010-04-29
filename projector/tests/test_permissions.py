@@ -1,16 +1,17 @@
-import logging
-
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from django.test.client import Client
-from django.http import HttpResponse
+#from django.http import HttpResponse
 
 from projector.models import Project
 from projector.permissions import ProjectPermission
 
 class ProjectorPermissionTests(TestCase):
+
+    def runTest(self):
+        pass
 
     def setUp(self):
         self.client = Client()
@@ -50,7 +51,7 @@ class ProjectorPermissionTests(TestCase):
             check = ProjectPermission(user=user)
             #self.failUnless(
             #    check.has_perm('can_read_repository_project', public_project))
-    
+
     def _assert_url_code(self, url, status_code):
         response = self.client.get(url)
         self.assertTrue(response.status_code == status_code,
@@ -73,7 +74,7 @@ class ProjectorPermissionTests(TestCase):
             self.public_project.get_task_list_url(),
         )
         self._assert_urls_code(urls_200, 200)
-        
+
         urls_302 = (
             reverse('projector_project_create'),
         )
@@ -92,10 +93,11 @@ class ProjectorPermissionTests(TestCase):
             self.john_project.get_members_url(),
         )
         self._assert_urls_code(urls_403, 403)
-            
+
     def test_views_logged(self):
         self.client.logout()
         logged = self.client.login(username='noperms', password='noperms')
+        self.assertTrue(logged)
         urls_200 = (
             reverse('projector_home'),
             reverse('projector_project_list'),
@@ -120,18 +122,17 @@ class ProjectorPermissionTests(TestCase):
         urls_200 = (
             self.public_project.get_absolute_url(),
             self.public_project.get_members_url(),
-            self.public_project.get_members_add_url(),
-            self.public_project.get_create_task_url(),
         )
         self._assert_urls_code(urls_200, 200)
 
         urls_403 = (
+            self.public_project.get_create_task_url(),
         )
         self._assert_urls_code(urls_403, 403)
-    
+
     def test_project_details_views(self):
         urls_200 = (
             self.public_project.get_absolute_url(),
         )
         self._assert_urls_code(urls_200, 200)
-    
+

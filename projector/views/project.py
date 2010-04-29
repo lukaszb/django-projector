@@ -59,7 +59,9 @@ def project_details(request, project_slug,
         return render_to_response(template_name, context,
             RequestContext(request))
     except Exception, err:
-        log_error(err)
+        dont_log_exceptions = (PermissionDenied,)
+        if not isinstance(err, dont_log_exceptions):
+            log_error(err)
         raise err
 
 project_details.csrf_exempt = True

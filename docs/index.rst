@@ -12,7 +12,7 @@ and repository backend integration. Aimed to work with upcoming, version
 simple application which can be easily customized or plugged into
 existing systems.
 
-.. image:: _static/django-projector-01.png
+.. image:: static/django-projector-01.png
    :width: 760px
 
 Features
@@ -61,6 +61,13 @@ Documentation
    installation
    configuration
    authorization
+
+**Development**
+
+.. toctree::
+   :maxdepth: 1
+
+   dev/testing
 
 Other topics
 ============

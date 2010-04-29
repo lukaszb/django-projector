@@ -1,13 +1,31 @@
 import os
+import sys
+
 from django.conf import global_settings
+
+abspath = lambda *p: os.path.abspath(os.path.join(*p))
+
+DEBUG = True
+
+PROJECT_ROOT = abspath(os.path.dirname(__file__))
+PROJECTOR_MODULE_PATH = abspath(PROJECT_ROOT, '..')
+sys.path.insert(0, PROJECTOR_MODULE_PATH)
+
+MEDIA_ROOT = abspath(PROJECT_ROOT, 'media')
+MEDIA_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': abspath(PROJECT_ROOT, '.hidden.db'),
+        'TEST_NAME': ':memory:',
     },
 }
+
 INSTALLED_APPS = (
+    'native_tags',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -23,18 +41,18 @@ INSTALLED_APPS = (
     'annoying',
     'attachments',
     'authority',
-    'capo',
     'djalog',
     'django_extensions',
     'django_sorting',
-    'notification',
     'pagination',
     'registration',
     'richtemplates',
-    'rosetta',
     'tagging',
     'projector',
+    'projector.extras.users',
+    'vcs.web.simplevcs',
 
+    'example_project',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,14 +65,18 @@ MIDDLEWARE_CLASSES = (
     'richtemplates.middleware.Http403Middleware',
     'django_sorting.middleware.SortingMiddleware',
     'djalog.middleware.SQLLoggingMiddleware',
-    'projector.utils.simplehg.PaginationMiddleware',
+    'vcs.web.simplevcs.middleware.PaginationMiddleware',
 )
 
+DJALOG_SQL = True
+DJALOG_SQL_SUMMARY_ONLY = True
 DJALOG_LEVEL = 5
 DJALOG_USE_COLORS = True
 DJALOG_FORMAT = "[%(levelname)s] %(message)s"
-ROOT_URLCONF = 'projector.tests.urls'
-TEMPLATE_CONTEXT_PROCESSORS = global_settings + (
+
+ROOT_URLCONF = 'example_project.urls'
+
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'richtemplates.context_processors.media',
 )
@@ -66,9 +88,26 @@ TEMPLATE_LOADERS = (
 
 TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates'),
-    os.path.abspath(os.path.join(__import__('richtemplates').__path__[0],
-        'templates_profiles', 'basic')),
 )
+
 SITE_ID = 1
 
+TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+
+PROJECTOR_PROJECTS_ROOT_DIR = abspath(
+    PROJECT_ROOT, 'projects')
+PROJECTOR_BANNED_PROJECT_NAMES = ('barfoo',)
+PROJECTOR_ALWAYS_ALLOW_READ_PUBLIC_PROJECTS = False
+
+LOGIN_REDIRECT_URL = '/projector/'
+AUTH_PROFILE_MODULE = 'projector.UserProfile'
+
+RICHTEMPLATES_RESTRUCTUREDTEXT_DIRECTIVES = {
+    'code-block': 'richtemplates.rstdirectives.pygments_directive',
+}
+RICHTEMPLATES_DEFAULT_SKIN = 'ruby'
+
+NATIVE_TAGS = (
+    'native_tags.contrib.pygmentize',
+)
 
