@@ -4,7 +4,15 @@ include LICENSE
 include MANIFEST.in
 include ez_setup.py
 include requirements.txt
-recursive-include docs *
-recursive-include projector/locale *
-recursive-include projector/media *
-recursive-include projector/templates *
+include tests.py
+
+include docs/conf.py
+include docs/make.bat
+include docs/Makefile
+recursive-include docs *.rst *.png
+recursive-include docs/theme *
+
+recursive-include example_project *.py *.html
+
+recursive-include projector *.py *.png *.gif *.html *.json
+recursive-include projector/locale *.mo *.po

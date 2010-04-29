@@ -13,19 +13,6 @@ except IOError, err:
         "``long_description`` (%s)\n" % readme_file)
     sys.exit(1)
 
-def find_package_data():
-    import os
-    data_extensions = ['html', 'js', 'png', 'css', 'xml']
-    data = {'projector': []}
-    topdir = 'projector'
-    for dir, subdirs, files in os.walk(topdir):
-        for file in files:
-            ext = file.split('.')[-1].lower()
-            if ext in data_extensions:
-                fpath = os.path.join(dir, file)[len('projector/'):]
-                data['projector'].append(fpath)
-    return data
-
 setup(
     name = 'django-projector',
     version = projector.__version__,
@@ -37,7 +24,6 @@ setup(
     zip_safe = False,
     packages = find_packages(),
     include_package_data = True,
-    package_data = find_package_data(),
     scripts = [],
     requires = ['Djalog', 'richtemplates', 'mercurial'],
     install_requires = [
