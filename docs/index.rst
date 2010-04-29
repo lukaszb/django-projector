@@ -62,6 +62,13 @@ Documentation
    configuration
    authorization
 
+**Usage:**
+
+.. toctree::
+   :maxdepth: 1
+
+   example_project
+
 **Development**
 
 .. toctree::
