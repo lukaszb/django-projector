@@ -11,10 +11,6 @@ PROJECT_ROOT = abspath(os.path.dirname(__file__))
 PROJECTOR_MODULE_PATH = abspath(PROJECT_ROOT, '..')
 sys.path.insert(0, PROJECTOR_MODULE_PATH)
 
-MEDIA_ROOT = abspath(PROJECT_ROOT, 'media')
-MEDIA_URL = '/media/'
-ADMIN_MEDIA_PREFIX = '/admin-media/'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -73,11 +69,9 @@ MIDDLEWARE_CLASSES = (
     'vcs.web.simplevcs.middleware.PaginationMiddleware',
 )
 
-DJALOG_SQL = True
-DJALOG_SQL_SUMMARY_ONLY = True
-DJALOG_LEVEL = 5
-DJALOG_USE_COLORS = True
-DJALOG_FORMAT = "[%(levelname)s] %(message)s"
+MEDIA_ROOT = abspath(PROJECT_ROOT, 'media')
+MEDIA_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 ROOT_URLCONF = 'example_project.urls'
 
@@ -97,6 +91,12 @@ TEMPLATE_DIRS = (
 
 SITE_ID = 1
 
+USE_I18N = True
+USE_L10N = True
+
+LOGIN_REDIRECT_URL = '/projector/'
+AUTH_PROFILE_MODULE = 'projector.UserProfile'
+
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 PROJECTOR_PROJECTS_ROOT_DIR = abspath(
@@ -104,8 +104,11 @@ PROJECTOR_PROJECTS_ROOT_DIR = abspath(
 PROJECTOR_BANNED_PROJECT_NAMES = ('barfoo',)
 PROJECTOR_ALWAYS_ALLOW_READ_PUBLIC_PROJECTS = False
 
-LOGIN_REDIRECT_URL = '/projector/'
-AUTH_PROFILE_MODULE = 'projector.UserProfile'
+DJALOG_SQL = True
+DJALOG_SQL_SUMMARY_ONLY = True
+DJALOG_LEVEL = 5
+DJALOG_USE_COLORS = True
+DJALOG_FORMAT = "[%(levelname)s] %(message)s"
 
 RICHTEMPLATES_RESTRUCTUREDTEXT_DIRECTIVES = {
     'code-block': 'richtemplates.rstdirectives.pygments_directive',

@@ -21,35 +21,36 @@
     {% autosort milestone_list %}
     {% autopaginate milestone_list %}
 
-    <table class="datatable">
-        <thead class="datatable-thead">
-            <tr class="datatable-thead-subheader">
-                <th>{% anchor name _("Milestone") %}</th>
-                <th>{% anchor task__count _("Tasks") %}</th>
-                <th>{% trans "Progress" %}</th>
-            </tr>
-        </thead>
-        <tbody class="datatable-tbody">
-            {% for milestone in milestone_list %}
-            <tr class="{% cycle "odd" "even" %} hoverable">
-                <td><a class="block-link show-tipsy" href="{% url projector_project_milestone_detail project.slug milestone.slug %}"
-                        title="{{ milestone.description }}">{{ milestone.name }}</a>
-                </td>
-                <td><a class="block-link show-tipsy centered"
-                        title="{% trans "Show all related tasks" %}"
-                        href="{{ project.get_task_list_url }}?milestone={{ milestone.id }}">
-                        {{ milestone.task__count }}</a>
-                </td>
-                <td>
+    <div id="milestone-sorting" class="togglable">
+        <p>{% trans "Sort by" %}</p>
+        <ul class="nav-horizontal">
+            <li>{% anchor name _("Name") %}</li>
+            <li>{% anchor created_at _("Created at") %}</li>
+            <li>{% anchor task__count _("Tasks") %}</li>
+        </ul>
+    </div>
 
-                    {% include "projector/project/milestone_progress_table.html" %}
-
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+    {% for milestone in milestone_list %}
+        <div id="milestone:{{ milestone }}" class="richblock">
+            <h2><a href="{{ milestone.get_absolute_url }}">{{ milestone }}</a></h2>
+            <table class="richblock-properties">
+                <tbody>
+                    <tr>
+                        <th>{% trans "Created at" %}</th>
+                        <td>{{ milestone.created_at }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Tasks" %}</th>
+                        <td><a class="show-tipsy centered"
+                               href="{{ project.get_task_list_url }}?milestone={{ milestone.id }}"
+                               title="{% trans "Show all related tasks" %}">{{ milestone.task__count }}</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            {% include "projector/project/milestone_progress_table.html" %}
+        </div>
+    {% endfor %}
 
 </div>
 </div>

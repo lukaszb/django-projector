@@ -205,7 +205,8 @@ def project_milestones(request, project_slug):
         if not check.view_project(project):
             raise PermissionDenied()
     milestone_list = project.milestone_set\
-        .annotate(Count('task'))
+        .annotate(Count('task'))\
+        .order_by('-created_at')
     context = {
         'project': project,
         'milestone_list': milestone_list,

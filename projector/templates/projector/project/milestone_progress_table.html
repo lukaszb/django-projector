@@ -6,21 +6,19 @@
                 {% with milestone.get_finished_tasks_count_as_percentage as finished %}
                 {% if finished %}
                     <td class="projector-milestone-progress-table-finished show-tipsy"
-                        title="{{ milestone.get_finished_tasks_count }} / {{ milestone.get_tasks_count }}"
+                        title="{% trans "Opened tasks" %} {{ milestone.get_finished_tasks_count }} / {{ milestone.get_tasks_count }}"
                         width="{{ milestone.get_finished_tasks_count_as_percentage }}%">
-                        <a class="block-link" href="{{ milestone.project.get_task_list_url }}?is_resolved=2&milestone={{ milestone.id }}">
-                            {% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%
-                        </a>
+                        <a href="{{ milestone.project.get_task_list_url }}?is_resolved=2&milestone={{ milestone.id }}"
+                           class="block-link">{% trans "Done" %} {{ milestone.get_finished_tasks_count_as_percentage|floatformat:"2" }}%</a>
                     </td>
                 {% endif %}
                 {% endwith %}
                 {% with milestone.get_unfinished_tasks_count_as_percentage as unfinished %}
                 {% if unfinished %}
                 <td class="projector-milestone-progress-table-unfinished show-tipsy"
-                        title="{{ milestone.get_unfinished_tasks_count }} / {{ milestone.get_tasks_count }}">
-                    <a class="block-link" href="{{ milestone.project.get_task_list_url }}?is_resolved=3&milestone={{ milestone.id }}">
-                        {% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%
-                    </a>
+                        title="{% trans "Closed tasks" %} {{ milestone.get_unfinished_tasks_count }} / {{ milestone.get_tasks_count }}">
+                    <a href="{{ milestone.project.get_task_list_url }}?is_resolved=3&milestone={{ milestone.id }}"
+                       class="block-link">{% trans "Left" %} {{ milestone.get_unfinished_tasks_count_as_percentage|floatformat:"2" }}%</a>
                 </td>
                 {% endif %}
                 {% endwith %}
