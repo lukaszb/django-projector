@@ -4,6 +4,16 @@
 {% load i18n %}
 {% load permissions %}
 
+{% block extra_head %}{{ block.super }}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#id_project_repository_url').click(function(){
+            this.select();
+        });
+    });
+</script>
+{% endblock %}
+
 {% block col_left %}{{ block.super }}
 
 <div class="richtemplates-panel">
