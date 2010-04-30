@@ -152,7 +152,7 @@ class TeamForm(LimitingModelForm):
         exclude = ['project']
         choices_limiting_fields = ['project']
 
-    def clean_group(self, commit=True):
+    def clean_group(self):
         group = self.cleaned_data['group']
         if Team.objects.filter(
             group = group,
@@ -177,6 +177,15 @@ class ComponentForm(forms.ModelForm):
     class Meta:
         model = Component
         exclude = ['project']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if self.instance.project.component_set\
+            .filter(name__iexact=name)\
+            .exists():
+            raise forms.ValidationError(_("Component with same name already "
+                "defined for this project"))
+        return name
 
 class StatusEditForm(forms.ModelForm):
 

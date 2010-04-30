@@ -382,14 +382,15 @@ class Project(models.Model):
 class Component(models.Model):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=64)
-    slug = AutoSlugField(max_length=64, populate_from='name')
+    slug = AutoSlugField(max_length=64, populate_from='name',
+        always_update=True, unique_with='project')
     description = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name = _('component')
         verbose_name_plural = _('components')
-        unique_together = ('project', 'slug')
         ordering = ('name',)
+        unique_together = ('project', 'name')
 
     def __unicode__(self):
         return self.name
@@ -455,7 +456,7 @@ class Milestone(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'))
     name = models.CharField(max_length=64)
     slug = AutoSlugField(max_length=64, populate_from='name',
-        unique_with='project')
+        always_update=True, unique_with='project')
     description = models.TextField()
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -541,6 +542,8 @@ class TimelineEntry(models.Model):
 
 class Priority(OrderedDictModel):
     project = models.ForeignKey(Project)
+    slug = AutoSlugField(max_length=64, populate_from='name',
+        always_update=True, unique_with='project')
 
     class Meta:
         verbose_name = _('priority level')
@@ -555,6 +558,8 @@ class Status(OrderedDictModel):
         default=False)
     destinations = models.ManyToManyField('self', verbose_name=_('destinations'),
         through='Transition', symmetrical=False, null=True, blank=True)
+    slug = AutoSlugField(max_length=64, populate_from='name',
+        always_update=True, unique_with='project')
 
     def can_change_to(self, new_status):
         """
