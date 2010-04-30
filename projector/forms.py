@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import modelformset_factory
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 
 from projector.models import Membership
 from projector.models import Team
@@ -12,7 +12,7 @@ from projector.models import Component
 from projector.models import Milestone
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
-    UserByNameField, ModelByNameField
+    ModelByNameField
 
 import logging
 
@@ -65,7 +65,8 @@ class TaskCommentForm(forms.Form):
         required=False)
 
 class TaskForm(LimitingModelForm):
-    owner = UserByNameField(max_length=128, label=_('Owner'), required=False)
+    owner = ModelByNameField(max_length=128, queryset=User.objects.all,
+        attr='username', label=_('Owner'), required=False)
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
 
@@ -126,7 +127,8 @@ class TaskEditForm(TaskForm):
         return cleaned_data
 
 class MembershipForm(LimitingModelForm):
-    member = UserByNameField(max_length=128, label=_("Member"))
+    member = ModelByNameField(max_length=128, queryset=User.objects.all,
+        attr='username', label=_("Member"))
 
     class Meta:
         model = Membership
