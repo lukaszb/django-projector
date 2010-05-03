@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.contrib.auth.models import AnonymousUser
 
 class ProjectManager(models.Manager):
 
@@ -10,17 +11,19 @@ class ProjectManager(models.Manager):
         is inactive/anonymous, only public projects are
         returned.
         """
+        if not user:
+            user = AnonymousUser()
         qs = self.get_query_set()
-        if user.is_active and user.is_superuser:
-            return qs
         qset = Q()
         if user.is_active:
-            qset = Q(public=True) | Q(public=False, membership__member=user)
-        qs = qs.filter(qset)
-        ids = set(qs.values_list('pk', flat=True))
-        qs = self.get_query_set().select_related('membership__member')
-        if ids:
-            qs = qs.filter(pk__in=ids)
+            if user.is_superuser:
+                pass
+            else:
+                qset = qset & Q(public=True) | Q(public=False,
+                    membership__member=user)
+        else:
+            qset = qset & Q(public=True)
+        qs = qs.filter(qset).select_related('membership__member')
         return qs
 
 class TeamManager(models.Manager):
@@ -29,6 +32,8 @@ class TeamManager(models.Manager):
         """
         Returns queryset of Team instances of groups for given user.
         """
+        if not user:
+            user = AnonymousUser()
         queryset = self.get_query_set()
         queryset = queryset.filter(group__user=user)
         return queryset

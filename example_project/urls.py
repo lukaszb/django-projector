@@ -16,7 +16,6 @@ urlpatterns = patterns('',
 )
 
 if settings.DEBUG:
-    print "adding proper urls to media"
     urlpatterns += patterns('',
         (r'^%s/(?P<path>.*)$' % settings.MEDIA_URL.strip('/'),
             'django.views.static.serve',

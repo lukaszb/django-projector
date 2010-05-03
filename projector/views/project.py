@@ -115,14 +115,13 @@ def _project_detail_hg(request, project):
     response = get_mercurial_response(request, **mercurial_info)
     return response
 
-@render_to('projector/project/list.html')
-def project_list(request):
+def project_list(request, template_name='projector/project/list.html'):
     project_list = Project.objects.projects_for_user(user=request.user)\
         .annotate(Count('task'))
     context = {
         'project_list' : project_list,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 def project_task_list(request, project_slug,
         template_name='projector/project/task_list.html'):
