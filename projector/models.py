@@ -837,9 +837,9 @@ def project_created_listener(instance, **kwargs):
         # Hardcoding repository creation process until more backends
         # are available from ``vcs``
         repo_path = instance._get_repo_path()
-        type = 'hg'
+        alias = 'hg'
         logging.info("Initializing new mercurial repository at %s" % repo_path)
-        repository = Repository.objects.create(path=repo_path, type=type)
+        repository = Repository.objects.create(path=repo_path, alias=alias)
         instance.repository = repository
         instance.save()
     else:
