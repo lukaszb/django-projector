@@ -4,7 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 
 class ProjectManager(models.Manager):
 
-    def projects_for_user(self, user=None):
+    def for_user(self, user=None):
         """
         Returns queryset of Project instances available
         for given user. If no user is given or user

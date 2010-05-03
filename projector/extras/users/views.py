@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 from annoying.decorators import render_to
-from projector.models import Team
+from projector.models import Team, Project
 from projector.extras.users.forms import UserProfileForm
 
 @render_to('projector/accounts/user_list.html')
@@ -43,6 +43,7 @@ def profile_detail(request, username):
     user = get_object_or_404(User, username=username)
     context = {
         'profile': user.get_profile(),
+        'project_list': Project.objects.for_user(request.user),
         'teams': Team.objects.for_user(user)
     }
     return context
