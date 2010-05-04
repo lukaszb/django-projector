@@ -90,7 +90,10 @@ urlpatterns += patterns('projector.views.project',
         view='project_teams_manage',
         name='projector_project_teams_manage'),
 
-    # Sources
+    # Repository sources
+    url(r'^projects/(?P<project_slug>[-\w]+)/src/diff/(?P<revision1>[\w]*)-(?P<revision2>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='project_file_diff',
+        name='projector_project_file_diff'),
     url(r'^projects/(?P<project_slug>[-\w]+)/src/changesets/$',
         view='project_changesets',
         name='projector_project_changesets'),

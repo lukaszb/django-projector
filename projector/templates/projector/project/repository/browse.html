@@ -18,11 +18,14 @@
                 <tbody>
                     <tr>
                         <th>{% trans "Path" %}</th>
-                        <td>{{ root.path }}</td>
+                        <td><a class="show-tipsy"
+                               href="{% url projector_project_sources_browse project.slug root.changeset.id root.path %}"
+                               title="{% trans "Show node" %}">{{ root.path|default:"/" }}</a>
+                        </td>
                     </tr>
                     <tr>
                         <th>{% trans "Revision" %}</th>
-                        <td>{{ root.changeset.raw_id }}</td>
+                        <td>{{ root.changeset.revision }}:{{ root.changeset.raw_id }}</td>
                     </tr>
                     {% if root.is_file %}
                     <tr>
@@ -40,6 +43,20 @@
                     {% endif %}
                 </tbody>
             </table>
+            {% if root.is_file %}
+            <h2>{% trans "History" %}</h2>
+            <ul class="nav-vertical">
+                {% for changeset in root.history %}
+                <li>
+                    <a href="{% url projector_project_file_diff project.slug root.changeset.id changeset.id root.path %}"
+                       class="show-tipsy"
+                       title="{% trans "Show diff" %}">{{ changeset.revision }}:{{ changeset.id }}</a>
+                    {{ changeset.date|timesince }}
+                    {% trans "ago" %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -54,6 +71,7 @@
         <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
         <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
     </ul>    
+    {% block browse_content %}
     <div id="repo-browser">
         {% load breadcrumber %}
         <div class="browser-breadcrumbs">
@@ -134,6 +152,7 @@
         </div>
         {% endif %}
     </div>
+    {% endblock %}
 </div>
 </div>
 

@@ -31,7 +31,7 @@ from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
 from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
-from vcs.web.simplevcs.views import browse_repository
+from vcs.web.simplevcs.views import browse_repository, diff_file
 
 def project_details(request, project_slug,
         template_name='projector/project/details.html'):
@@ -671,7 +671,8 @@ def project_teams_manage(request, project_slug, name,
 
 
 def project_browse_repository(request, project_slug, rel_repo_url='',
-        revision='tip', template_name='projector/project/repository.html'):
+        revision='tip',
+        template_name='projector/project/repository/browse.html'):
     """
     Handles project's repository browser.
     """
@@ -695,7 +696,33 @@ def project_browse_repository(request, project_slug, rel_repo_url='',
     }
     return browse_repository(request, **repo_info)
 
-@render_to('projector/project/changeset_list.html')
+def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
+        template_name='projector/project/repository/diff.html'):
+    """
+    Returns diff page of the file at given ``rel_repo_url``.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private():
+        check = ProjectPermission(request.user)
+        if not request.user.is_authenticated() or \
+            not check.read_repository_project(project):
+            raise PermissionDenied()
+    if not project._get_repo_path():
+        messages.error(request, _("Repository's url is not set! Please "
+            "configure project preferences first."))
+    diff_info = {
+        'repository': project.repository,
+        'revision1': revision1,
+        'revision2': revision2,
+        'file_path': rel_repo_url,
+        'template_name': template_name,
+        'extra_context': {
+            'project': project,
+        },
+    }
+    return diff_file(request, **diff_info)
+
+@render_to('projector/project/repository/changeset_list.html')
 def project_changesets(request, project_slug):
     """
     Returns repository's changesets view.

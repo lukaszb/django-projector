@@ -43,7 +43,7 @@
                     {{ changeset.date|timesince }} {% trans "ago" %}
                 </td>
                 <td>{{ changeset.author|tooltip:"15" }}</td>
-                <td>{{ changeset.message|changeset_message:project|tooltip:"60" }}</td>
+                <td>{{ changeset.message|tooltip:"60" }}</td>
                 <td><a class="browser-zoom block-link show-tipsy"
                        href="{% url projector_project_sources_browse project.slug changeset.id '' %}"
                        title="{% trans "Browse revision's content" %}"></a>
