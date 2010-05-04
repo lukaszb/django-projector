@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.tokens import default_token_generator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
@@ -21,7 +20,6 @@ from projector.utils import abspath
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
 from projector.managers import ProjectManager, TeamManager
-from richtemplates.utils import get_user_profile_model
 from vcs.web.simplevcs.models import Repository
 
 class DictModel(models.Model):
@@ -807,42 +805,10 @@ class TaskRevision(AbstractTask):
         return "#%d %s: Revision %d" % (self.task.id, self.task.summary,
             self.revision)
 
-# ==================== #
-# Signals and handlers #
-# ==================== #
+# ================ #
+# Signals handlers #
+# ================ #
 
-@signals.post_save(sender=User)
-def request_new_profile(sender, instance, **kwargs):
-    """
-    Creation of profile for new users
-    """
-    _UserProfile = get_user_profile_model()
-    if _UserProfile is None:
-        return
-    profile, created = _UserProfile.objects.get_or_create(
-        user=instance,
-    )
-    if created is True:
-        logging.debug("Creating profile for %s ..." % instance)
-        profile.activation_token = default_token_generator.make_token(instance)
-        profile.save()
-        logging.debug("Created profile's id: %s" % profile.id)
-
-@signals.post_save(sender=Project)
-def project_created_listener(instance, **kwargs):
-    if not kwargs.get('created', False):
-        # This listener is aimed for newly created projects only
-        return
-    if projector_settings.PROJECTS_ROOT_DIR:
-        # Hardcoding repository creation process until more backends
-        # are available from ``vcs``
-        repo_path = instance._get_repo_path()
-        alias = 'hg'
-        logging.info("Initializing new mercurial repository at %s" % repo_path)
-        repository = Repository.objects.create(path=repo_path, alias=alias)
-        instance.repository = repository
-        instance.save()
-    else:
-        logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
-            "create repository for this project.")
+from projector.listeners import start_listening
+start_listening()
 

@@ -26,6 +26,7 @@ Following packages are needed to get ``django-projector`` working:
 - `django-autoslug`_
 - `django-attachments`_
 - `django-extensions`_
+- `django-keyedcache`_
 - `django-pagination`_ (preferred 1.0.5 as 1.0.6 is bugged)
 - `django-richtemplates`_
 - `django-sorting`_
@@ -47,6 +48,8 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-autoslug: http://bitbucket.org/neithere/django-autoslug/
 .. _django-attachments: http://github.com/bartTC/django-attachments 
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
+.. _django-keyedcache: http://bitbucket.org/bkroeze/django-keyedcache/
+.. _django-signals-ahoy: http://bitbucket.org/bkroeze/django-signals-ahoy/
 .. _django-pagination: http://code.google.com/p/django-pagination/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/
 .. _django-sorting: http://github.com/directeur/django-sorting

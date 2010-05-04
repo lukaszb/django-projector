@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'pagination',
     'registration',
     'richtemplates',
+    'signals_ahoy',
     'tagging',
     'projector',
     'projector.extras.users',
@@ -93,6 +94,8 @@ SITE_ID = 1
 
 USE_I18N = True
 USE_L10N = True
+
+
 
 LOGIN_REDIRECT_URL = '/projector/'
 AUTH_PROFILE_MODULE = 'projector.UserProfile'

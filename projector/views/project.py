@@ -159,7 +159,6 @@ def project_create(request):
     form = ProjectForm(request.POST or None, instance=project)
     if request.method == 'POST' and form.is_valid():
         project = form.save()
-        project.create_workflow()
         return HttpResponseRedirect(project.get_absolute_url())
     context = {
         'form' : form,
