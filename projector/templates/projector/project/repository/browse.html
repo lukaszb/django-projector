@@ -25,7 +25,9 @@
                     </tr>
                     <tr>
                         <th>{% trans "Revision" %}</th>
-                        <td>{{ root.changeset.revision }}:{{ root.changeset.raw_id }}</td>
+                        <td><a class="show-tipsy"
+                               href="{% url projector_project_sources_browse project.slug root.changeset.id '' %}"
+                               title="{% trans "Show changeset" %}">{{ root.changeset.revision }}:{{ root.changeset.raw_id }}</a></td>
                     </tr>
                     {% if root.is_file %}
                     <tr>
@@ -38,7 +40,7 @@
                     </tr>
                     <tr>
                         <th>{% trans "Last modified" %}</th>
-                        <td>{{ root.last_changeset.date }}</td>
+                        <td><span class="show-tipsy" title="{{ root.last_changeset.date }}">{{ root.last_changeset.date|timesince }}</span></td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -51,7 +53,7 @@
                     <a href="{% url projector_project_file_diff project.slug root.changeset.id changeset.id root.path %}"
                        class="show-tipsy"
                        title="{% trans "Show diff" %}">{{ changeset.revision }}:{{ changeset.id }}</a>
-                    {{ changeset.date|timesince }}
+                    <span class="show-tipsy" title="{{ changeset.date }}">{{ changeset.date|timesince }}</span>
                     {% trans "ago" %}
                 </li>
                 {% endfor %}
