@@ -2,16 +2,16 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from projector.utils import using_projector_profile
+from richtemplates.models import UserProfile as RichUserProfile
 
-class UserProfile(models.Model):
+class UserProfile(RichUserProfile):
     """
     Base user profile class for ``django-projector``.
     Would be abstract if ``AUTH_PROFILE_MODULE`` is not set or doesn't equal
     with ``projector.UserProfile``.
     """
-    user = models.ForeignKey('auth.User', verbose_name=_('user'), unique=True)
-    activation_token = models.CharField(_('activation_token'), max_length=32)
-    skin = models.CharField(_('Color schema'), max_length=64)
+    activation_token = models.CharField(_('activation_token'), max_length=32,
+        editable=False)
 
     class Meta:
         app_label = 'projector'

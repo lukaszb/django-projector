@@ -4,11 +4,6 @@
 {% load richtemplates_tags %}
 {% load native %}
 
-{% if root.is_file %}
-    {% block head_css %}{{ block.super }}
-    {% endblock %}
-{% endif %}
-
 {% block col_left %}{{ block.super }}
 <div class="richtemplates-panel">
     <h5>{% trans "Node's information" %}</h5>
