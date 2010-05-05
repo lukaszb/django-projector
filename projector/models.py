@@ -12,9 +12,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 
-from annoying.decorators import signals
 from authority.models import Permission
 from autoslug import AutoSlugField
+from livesettings import config_value
 from projector.conf import default_workflow
 from projector.utils import abspath
 from projector.utils.lazy import LazyProperty
@@ -459,7 +459,8 @@ class Milestone(models.Model):
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
-        datetime.timedelta(days=projector_settings.DEFAULT_DEADLINE_DELTA))
+        datetime.timedelta(days=config_value('PROJECTOR',
+            'MILESTONE_DEADLINE_DELTA')))
     date_completed = models.DateField(_('date completed'), null=True,
         blank=True)
 

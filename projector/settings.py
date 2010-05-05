@@ -1,13 +1,13 @@
 import os
 import logging
+
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
+from livesettings import config_register, StringValue, IntegerValue,\
+    BooleanValue, ConfigurationGroup
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
-
-USE_PYGMENTS = getattr(settings, 'PROJECTOR_USE_PYGMENTS', False)
-
-BASIC_AUTH_REALM = getattr(settings, 'PROJECTOR_BASIC_AUTH_REALM',
-    'Projector Basic Auth')
 
 BANNED_PROJECT_NAMES = getattr(settings, 'PROJECTOR_BANNED_PROJECT_NAMES', ())
 BANNED_PROJECT_NAMES += (
@@ -29,7 +29,7 @@ BANNED_PROJECT_NAMES += (
 
 PROJECTS_ROOT_DIR = getattr(settings, 'PROJECTOR_PROJECTS_ROOT_DIR', None)
 if PROJECTS_ROOT_DIR is None:
-    logging.debug("django-projector: RICHTEMPLATES_PROJECTS_ROOT_DIR not set "
+    logging.debug("django-projector: PROJECTOR_PROJECTS_ROOT_DIR not set "
         "- will not create repositories")
 else:
     PROJECTS_ROOT_DIR = abspath(PROJECTS_ROOT_DIR)
@@ -38,8 +38,37 @@ else:
         logging.info("django-projector: created %s directory"
             % PROJECTS_ROOT_DIR)
 
-DEFAULT_DEADLINE_DELTA = 60 # In days
 
-ALWAYS_ALLOW_READ_PUBLIC_PROJECTS = getattr(settings,
-    'PROJECTOR_ALWAYS_ALLOW_READ_PUBLIC_PROJECTS', False)
+# Following settings may be changed dynamically (livesettings)
+
+CONFIG = ConfigurationGroup('PROJECTOR', _("Projector application settings"))
+
+config_register(StringValue(
+    CONFIG,
+    'BASIC_AUTH_REALM',
+    description = _("Basic auth realm text"),
+    help_text = _("Text send when user is asked for credentials if he/she "
+        "tries to work with project's repository."),
+    default = 'Projector Basic Auth')
+)
+
+config_register(IntegerValue(
+    CONFIG,
+    'MILESTONE_DEADLINE_DELTA',
+    description = _("Default days number for milestones"),
+    help_text = _("Every milestone has its deadline and this number specifies "
+                  "how many days would be given by default. It may be set to "
+                  "any date during milestone creation process though."),
+    default = 60)
+)
+
+config_register(BooleanValue(
+    CONFIG,
+    'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS',
+    description = _("Allow read public projects"),
+    help_text = _("By default, authorization is required even if project is "
+                  "public. However, if this is set to True, any user would "
+                  "be allowed to read public projects' repositories."),
+    default = False)
+)
 

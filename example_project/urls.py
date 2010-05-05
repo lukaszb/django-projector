@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     (r'^projector/', include('projector.urls')),
     (r'^users/', include('projector.extras.users.urls')),
 
+    (r'^admin/settings/', include('livesettings.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
 

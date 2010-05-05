@@ -45,6 +45,8 @@ INSTALLED_APPS = (
     'djalog',
     'django_extensions',
     'django_sorting',
+    'keyedcache',
+    'livesettings',
     'pagination',
     'registration',
     'richtemplates',
@@ -95,7 +97,8 @@ SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 
-
+CACHE_PREFIX = 'projector-example-project'
+CACHE_TIMEOUT = 300
 
 LOGIN_REDIRECT_URL = '/projector/'
 AUTH_PROFILE_MODULE = 'projector.UserProfile'
@@ -105,7 +108,6 @@ TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 PROJECTOR_PROJECTS_ROOT_DIR = abspath(
     PROJECT_ROOT, 'projects')
 PROJECTOR_BANNED_PROJECT_NAMES = ('barfoo',)
-PROJECTOR_ALWAYS_ALLOW_READ_PUBLIC_PROJECTS = False
 
 DJALOG_SQL = True
 DJALOG_SQL_SUMMARY_ONLY = True
@@ -122,6 +124,6 @@ RICHTEMPLATES_PYGMENTS_STYLES = {
 }
 
 NATIVE_TAGS = (
-    'native_tags.contrib.pygmentize',
+    'richtemplates.templatetags.native',
 )
 

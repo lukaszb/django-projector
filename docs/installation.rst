@@ -27,8 +27,10 @@ Following packages are needed to get ``django-projector`` working:
 - `django-attachments`_
 - `django-extensions`_
 - `django-keyedcache`_
+- `django-livesettings`_
 - `django-pagination`_ (preferred 1.0.5 as 1.0.6 is bugged)
 - `django-richtemplates`_
+- `django-signals-ahoy`_
 - `django-sorting`_
 - `django-tagging`_
 - `vcs`_
@@ -38,9 +40,9 @@ Following packages are needed to get ``django-projector`` working:
 
 
 .. [1] `pip <http://pip.openplans.org/>`_ is tool similar to `easy_install
-    <http://pypi.python.org/pypi/setuptools>`_ with some more power (like smooth
-    integration with `virtualenv <http://virtualenv.openplans.org/>`_, ``freeze``
-    command, package uninstallation and others.
+    <http://pypi.python.org/pypi/setuptools>`_ with some more power (like
+    smooth integration with `virtualenv <http://virtualenv.openplans.org/>`_,
+    ``freeze`` command, package uninstallation and others.
 
 .. _django: http://www.djangoproject.com
 .. _django-annoying: http://bitbucket.org/offline/django-annoying/
@@ -49,6 +51,7 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-attachments: http://github.com/bartTC/django-attachments 
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
 .. _django-keyedcache: http://bitbucket.org/bkroeze/django-keyedcache/
+.. _django-livesettings: http://bitbucket.org/bkroeze/django-livesettings/
 .. _django-signals-ahoy: http://bitbucket.org/bkroeze/django-signals-ahoy/
 .. _django-pagination: http://code.google.com/p/django-pagination/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/

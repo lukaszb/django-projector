@@ -16,6 +16,8 @@ from annoying.decorators import render_to
 from authority.decorators import permission_required_or_403
 from authority.models import Permission
 
+from livesettings import config_value
+
 from projector.models import Project, Membership, Team, Task
 from projector.models import Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm
@@ -23,7 +25,6 @@ from projector.forms import StatusForm, StatusFormSet, ComponentForm
 from projector.forms import TeamForm
 from projector.permissions import ProjectPermission, get_or_create_permisson
 from projector.filters import TaskFilter
-from projector import settings as projector_settings
 
 from richtemplates.shortcuts import get_first_or_None
 
@@ -72,7 +73,6 @@ def _project_detail_hg(request, project):
     we need to check permissions.
     TODO: Should use higher level simplevcs method
     """
-    #realm = projector_settings.BASIC_AUTH_REALM
     if not is_mercurial(request):
         msg = "_project_detail_hg called for non mercurial request"
         logging.error(msg)
@@ -83,15 +83,15 @@ def _project_detail_hg(request, project):
             % request.method)
     # Allow to read from public projects
     if project.is_public() and request.method == 'GET' and \
-        projector_settings.ALWAYS_ALLOW_READ_PUBLIC_PROJECTS:
+        config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         return get_mercurial_response(request,
             repo_path=project._get_repo_path())
 
     # Check if user have been already authorized or ask to
     request.user = basic_auth(request)
     if request.user is None:
-        return ask_basic_auth(request)
-    print request.user
+        return ask_basic_auth(request, realm=config_value('PROJECTOR',
+            'BASIC_AUTH_REALM'))
 
     check = ProjectPermission(request.user)
 
@@ -676,7 +676,8 @@ def project_browse_repository(request, project_slug, rel_repo_url='',
     Handles project's repository browser.
     """
     project = get_object_or_404(Project, slug=project_slug)
-    if project.is_private():
+    if project.is_private() or \
+            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
         if not request.user.is_authenticated() or \
             not check.read_repository_project(project):
@@ -701,7 +702,8 @@ def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
     Returns diff page of the file at given ``rel_repo_url``.
     """
     project = get_object_or_404(Project, slug=project_slug)
-    if project.is_private():
+    if project.is_private() or \
+            not config_value('PROJECT', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
         if not request.user.is_authenticated() or \
             not check.read_repository_project(project):
@@ -727,7 +729,8 @@ def project_changesets(request, project_slug):
     Returns repository's changesets view.
     """
     project = get_object_or_404(Project, slug=project_slug)
-    if project.is_private():
+    if project.is_private() or \
+            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
         if not check.read_repository_project(project):
             raise PermissionDenied()
