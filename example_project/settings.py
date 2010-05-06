@@ -25,6 +25,12 @@ for db, conf in DATABASES.items():
         conf['NAME'] = abspath(PROJECT_ROOT, conf['NAME'])
 
 INSTALLED_APPS = (
+    'admin_tools',
+    'admin_tools.theming',
+    'admin_tools.menu',
+    'admin_tools.dashboard',
+    'dingo',
+
     'native_tags',
 
     'django.contrib.auth',
@@ -126,4 +132,6 @@ RICHTEMPLATES_PYGMENTS_STYLES = {
 NATIVE_TAGS = (
     'richtemplates.templatetags.native',
 )
+
+#ADMIN_TOOLS_MENU = 'example_project.menu.CustomMenu'
 

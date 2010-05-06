@@ -741,5 +741,7 @@ def project_changesets(request, project_slug):
         'project': project,
     }
     context['repository'] = project.repository
+    context['CHANGESETS_PAGINATE_BY'] = config_value('PROJECTOR',
+        'CHANGESETS_PAGINATE_BY')
     return context
 

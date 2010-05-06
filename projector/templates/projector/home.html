@@ -14,6 +14,11 @@
         <li><a href="{% url projector_home %}">{% trans "Projector homepage" %}</a></li>
         <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
     </ul>
+    <ul class="menu-top-right">
+        {% if user.is_authenticated and user.is_superuser %}
+        <li><a href="{% url projector_settings %}">{% trans "Settings" %}</a></li>
+        {% endif %}
+    </ul>
 </div>
 {% endblock %}
 

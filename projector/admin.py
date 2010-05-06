@@ -60,29 +60,6 @@ class TaskAdmin(admin.ModelAdmin):
     inlines = [TaskRevisionInline, AttachmentInlines]
     form = TaskAdminForm
 
-    # Overrides save_model *method*
-    '''
-    def save_model(self, request, obj, form, change):
-        """
-        Overrides standard admin.ModelAdmin save_model method.
-        It sets editor (and his/her IP) based on data from request.
-        If model is new (it's primary key is not yet set) sets
-        author/author_ip fields too.
-        """
-
-        logging.debug("%s.save_model method called!" % self.__class__.__name__)
-
-        if getattr(obj, 'pk', None) is None:
-            # Its a new instance so we need to
-            # set author and author_ip fields
-            obj.author = request.user
-            obj.author_ip = request.META['REMOTE_ADDR']
-        obj.editor = request.user
-        obj.editor_ip = request.META['REMOTE_ADDR']
-        #obj.save()
-        return super(TaskAdmin, self).save_model(request, obj, form, change)
-    '''
-
     fieldsets = (
         (_("Task details"), {
             'fields': (

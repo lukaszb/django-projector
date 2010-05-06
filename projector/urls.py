@@ -4,6 +4,7 @@ from projector.feeds import LatestProjectsFeed
 
 urlpatterns = patterns('projector.views',
     url(r'^$', 'project.project_list', name='projector_home'),
+    url(r'^settings/$', 'settings', name='projector_settings'),
 )
 
 urlpatterns += patterns('projector.views.project_category',
@@ -28,6 +29,8 @@ urlpatterns += patterns('projector.views.project',
     url(r'^projects/(?P<project_slug>[-\w]+)/edit/$',
         view='project_edit',
         name='projector_project_edit'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/$',
+        view='project_details', name='projector_project_details'),
 
     # Milestones
     url(r'^projects/(?P<project_slug>[-\w]+)/milestones/$',
@@ -120,11 +123,6 @@ urlpatterns += patterns('projector.views.task',
 
 urlpatterns += patterns('projector.views.reports',
     url(r'^tasks/reports/$', 'task_reports', name='projector_task_reports'),
-)
-
-urlpatterns += patterns('projector.views.project',
-    url(r'^projects/(?P<project_slug>[-\w]+)/$',
-        view='project_details', name='projector_project_details'),
 )
 
 # ========== #
