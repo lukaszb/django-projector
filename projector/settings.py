@@ -29,6 +29,9 @@ BANNED_PROJECT_NAMES += (
     'user', 'users',
 )
 
+CREATE_PROJECT_ASYNCHRONOUSLY = getattr(settings,
+    'PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY', True)
+
 PROJECTS_ROOT_DIR = getattr(settings, 'PROJECTOR_PROJECTS_ROOT_DIR', None)
 if PROJECTS_ROOT_DIR is None:
     logging.debug("django-projector: PROJECTOR_PROJECTS_ROOT_DIR not set "

@@ -50,9 +50,13 @@ def project_created_listener(sender, instance, **kwargs):
         logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
             "create repository for this project.")
 
-project_created_listener = AsynchronousListener(project_created_listener)
+async_project_created_listener = AsynchronousListener(project_created_listener)
 
 def start_listening():
     post_save.connect(request_new_profile, sender=User)
-    post_save.connect(project_created_listener.listen, sender=Project)
+
+    if projector_settings.CREATE_PROJECT_ASYNCHRONOUSLY:
+        post_save.connect(async_project_created_listener.listen, sender=Project)
+    else:
+        post_save.connect(project_created_listener, sender=Project)
 

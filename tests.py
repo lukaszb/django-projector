@@ -4,7 +4,7 @@ Unit tests for ``django-projector``.
 import os
 import sys
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "example_project.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "example_project.settings_test"
 from example_project import settings
 
 # Hide logging messages

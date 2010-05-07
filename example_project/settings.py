@@ -29,7 +29,6 @@ INSTALLED_APPS = (
     'admin_tools.theming',
     'admin_tools.menu',
     'admin_tools.dashboard',
-    'dingo',
 
     'native_tags',
 

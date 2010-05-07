@@ -19,8 +19,9 @@ class ProjectorStatusTransition(TestCase):
             slug=slugify(name),
             author=self.admin,
         )
-        if craeted:
-            self.project.create_workflow()
+        #commenting out as now workflow creation is handled by signals/listeners
+        #if craeted:
+        #    self.project.create_workflow()
 
         Transition.objects.filter(
             Q(source__project=self.project) |
@@ -38,10 +39,10 @@ class ProjectorStatusTransition(TestCase):
 
     def test_transition(self):
         s1, s2 = self.project.status_set.all()[:2]
-        t1 = Transition.objects.create(source=s1, destination=s2)
+        Transition.objects.create(source=s1, destination=s2)
         self.assertTrue(s1.can_change_to(s2))
         self.assertFalse(s2.can_change_to(s1))
-        t2 = Transition.objects.create(source=s2, destination=s1)
+        Transition.objects.create(source=s2, destination=s1)
         self.assertTrue(s1.can_change_to(s2))
         self.assertTrue(s2.can_change_to(s1))
 

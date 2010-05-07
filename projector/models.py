@@ -308,7 +308,7 @@ class Project(models.Model):
                     "'%s'" % (self, perm, self.author))
                 get_or_create_permisson(
                     user = self.author,
-                    project = self,
+                    obj = self,
                     codename = perm)
 
     def create_workflow(self, workflow=default_workflow):

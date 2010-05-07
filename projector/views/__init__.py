@@ -16,5 +16,6 @@ def settings(request):
     """
     if not (request.user.is_authenticated() and request.user.is_superuser):
         raise Http404
-    return group_settings(request, 'PROJECTOR')
+    return group_settings(request, 'PROJECTOR',
+        template='projector/settings.html')
 
