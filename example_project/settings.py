@@ -130,6 +130,7 @@ RICHTEMPLATES_PYGMENTS_STYLES = {
 
 NATIVE_TAGS = (
     'richtemplates.templatetags.native',
+    'projector.templatetags.native',
 )
 
 #ADMIN_TOOLS_MENU = 'example_project.menu.CustomMenu'

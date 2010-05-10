@@ -13,17 +13,17 @@ class ProjectPermission(permissions.BasePermission):
     checks = [
         'view',
 
-        'view_members',
+        'view_members', # View all members for the project (so plural)
         'add_member',
         'change_member',
         'delete_member',
 
-        'view_teams',
+        'view_teams', # View all teams for the project (so plural)
         'add_team',
         'change_team',
         'delete_team',
 
-        'view_tasks',
+        'view_tasks', # View all tasks for the project (so plural)
         'add_task',
         'change_task',
 
@@ -59,13 +59,30 @@ def get_or_create_permisson(codename, obj, user=None, group=None,
     perm_obj, created = Permission.objects.get_or_create(
         creator = creator,
         content_type = ContentType.objects.get_for_model(obj),
-        object_id = obj.id,
+        object_id = obj.pk,
         codename = codename,
         user = user,
         group = group,
         approved = approved
     )
     return perm_obj
+
+def remove_permission(codename, obj, user=None, group=None):
+    """
+    Deletes chosen permission from database.
+    """
+    qs = Permission.objects.filter(
+        content_type = ContentType.objects.get_for_model(obj),
+        object_id = obj.pk,
+        codename = codename,
+    )
+    if user:
+        qs = qs.filter(user=user)
+    if group:
+        qs = qs.filter(group)
+    import logging
+    logging.error("Removes: %s" % qs)
+    qs.delete()
 
 def get_perms_for_user(user, obj, content_type=None):
     """

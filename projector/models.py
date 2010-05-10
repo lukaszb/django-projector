@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User, Group
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
@@ -424,6 +425,44 @@ class Membership(models.Model):
             'project_slug': self.project.slug,
             'username': self.member.username,
         })
+
+    @LazyProperty
+    def perms(self):
+        """
+        Returns Permission objects (django-authority) for member, not his/her
+        groups.
+        """
+        from projector.permissions import get_perms
+        return get_perms(self.member, self.project)
+
+    @LazyProperty
+    def all_perms(self):
+        """
+        Returns all Permission objects (django-authority) for member's and
+        his/he groups (to fetch user specific permissions only, use ``perms``
+        instead).
+        """
+        perms = Permission.objects.filter(
+            models.Q(group__in = self.member.groups.all()) |
+            models.Q(user=self.member)
+        ).filter(
+            approved = True,
+            content_type = ContentType.objects.get_for_model(Project),
+            object_id = self.project_id,
+        )
+        return perms
+
+    @LazyProperty
+    def teams(self):
+        """
+        Returns all Team instances related with membership's project and member
+        by his/her groups.
+        """
+        return Team.objects.filter(
+            project=self.project,
+            group__in=self.member.groups.all()
+        )
+
 
 class Team(models.Model):
     group = models.ForeignKey(Group, verbose_name=_('group'))

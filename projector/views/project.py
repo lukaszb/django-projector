@@ -3,7 +3,6 @@ import pprint
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect, Http404
@@ -22,7 +21,7 @@ from projector.models import Project, Membership, Team, Task
 from projector.models import Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm
 from projector.forms import StatusForm, StatusFormSet, ComponentForm
-from projector.forms import TeamForm
+from projector.forms import TeamForm, ProjectMembershipPermissions
 from projector.permissions import ProjectPermission, get_or_create_permisson
 from projector.filters import TaskFilter
 
@@ -478,8 +477,8 @@ def project_members_add(request, project_slug,
 
 @permission_required_or_403('project_permission.change_member_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/members_manage.html')
-def project_members_manage(request, project_slug, username):
+def project_members_manage(request, project_slug, username,
+        template_name='projector/project/members/manage.html'):
     """
     Manages membership settings and permissions of project's member.
     """
@@ -492,72 +491,29 @@ def project_members_manage(request, project_slug, username):
         messages.warning(request, _("Project owner's membership cannot be "
             "modified. He/She has all permissions for this project."))
         return redirect(project.get_members_url())
-    check = ProjectPermission(user=member)
+    member_permissions = membership.all_perms
+    codenames = [str(p.codename) for p in member_permissions]
 
-    form = MembershipForm(request.POST or None, instance=membership)
-    permissions = ProjectPermission(membership.member)
-    available_permissions = [ '.'.join(('project_permission', perm))
-        for perm in permissions.checks if perm.endswith('_project')]
-    logging.info("Available permissions for projects are:\n%s"
-        % pprint.pformat(available_permissions))
-
-    # Fetch members' permissions for this project
-    member_current_permissions = member\
-        .granted_permissions\
-        .get_for_model(project)\
-        .select_related('user', 'creator', 'group', 'content_type')\
-        .filter(object_id=project.id)
-
-    def get_or_create_permisson(perm):
-        for perm_obj in member_current_permissions:
-            if perm_obj.codename == perm:
-                return perm_obj
-        perm_obj, created = Permission.objects.get_or_create(
-            creator = request.user,
-            content_type = ContentType.objects.get_for_model(
-                membership.project),
-            object_id = membership.project.id,
-            codename = perm,
-            user = membership.member,
-            approved = False,
-        )
-        return perm_obj
-
-    logging.info("Current %s's permissions:" % member)
-    for perm in member_current_permissions:
-        logging.info("%s | Approved is %s" % (perm, perm.approved))
-
+    form = ProjectMembershipPermissions(request.POST or None,
+        membership = membership,
+        initial_permissions=codenames,
+        request = request)
     if request.method == 'POST':
-        granted_perms = request.POST.getlist('perms')
-        logging.debug("POST'ed perms: %s" % granted_perms)
-        for perm in available_permissions:
-            logging.info("Permisson %s | Member %s has it: %s"
-                % (perm, member, member.has_perm(perm)))
-            if perm in granted_perms and not check.has_perm(perm, project):
-                # Grant perm
-                logging.debug("Granting permission %s for user %s"
-                    % (perm, member))
-                perm_obj = get_or_create_permisson(perm)
-                if not perm_obj.approved:
-                    perm_obj.approved = True
-                    perm_obj.save()
-            if perm not in granted_perms and check.has_perm(perm, project):
-                # Disable perm
-                logging.debug("Disabling permission %s for user %s"
-                    % (perm, member))
-                perm_obj = get_or_create_permisson(perm)
-                perm_obj.approved = False
-                perm_obj.creator = request.user
-                perm_obj.save()
-
+        if form.is_valid():
+            logging.info("Form's data:\n%s" % form.cleaned_data)
+            messages.success(request, _("Permissions updated"))
+            form.save(request)
+        else:
+            messages.error(request,
+                _("Errors occured while processing the form"))
+        return redirect(membership.get_absolute_url())
     context = {
         'project': project,
         'form': form,
         'membership': membership,
-        'permissions': permissions,
-        'available_permissions': available_permissions,
+        'member_permissions': member_permissions,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 # Teams
 
@@ -635,7 +591,7 @@ def project_teams_manage(request, project_slug, name,
         granted_perms = request.POST.getlist('perms')
         logging.debug("POST'ed perms: %s" % granted_perms)
         for perm in available_permissions:
-            logging.info("Permisson %s | Team %s has it: %s"
+            logging.info("Permission %s | Team %s has it: %s"
                 % (perm, team, perm in team.perms))
             perm_codename = '.'.join((check.label, perm))
             if perm in granted_perms and not perm in team_short_perms:
@@ -703,7 +659,7 @@ def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
     """
     project = get_object_or_404(Project, slug=project_slug)
     if project.is_private() or \
-            not config_value('PROJECT', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
+            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
         if not request.user.is_authenticated() or \
             not check.read_repository_project(project):

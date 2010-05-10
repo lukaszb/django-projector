@@ -5,9 +5,10 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from livesettings import config_register, StringValue, IntegerValue,\
-    BooleanValue, ConfigurationGroup
+    BooleanValue, ConfigurationGroup, MultipleStringValue
 
 from projector.utils.validators import IntegerValidator
+from projector.utils.basic import codename_to_label
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
@@ -94,4 +95,38 @@ config_register(IntegerValue(
     ],
     )
 )
+
+editable_perm_codenames = (
+    'project_permission.view_project',
+
+    'project_permission.view_members_project',
+    'project_permission.add_member_project',
+    'project_permission.change_member_project',
+    'project_permission.delete_member_project',
+
+    'project_permission.view_teams_project',
+    'project_permission.add_team_project',
+    'project_permission.change_team_project',
+    'project_permission.delete_team_project',
+
+    'project_permission.view_tasks_project',
+    'project_permission.add_task_project',
+    'project_permission.change_task_project',
+    'project_permission.delete_task_project',
+
+    'project_permission.read_repository_project',
+    'project_permission.write_repository_project',
+)
+
+config_register(MultipleStringValue(
+    PROJECTOR,
+    'MEMBERSHIP_EDITABLE_PERMISSIONS',
+    description = _("Member's editable permissions"),
+    help_text = _("Those permissions would be editable at project's 'members' "
+                  "page."),
+    default = editable_perm_codenames,
+    choices = [(codename, codename_to_label(codename))
+        for codename in editable_perm_codenames
+    ],
+))
 

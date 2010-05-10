@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load permissions %}
+{% load native %}
 
 {% block extra_head %}{{ block.super }}
     <script type="text/javascript">
@@ -60,9 +61,9 @@
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td class="centered">
                     {% if permission in team_short_perms %}
-                        <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-yes.gif" />
+                        {% richicon "icon-yes.gif" %}
                     {% else %}
-                        <img src="{{ MEDIA_URL }}richtemplates/img/icons/icon-no.gif" />
+                        {% richicon "icon-no.gif" %}
                     {% endif %}
                 </td>
                 <td>{{ permission }}</td>

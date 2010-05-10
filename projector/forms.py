@@ -2,6 +2,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User, Group
+from django.contrib import messages
 
 from projector.models import Membership
 from projector.models import Team
@@ -10,9 +11,13 @@ from projector.models import Task
 from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
+from projector.utils.basic import codename_to_label
+
+from livesettings import config_value
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     ModelByNameField
+from richtemplates.widgets import RichCheckboxSelectMultiple
 
 import logging
 
@@ -144,6 +149,64 @@ class MembershipForm(LimitingModelForm):
             raise forms.ValidationError(_("This user is already member of "
                 "this project"))
         return member
+
+class ProjectMembershipPermissions(forms.Form):
+    permissions = forms.MultipleChoiceField(
+        choices = ((codename, codename_to_label(codename)) for codename in
+            config_value('PROJECTOR', 'MEMBERSHIP_EDITABLE_PERMISSIONS')),
+        label = _("Permissions"),
+        widget = RichCheckboxSelectMultiple,
+        required = False)
+
+    def __init__(self, data=None, initial_permissions=[], membership=None,
+            request=None):
+        super(ProjectMembershipPermissions, self).__init__(data)
+        self.membership = membership
+        self.fields['permissions'].initial = initial_permissions
+        self.request = request
+
+    def _message(self, level, message):
+        # If request was set on form, will use messages framework
+        assert level in ('success', 'warning', 'info', 'error')
+        if self.request:
+            getattr(messages, level)(self.request, message)
+
+    def save(self, request, commit=True):
+        """
+        Saves granted permissions and removes those switched off.
+        """
+        from projector.permissions import get_or_create_permisson
+        from projector.permissions import remove_permission
+        granted_codenames = self.cleaned_data['permissions']
+        member_perms = self.membership.all_perms
+        current_codenames = [p.codename for p in member_perms]
+        # Grant permissions
+        for codename in granted_codenames:
+            if codename not in current_codenames:
+                get_or_create_permisson(
+                    codename = codename,
+                    obj = self.membership.project,
+                    user = self.membership.member,
+                    creator = request.user,
+                )
+                self._message('info', _("Permission added: %s" % codename))
+        # Remove permissions
+        for codename in current_codenames:
+            if codename not in granted_codenames:
+                remove_permission(
+                    codename = codename,
+                    obj = self.membership.project,
+                    user = self.membership.member,
+                )
+                self._message('error', _("Permission removed: %s" % codename))
+        # if permission stays after removal - member probably got perm from
+        # his/her team
+
+    def get_codenames(self):
+        """
+        Returns codenames of editable permissions.
+        """
+        return [choice[0] for choice in self.fields['permissions'].choices]
 
 class TeamForm(LimitingModelForm):
     group = ModelByNameField(queryset=Group.objects.all,
