@@ -149,8 +149,8 @@ class Project(models.Model):
             {'project_slug': self.slug })
 
     @models.permalink
-    def get_members_manage_url(self, username):
-        return ('projector_project_members_manage', (),
+    def get_members_edit_url(self, username):
+        return ('projector_project_members_edit', (),
             {'project_slug': self.slug, 'username': username})
 
     @models.permalink
@@ -163,8 +163,8 @@ class Project(models.Model):
             {'project_slug': self.slug })
 
     @models.permalink
-    def get_teams_manage_url(self, name):
-        return ('projector_project_teams_manage', (),
+    def get_teams_edit_url(self, name):
+        return ('projector_project_teams_edit', (),
             {'project_slug': self.slug, 'name': name})
 
     @models.permalink
@@ -421,7 +421,7 @@ class Membership(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_members_manage', (), {
+        return ('projector_project_members_edit', (), {
             'project_slug': self.project.slug,
             'username': self.member.username,
         })
@@ -479,7 +479,7 @@ class Team(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_teams_manage', (), {
+        return ('projector_project_teams_edit', (), {
             'project_slug': self.project.slug,
             'name': self.group.name,
         })

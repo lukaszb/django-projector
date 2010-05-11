@@ -1,6 +1,8 @@
 {% extends "projector/home.html" %}
 
-{% load config_tags %}
+{% block extra_head %}{{ block.super }}
+    {{ form.media }}
+{% endblock %}
 
 {% block col_left %}{% endblock %}
 

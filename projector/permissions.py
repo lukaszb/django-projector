@@ -79,9 +79,9 @@ def remove_permission(codename, obj, user=None, group=None):
     if user:
         qs = qs.filter(user=user)
     if group:
-        qs = qs.filter(group)
+        qs = qs.filter(group=group)
     import logging
-    logging.error("Removes: %s" % qs)
+    logging.warning("Removes: %s" % qs)
     qs.delete()
 
 def get_perms_for_user(user, obj, content_type=None):

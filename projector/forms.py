@@ -150,28 +150,31 @@ class MembershipForm(LimitingModelForm):
                 "this project"))
         return member
 
-class ProjectMembershipPermissions(forms.Form):
+def get_editable_perms():
+    return ((codename, codename_to_label(codename)) for codename in
+            config_value('PROJECTOR', 'MEMBERSHIP_EDITABLE_PERMISSIONS'))
+
+class ProjectMembershipPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(
-        choices = ((codename, codename_to_label(codename)) for codename in
-            config_value('PROJECTOR', 'MEMBERSHIP_EDITABLE_PERMISSIONS')),
+        choices = get_editable_perms(),
         label = _("Permissions"),
         widget = RichCheckboxSelectMultiple,
         required = False)
 
     def __init__(self, data=None, initial_permissions=[], membership=None,
-            request=None):
-        super(ProjectMembershipPermissions, self).__init__(data)
+            request=None, send_messages=False):
+        super(ProjectMembershipPermissionsForm, self).__init__(data)
         self.membership = membership
         self.fields['permissions'].initial = initial_permissions
         self.request = request
+        self.send_messages = send_messages
 
     def _message(self, level, message):
-        # If request was set on form, will use messages framework
         assert level in ('success', 'warning', 'info', 'error')
-        if self.request:
+        if self.request and self.send_messages:
             getattr(messages, level)(self.request, message)
 
-    def save(self, request, commit=True):
+    def save(self, commit=True):
         """
         Saves granted permissions and removes those switched off.
         """
@@ -187,7 +190,7 @@ class ProjectMembershipPermissions(forms.Form):
                     codename = codename,
                     obj = self.membership.project,
                     user = self.membership.member,
-                    creator = request.user,
+                    creator = self.request.user,
                 )
                 self._message('info', _("Permission added: %s" % codename))
         # Remove permissions
@@ -198,9 +201,64 @@ class ProjectMembershipPermissions(forms.Form):
                     obj = self.membership.project,
                     user = self.membership.member,
                 )
-                self._message('error', _("Permission removed: %s" % codename))
+                self._message('warning', _("Permission removed: %s" % codename))
         # if permission stays after removal - member probably got perm from
         # his/her team
+
+    def get_codenames(self):
+        """
+        Returns codenames of editable permissions.
+        """
+        return [choice[0] for choice in self.fields['permissions'].choices]
+
+class ProjectTeamPermissionsForm(forms.Form):
+    permissions = forms.MultipleChoiceField(
+        choices = get_editable_perms(),
+        label = _("Permissions"),
+        widget = RichCheckboxSelectMultiple,
+        required = False)
+
+    def __init__(self, data=None, initial_permissions=[], team=None,
+            request=None, send_messages=False):
+        super(ProjectTeamPermissionsForm, self).__init__(data)
+        self.team = team
+        self.fields['permissions'].initial = initial_permissions
+        self.request = request
+        self.send_messages = send_messages
+
+    def _message(self, level, message):
+        assert level in ('success', 'warning', 'info', 'error')
+        if self.request and self.send_messages:
+            getattr(messages, level)(self.request, message)
+
+    def save(self, commit=True):
+        """
+        Saves granted permissions and removes those switched off.
+        """
+        from projector.permissions import get_or_create_permisson
+        from projector.permissions import remove_permission
+        granted_codenames = self.cleaned_data['permissions']
+        team_perms = self.team.perms
+        current_codenames = [p.codename for p in team_perms]
+        # Grant permissions
+        for codename in granted_codenames:
+            if codename not in current_codenames:
+                get_or_create_permisson(
+                    codename = codename,
+                    obj = self.team.project,
+                    group = self.team.group,
+                    creator = self.request.user,
+                )
+                self._message('info', _("Permission added: %s" % codename))
+        # Remove permissions
+        for codename in current_codenames:
+            if codename not in granted_codenames:
+                remove_permission(
+                    codename = codename,
+                    obj = self.team.project,
+                    group = self.team.group,
+                )
+                self._message('warning', _("Permission removed: %s" % codename))
 
     def get_codenames(self):
         """

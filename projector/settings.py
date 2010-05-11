@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from livesettings import config_register, StringValue, IntegerValue,\
     BooleanValue, ConfigurationGroup, MultipleStringValue
 
+from richtemplates.extras.livesettingsext import RichMultipleStringValue
+
 from projector.utils.validators import IntegerValidator
 from projector.utils.basic import codename_to_label
 
@@ -118,7 +120,7 @@ editable_perm_codenames = (
     'project_permission.write_repository_project',
 )
 
-config_register(MultipleStringValue(
+config_register(RichMultipleStringValue(
     PROJECTOR,
     'MEMBERSHIP_EDITABLE_PERMISSIONS',
     description = _("Member's editable permissions"),

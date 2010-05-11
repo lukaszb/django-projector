@@ -83,7 +83,7 @@ class ProjectorPermissionTests(TestCase):
         urls_403 = (
             self.public_project.get_edit_url(),
             self.public_project.get_members_add_url(),
-            self.public_project.get_members_manage_url('john_doe'),
+            self.public_project.get_members_edit_url('john_doe'),
             self.public_project.get_create_task_url(),
             self.public_project.get_edit_url(),
             self.public_project.get_milestones_add_url(),

@@ -79,8 +79,8 @@ urlpatterns += patterns('projector.views.project',
         view='project_members_add',
         name='projector_project_members_add'),
     url(r'^projects/(?P<project_slug>[-\w]+)/members/(?P<username>\w+)/$',
-        view='project_members_manage',
-        name='projector_project_members_manage'),
+        view='project_members_edit',
+        name='projector_project_members_edit'),
 
     # Teams
     url(r'^projects/(?P<project_slug>[-\w]+)/teams/$',
@@ -90,8 +90,8 @@ urlpatterns += patterns('projector.views.project',
         view='project_teams_add',
         name='projector_project_teams_add'),
     url(r'^projects/(?P<project_slug>[-\w]+)/teams/(?P<name>\w+)/$',
-        view='project_teams_manage',
-        name='projector_project_teams_manage'),
+        view='project_teams_edit',
+        name='projector_project_teams_edit'),
 
     # Repository sources
     url(r'^projects/(?P<project_slug>[-\w]+)/src/diff/(?P<revision1>[\w]*)-(?P<revision2>[\w]*)/(?P<rel_repo_url>.*)$',

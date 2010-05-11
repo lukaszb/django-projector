@@ -1,5 +1,4 @@
 import logging
-import pprint
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +12,6 @@ from django.utils.translation import ugettext as _
 from annoying.decorators import render_to
 
 from authority.decorators import permission_required_or_403
-from authority.models import Permission
 
 from livesettings import config_value
 
@@ -21,8 +19,9 @@ from projector.models import Project, Membership, Team, Task
 from projector.models import Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm
 from projector.forms import StatusForm, StatusFormSet, ComponentForm
-from projector.forms import TeamForm, ProjectMembershipPermissions
-from projector.permissions import ProjectPermission, get_or_create_permisson
+from projector.forms import TeamForm, ProjectMembershipPermissionsForm,\
+    ProjectTeamPermissionsForm
+from projector.permissions import ProjectPermission
 from projector.filters import TaskFilter
 
 from richtemplates.shortcuts import get_first_or_None
@@ -430,7 +429,7 @@ def project_workflow_add_status(request, project_slug):
 # Members
 
 def project_members(request, project_slug,
-        template_name='projector/project/members.html'):
+        template_name='projector/project/members/home.html'):
     """
     Shows/updates project's members and groups view.
     """
@@ -451,7 +450,7 @@ def project_members(request, project_slug,
 @permission_required_or_403('project_permission.add_member_project',
     (Project, 'slug', 'project_slug'))
 def project_members_add(request, project_slug,
-        template_name='projector/project/members_add.html'):
+        template_name='projector/project/members/add.html'):
     """
     Adds member for a project.
     """
@@ -477,8 +476,8 @@ def project_members_add(request, project_slug,
 
 @permission_required_or_403('project_permission.change_member_project',
     (Project, 'slug', 'project_slug'))
-def project_members_manage(request, project_slug, username,
-        template_name='projector/project/members/manage.html'):
+def project_members_edit(request, project_slug, username,
+        template_name='projector/project/members/edit.html'):
     """
     Manages membership settings and permissions of project's member.
     """
@@ -494,15 +493,15 @@ def project_members_manage(request, project_slug, username,
     member_permissions = membership.all_perms
     codenames = [str(p.codename) for p in member_permissions]
 
-    form = ProjectMembershipPermissions(request.POST or None,
+    form = ProjectMembershipPermissionsForm(request.POST or None,
         membership = membership,
-        initial_permissions=codenames,
+        initial_permissions = codenames,
         request = request)
     if request.method == 'POST':
         if form.is_valid():
             logging.info("Form's data:\n%s" % form.cleaned_data)
             messages.success(request, _("Permissions updated"))
-            form.save(request)
+            form.save()
         else:
             messages.error(request,
                 _("Errors occured while processing the form"))
@@ -539,7 +538,7 @@ def project_teams(request, project_slug,
 @permission_required_or_403('project_permission.add_team_project',
     (Project, 'slug', 'project_slug'))
 def project_teams_add(request, project_slug,
-        template_name='projector/project/teams/create.html'):
+        template_name='projector/project/teams/add.html'):
     """
     Adds team for a project.
     """
@@ -565,7 +564,7 @@ def project_teams_add(request, project_slug,
 
 @permission_required_or_403('project_permission.change_team_project',
     (Project, 'slug', 'project_slug'))
-def project_teams_manage(request, project_slug, name,
+def project_teams_edit(request, project_slug, name,
         template_name='projector/project/teams/edit.html'):
     """
     Manages settings and permissions of project's team.
@@ -573,55 +572,28 @@ def project_teams_manage(request, project_slug, name,
     team = get_object_or_404(Team,
         project__slug=project_slug, group__name=name)
     project = team.project
-    group = team.group
-    check = ProjectPermission(group=team.group)
+    team_permissions = team.perms
+    codenames = [str(p.codename) for p in team_permissions]
 
-    form = TeamForm(request.POST or None, instance=team)
-    available_permissions = check.get_local_checks()
-    logging.info("Available permissions for projects are:\n%s"
-        % pprint.pformat(available_permissions))
-
-    logging.info("Current %s's permissions:" % group)
-    for perm in team.perms:
-        logging.info("%s | Approved is %s" % (perm, perm.approved))
-
-    team_short_perms = [perm.codename.split('.')[-1] for perm in team.perms]
-
+    form = ProjectTeamPermissionsForm(request.POST or None,
+        team = team,
+        initial_permissions = codenames,
+        request = request)
     if request.method == 'POST':
-        granted_perms = request.POST.getlist('perms')
-        logging.debug("POST'ed perms: %s" % granted_perms)
-        for perm in available_permissions:
-            logging.info("Permission %s | Team %s has it: %s"
-                % (perm, team, perm in team.perms))
-            perm_codename = '.'.join((check.label, perm))
-            if perm in granted_perms and not perm in team_short_perms:
-                # Grant perm
-                logging.debug("Granting permission %s for team %s"
-                    % (perm_codename, team))
-                get_or_create_permisson(
-                    perm_codename,
-                    project,
-                    group = team.group,
-                    approved = True,
-                    creator = request.user,
-                )
-            if perm not in granted_perms and perm in team_short_perms:
-                # Disable perm
-                logging.debug("Disabling permission %s for team %s"
-                    % (perm_codename, team))
-                try:
-                    team.perms.get(codename=perm_codename).delete()
-                except Permission.DoesNotExist:
-                    pass
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Permissions updated"))
+        else:
+            messages.error(request,
+                _("Errors occured while processing the form"))
         return redirect(team.get_absolute_url())
-
     context = {
         'project': project,
         'form': form,
         'team': team,
-        'available_permissions': available_permissions,
-        'team_short_perms': team_short_perms,
+        'team_permissions': team_permissions,
     }
+
     return render_to_response(template_name, context, RequestContext(request))
 
 
