@@ -152,11 +152,11 @@ class MembershipForm(LimitingModelForm):
 
 def get_editable_perms():
     return ((codename, codename_to_label(codename)) for codename in
-            config_value('PROJECTOR', 'MEMBERSHIP_EDITABLE_PERMISSIONS'))
+            config_value('PROJECTOR', 'PROJECT_EDITABLE_PERMISSIONS'))
 
 class ProjectMembershipPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(
-        choices = get_editable_perms(),
+        choices = (), # fetch for every instance (see __init__)
         label = _("Permissions"),
         widget = RichCheckboxSelectMultiple,
         required = False)
@@ -165,6 +165,7 @@ class ProjectMembershipPermissionsForm(forms.Form):
             request=None, send_messages=False):
         super(ProjectMembershipPermissionsForm, self).__init__(data)
         self.membership = membership
+        self['permissions'].field.choices = get_editable_perms()
         self.fields['permissions'].initial = initial_permissions
         self.request = request
         self.send_messages = send_messages

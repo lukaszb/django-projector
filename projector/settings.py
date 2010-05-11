@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from livesettings import config_register, StringValue, IntegerValue,\
-    BooleanValue, ConfigurationGroup, MultipleStringValue
+    BooleanValue, ConfigurationGroup
 
 from richtemplates.extras.livesettingsext import RichMultipleStringValue
 
@@ -122,10 +122,10 @@ editable_perm_codenames = (
 
 config_register(RichMultipleStringValue(
     PROJECTOR,
-    'MEMBERSHIP_EDITABLE_PERMISSIONS',
-    description = _("Member's editable permissions"),
+    'PROJECT_EDITABLE_PERMISSIONS',
+    description = _("Editable permissions per project"),
     help_text = _("Those permissions would be editable at project's 'members' "
-                  "page."),
+                  "and teams' page."),
     default = editable_perm_codenames,
     choices = [(codename, codename_to_label(codename))
         for codename in editable_perm_codenames

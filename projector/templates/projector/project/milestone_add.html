@@ -25,7 +25,7 @@
                 <input id="id_submit" type="submit" name="submit"
                     value="{% trans "Create milestone" %}"/>
                 <input type="button" onclick="window.location='{% spaceless %}
-                    {% url projector_project_edit project.slug %}
+                    {% url projector_project_milestones project.slug %}
                     {% endspaceless %}'" value="{% trans "Cancel" %}"/>
             </div>
         </form>
