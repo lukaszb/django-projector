@@ -74,7 +74,8 @@ def task_details(request, project_slug, task_id,
             if action_type > 0 or comment:
                 messages.success(request, _("Task updated successfully"))
                 task.save()
-                task.create_revision(comment)
+                task.comment = comment
+                task.create_revision()
             else:
                 messages.warning(request, _("There were no changes"))
             return HttpResponseRedirect(task.get_absolute_url())
@@ -166,8 +167,7 @@ def task_edit(request, project_slug, task_id,
                 editor=request.user,
                 editor_ip=request.META['REMOTE_ADDR'],
             )
-            comment = form.cleaned_data.get('comment', None)
-            task.create_revision(comment)
+            task.create_revision()
             messages.success(request, _("Task updated successfully."))
             return HttpResponseRedirect(task.get_absolute_url())
     else:

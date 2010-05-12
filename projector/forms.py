@@ -88,13 +88,6 @@ class TaskForm(LimitingModelForm):
         self.fields['status'].empty_label=None
         self.fields['owner'].queryset = self.instance.project.members.all()
 
-    def clean(self):
-        cleaned_data = super(TaskForm, self).clean()
-        if self.instance.id:
-            if not Task.diff(new=self.instance):
-                raise forms.ValidationError(_("No changes made"))
-        return cleaned_data
-
     def save(self, editor, editor_ip, project=None, commit=True):
         assert project or self.instance.project,\
             "For new tasks you have to pass project object into this method."
@@ -125,11 +118,10 @@ class TaskEditForm(TaskForm):
             status_field.queryset = self.instance.status.destinations.all()
 
     def clean(self):
-        cleaned_data = self.cleaned_data
-        logging.debug("cleaned_data:\n%s" % cleaned_data)
-        if not cleaned_data.get('comment'):
-            cleaned_data = super(TaskEditForm, self).clean()
-        return cleaned_data
+        comment = self.cleaned_data.get('comment', None)
+        logging.debug("Setting comment to: %s" % comment)
+        self.instance.comment = comment
+        return super(TaskEditForm, self).clean()
 
 class MembershipForm(LimitingModelForm):
     member = ModelByNameField(max_length=128, queryset=User.objects.all,

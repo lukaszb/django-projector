@@ -743,13 +743,20 @@ class Task(AbstractTask):
 
     def save(self, *args, **kwargs):
         self._calculate_id()
-        #if not self.pk:
-        #    self.status= Status.objects.get(id=1)
-        #else:
         if self.pk:
             # Task update
             self.revision += 1
         return super(Task, self).save(*args, **kwargs)
+
+    def _set_comment(self, comment):
+        self._comment = comment
+
+    def _get_comment(self):
+        return getattr(self, '_comment', None)
+
+    comment = property(_get_comment, _set_comment,
+        doc = "If comment is set, clean method won't check if there were "
+              "changes made to task itself")
 
     CHANGESET_FIELDS = (
         'summary',
@@ -783,6 +790,12 @@ class Task(AbstractTask):
                 diff[field] = (old_val, new_val)
         return diff
 
+    def clean(self):
+        logging.debug("Validating model... self.comment: %s" % self.comment)
+        if self.id and not Task.diff(new=self) and not self.comment:
+            raise ValidationError(_("No changes made"))
+        return super(Task, self).clean()
+
     def get_revisions(self, force_query=False):
         """
         Returns TaskRevision objects related to this Task instance.
@@ -806,9 +819,11 @@ class Task(AbstractTask):
 
     revisions = property(get_revisions)
 
-    def create_revision(self, comment=None):
+    def create_revision(self):
         """
-        Creates revision (instance of ``TaskRevision``) for this task.
+        Creates revision (instance of ``TaskRevision``) for this task. If
+        comment has been set, it would be used in revision creation
+        process.
         """
         revision_info = dict(
             task = self,
@@ -826,8 +841,8 @@ class Task(AbstractTask):
             component = self.component,
             deadline = self.deadline,
         )
-        if comment is not None:
-            revision_info['comment'] = comment
+        if self.comment is not None:
+            revision_info['comment'] = self.comment
         revision = TaskRevision.objects.create(**revision_info)
         logging.debug("TaskRevision created: %s" % revision)
         if hasattr(self, '_revisions'):

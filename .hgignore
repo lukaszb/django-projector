@@ -10,5 +10,6 @@ build
 _build
 dist
 .DS_Store
+*.orig
 
 example_project/media
