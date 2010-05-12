@@ -10,6 +10,11 @@
         $('#id_project_repository_url').click(function(){
             this.select();
         });
+        {% ifhasperm "project_permission.change_project" request.user project %}        
+        $('#admin-link').button({
+            icons: { primary: "ui-icon-wrench" }
+        })
+        {% endifhasperm %}
     });
 </script>
 {% endblock %}
@@ -93,21 +98,30 @@
     <div class="richtemplates-panel-content">
         <h1>{{ project.name }}</h1>
         <ul class="nav-inline">
-            <li><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project details" %}</a></li>
-            {% ifhasperm "project_permission.change_project" request.user project %}
-            <li><a class="button-link" href="{{ project.get_edit_url }}">{% trans "Edit" %}</a></li>
-            {% endifhasperm %}
-            <li><a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_components_url }}">{% trans "Components" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_teams_url }}">{% trans "Teams" %}</a></li>
+            <li class="richbuttonset"><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project details" %}</a></li>
             {% if project.get_repo_url %}
-                <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
+            <li class="richbuttonset"><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
             {% endif %}
+            <li class="richbuttonset">
+                <a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a>
+                <a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a>
+                <a class="button-link" href="{{ project.get_components_url }}">{% trans "Components" %}</a>
+                <a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
+            </li>
+            <li class="richbuttonset">
+                <a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a>
+                <a class="button-link" href="{{ project.get_teams_url }}">{% trans "Teams" %}</a>
+            </li>
         </ul>
-        
+
+        {% ifhasperm "project_permission.change_project" request.user project %}
+        <ul class="nav-inline">
+            <li class="richbuttonset">
+                <a id="admin-link" class="button-link" href="{{ project.get_edit_url }}">{% trans "Admin" %}</a>
+            </li>
+        </ul>
+        {% endifhasperm %}
+
         <ul class="messages">
             <li class="message message-info">{% trans "Clone repository" %}:
             <input id="id_project_repository_url" value="hg clone {{ project.get_repo_url }}"
@@ -136,11 +150,11 @@
                     </tr>
                     <tr>
                         <th>{% trans "Category" %}</th>
-                        <td>{{ project.category|default_if_none:"-" }}</th>
+                        <td>{{ project.category|default_if_none:"-" }}</td>
                     </tr>
                     <tr>
                         <th>{% trans "Author" %}</th>
-                        <td>{{ project.author }}</th>
+                        <td>{{ project.author }}</td>
                     </tr>
                     <tr>
                         <th>{% trans "Visibility" %}</th>

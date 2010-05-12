@@ -1,4 +1,4 @@
-{% extends "projector/project/details.html" %}
+{% extends "projector/project/repository/browse.html" %}
 
 {% load i18n %}
 {% load richtemplates_tags %}
@@ -15,10 +15,7 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Project's repository browser" %}</h5>
     <div class="richtemplates-panel-content">
-    <ul class="nav-inline">
-        <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
-        <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
-    </ul>    
+    {% block repository_menu %}{{ block.super }}{% endblock %}
     
     {% autopaginate repository CHANGESETS_PAGINATE_BY %}
 
@@ -30,24 +27,21 @@
                 <th class="width-5">{% trans "Revision" %}</th>
                 <th class="width-15">{% trans "Commited at" %}</th>
                 <th class="width-10">{% trans "Author" %}</th>
-                <th class="width-55">{% trans "Message" %}</th>
-                <th class="width-15">{% trans "Action" %}</th>
+                <th class="width-70">{% trans "Message" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
             {% for changeset in repository %}
             <tr class="{% cycle "odd" "even" %} hoverable">
-                <td><a class="browser-changeset block-link"
-                       href="#">{{ changeset.revision }}</a></td>
+                <td><a href="{% url projector_project_sources_browse project.slug changeset.id '' %}"
+                       class="browser-changeset block-link show-tipsy-left"
+                       title="{% trans "Browse revision's content" %}">{{ changeset.revision }}</a>
+                </td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}
                 </td>
                 <td>{{ changeset.author|tooltip:"15" }}</td>
-                <td>{{ changeset.message|tooltip:"60" }}</td>
-                <td><a class="browser-zoom block-link show-tipsy"
-                       href="{% url projector_project_sources_browse project.slug changeset.id '' %}"
-                       title="{% trans "Browse revision's content" %}"></a>
-                </td>
+                <td>{{ changeset.message|tooltip:"90" }}</td>
             </tr>
             {% endfor %}
         </tbody>

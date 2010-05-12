@@ -190,8 +190,8 @@ def project_edit(request, project_slug):
 
     return context
 
-@render_to('projector/project/milestone_list.html')
-def project_milestones(request, project_slug):
+def project_milestones(request, project_slug,
+        template_name='projector/project/milestones/home.html'):
     """
     Returns milestones view.
     """
@@ -207,10 +207,10 @@ def project_milestones(request, project_slug):
         'project': project,
         'milestone_list': milestone_list,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/project/milestone_detail.html')
-def project_milestone_detail(request, project_slug, milestone_slug):
+def project_milestone_detail(request, project_slug, milestone_slug,
+        template_name='projector/project/milestones/detail.html'):
     """
     Returns milestone detail view.
     """
@@ -225,12 +225,12 @@ def project_milestone_detail(request, project_slug, milestone_slug):
         'project': project,
         'milestone': milestone,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/milestone_add.html')
-def project_milestones_add(request, project_slug):
+def project_milestones_add(request, project_slug,
+        template_name='projector/project/milestones/add.html'):
     """
     Adds milestone for project.
     """
@@ -246,12 +246,12 @@ def project_milestones_add(request, project_slug):
         'form': form,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/milestone_edit.html')
-def project_milestone_edit(request, project_slug, milestone_slug):
+def project_milestone_edit(request, project_slug, milestone_slug,
+        template_name='projector/project/milestones/edit.html'):
     """
     Edits chosen milestone.
     """
@@ -267,10 +267,10 @@ def project_milestone_edit(request, project_slug, milestone_slug):
         'form': form,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/project/component_list.html')
-def project_components(request, project_slug):
+def project_components(request, project_slug,
+        template_name='projector/project/component_edit.html'):
     """
     Returns components view.
     """
@@ -285,10 +285,10 @@ def project_components(request, project_slug):
         'project': project,
         'component_list': component_list,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/project/component_detail.html')
-def project_component_detail(request, project_slug, component_slug):
+def project_component_detail(request, project_slug, component_slug,
+        template_name='projector/project/component_edit.html'):
     """
     Returns component detail view.
     """
@@ -303,12 +303,12 @@ def project_component_detail(request, project_slug, component_slug):
         'project': project,
         'component': component,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/component_add.html')
-def project_component_add(request, project_slug):
+def project_component_add(request, project_slug,
+        template_name='projector/project/component_edit.html'):
     """
     Adds component for project.
     """
@@ -324,12 +324,12 @@ def project_component_add(request, project_slug):
         'form': form,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/component_edit.html')
-def project_component_edit(request, project_slug, component_slug):
+def project_component_edit(request, project_slug, component_slug,
+        template_name='projector/project/component_edit.html'):
     """
     Edits chosen component.
     """
@@ -346,10 +346,10 @@ def project_component_edit(request, project_slug, component_slug):
         'form': form,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/project/workflow_detail.html')
-def project_workflow_detail(request, project_slug):
+def project_workflow_detail(request, project_slug,
+        template_name='projector/project/workflow/detail.html'):
     """
     Returns project's workflow detail view.
     """
@@ -361,12 +361,12 @@ def project_workflow_detail(request, project_slug):
     context = {
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/workflow_edit.html')
-def project_workflow_edit(request, project_slug):
+def project_workflow_edit(request, project_slug,
+        template_name='projector/project/workflow/edit.html'):
     """
     Edits chosen project's workflow.
     """
@@ -396,12 +396,12 @@ def project_workflow_edit(request, project_slug):
         'formset': formset,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/workflow_add_status.html')
-def project_workflow_add_status(request, project_slug):
+def project_workflow_add_status(request, project_slug,
+        template_name='projector/project/workflow/add_status.html'):
     """
     Adds status for project.
     """
@@ -420,7 +420,7 @@ def project_workflow_add_status(request, project_slug):
         'form': form,
         'project': project,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 # ========================== #
 # Membership - user & groups #

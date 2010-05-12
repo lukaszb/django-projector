@@ -562,10 +562,12 @@ class TimelineEntry(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     user = models.ForeignKey(User, verbose_name=_('user'), null=True,
         blank=True, editable=False)
-    action = models.CharField(_('action'), max_length=256)
+    action = models.CharField(_('action'), max_length=256,
+        help_text=_('Short note on activity, i.e.: commit message'))
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-created_at',)
+        get_latest_by = 'created_at'
         verbose_name = _('timeline entry')
         verbose_name_plural = _('timeline entries')
 

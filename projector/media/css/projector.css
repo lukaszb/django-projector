@@ -39,10 +39,6 @@ table.task-block-properties td, table.task-block-properties th {
     vertical-align: top;
 }
 
-.task-block-description pre {
-    border: 1px dotted black;
-}
-
 .task-changeset fieldset {
     border: 1px solid #D7D7D7;
     padding: 0.5em;
@@ -58,7 +54,7 @@ table.task-block-properties td, table.task-block-properties th {
 #task-attachments ul li {  }
 
 #comment-list { border: 1px solid #D7D7D7; margin: 5px; }
-.comment-block { margin: 5px; border: 1px dotted #999; }
+.comment-block { margin: 5px; border: 1px solid #999; }
 .comment-block-content { margin: 5px; }
 
 #task-history { margin: 5px; }

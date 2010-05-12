@@ -64,10 +64,16 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Project's repository browser" %}</h5>
     <div class="richtemplates-panel-content">
+
+    {% block repository_menu %}
     <ul class="nav-inline">
-        <li><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
-        <li><a class="button-link" href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a></li>
-    </ul>    
+        <li class="richbuttonset">
+            <a href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a>
+            <a href="{{ project.get_changesets_url }}">{% trans "Changesets" %}</a>
+        </li>
+    </ul>
+    {% endblock %}
+
     {% block browse_content %}
     <div id="repo-browser">
         {% load breadcrumber %}

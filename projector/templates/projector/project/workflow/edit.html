@@ -1,4 +1,4 @@
-{% extends "projector/project/details.html" %}
+{% extends "projector/project/workflow/detail.html" %}
 
 {% load markup %}
 {% load i18n %}
@@ -10,10 +10,7 @@
 <div class="richtemplates-panel">    
     <h5>{% trans "Workflow schema" %}</h5>
     <div class="richtemplates-panel-content">
-        <ul class="nav-inline">
-            <li><a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Back to workflow schema" %}</a></li>
-            <li><a class="button-link" href="{{ project.get_workflow_edit_url }}">{% trans "Edit" %}</a></li>
-        </ul>
+        {% block workflow_menu %}{{ block.super }}{% endblock %}
 
         <form method="post" action=".">
             {% csrf_token %}
