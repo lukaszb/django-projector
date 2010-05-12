@@ -270,7 +270,7 @@ def project_milestone_edit(request, project_slug, milestone_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 def project_components(request, project_slug,
-        template_name='projector/project/component_edit.html'):
+        template_name='projector/project/components/home.html'):
     """
     Returns components view.
     """
@@ -288,7 +288,7 @@ def project_components(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 def project_component_detail(request, project_slug, component_slug,
-        template_name='projector/project/component_edit.html'):
+        template_name='projector/project/components/detail.html'):
     """
     Returns component detail view.
     """
@@ -308,7 +308,7 @@ def project_component_detail(request, project_slug, component_slug,
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
 def project_component_add(request, project_slug,
-        template_name='projector/project/component_edit.html'):
+        template_name='projector/project/components/add.html'):
     """
     Adds component for project.
     """
@@ -329,7 +329,7 @@ def project_component_add(request, project_slug,
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
 def project_component_edit(request, project_slug, component_slug,
-        template_name='projector/project/component_edit.html'):
+        template_name='projector/project/components/edit.html'):
     """
     Edits chosen component.
     """
@@ -360,6 +360,8 @@ def project_workflow_detail(request, project_slug,
             raise PermissionDenied()
     context = {
         'project': project,
+        # indicates that this is workflow detail page at templates
+        'workflow': True,
     }
     return render_to_response(template_name, context, RequestContext(request))
 

@@ -13,10 +13,16 @@
         {% block workflow_menu %}
         <ul class="nav-inline">
             <li class="richbuttonset">
-                <a  class="button-link"href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
+                <a class="button-link"href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
                 {% ifhasperm "project_permission.change_project" request.user project %}
-                <a  class="button-link"href="{{ project.get_workflow_edit_url }}">{% trans "Edit" %}</a>
-                <a  class="button-link"href="{{ project.get_workflow_add_status_url }}">{% trans "Add status" %}</a>
+                <a class="button-link"href="{{ project.get_workflow_add_status_url }}">{% trans "Add status" %}</a>
+                {% endifhasperm %}
+            </li>
+            <li>
+                {% ifhasperm "project_permission.change_project" request.user project %}
+                {% if workflow %}
+                <a class="button-link richbutton-wrench"href="{{ project.get_workflow_edit_url }}">{% trans "Edit" %}</a>
+                {% endif %}
                 {% endifhasperm %}
             </li>
         </ul>

@@ -15,11 +15,15 @@
             <a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a>
             {% ifhasperm "project_permission.change_project" request.user project %}
             <a class="button-link" href="{{ project.get_milestones_add_url }}">{% trans "Add milestone" %}</a>
-            {% if milestone %}
-            <a class="button-link" href="{{ milestone.get_edit_url }}">{% trans "Edit" %}</a>
-            {% endif %}
             {% endifhasperm %}
         </li>
+        <li>
+            {% ifhasperm "project_permission.change_project" request.user project %}
+            {% if milestone %}
+            <a class="button-link richbutton-wrench" href="{{ milestone.get_edit_url }}">{% trans "Edit" %}</a>
+            {% endif %}
+            {% endifhasperm %}
+        </li>            
     </ul>
     {% endblock %}
 

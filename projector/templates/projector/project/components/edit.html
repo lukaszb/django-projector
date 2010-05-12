@@ -1,4 +1,4 @@
-{% extends "projector/project/details.html" %}
+{% extends "projector/project/components/home.html" %}
 
 {% load i18n %}
 {% load pagination_tags %}
@@ -8,6 +8,7 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Edit component" %}: {{ form.instance }}</h5>
     <div class="richtemplates-panel-content">
+        {% block components_menu %}{{ block.super }}{% endblock %}
         <form action="." method="post">
             {% csrf_token %}
             <table class="form-table">
