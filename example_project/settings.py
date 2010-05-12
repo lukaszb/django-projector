@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'registration',
     'richtemplates',
     'signals_ahoy',
+    'south',
     'tagging',
     'projector',
     'projector.extras.users',

@@ -25,7 +25,7 @@ BANNED_PROJECT_NAMES += (
     'create',
     'edit',
     'issue', 'issues',
-    'projects', 'projector',
+    'projects',
     'register', 'registration',
     'task', 'tasks',
     'update',

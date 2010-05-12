@@ -82,8 +82,11 @@ def _project_detail_hg(request, project):
     # Allow to read from public projects
     if project.is_public() and request.method == 'GET' and \
         config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        return get_mercurial_response(request,
-            repo_path=project._get_repo_path())
+        mercurial_info = {
+            'repo_path': project._get_repo_path(),
+            'push_ssl': simplevcs_settings.PUSH_SSL,
+        }
+        return get_mercurial_response(request, **mercurial_info)
 
     # Check if user have been already authorized or ask to
     request.user = basic_auth(request)

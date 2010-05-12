@@ -177,7 +177,7 @@
         <h2><a href="{{ project.get_milestones_url }}">{% trans "Roadmap" %}</a>:</h2>
         {% for milestone in project.milestone_set.all %}
         <h3><a href="{{ milestone.get_absolute_url }}">{{ milestone.name }}</a> ({% trans "deadline set to" %} {{ milestone.deadline }})</h3>
-        {% include "projector/project/milestone_progress_table.html" %}
+        {% include "projector/project/milestones/progress_table.html" %}
         {% empty %}
             <ul class="messages">
                 <li class="message message-info">{% trans "No milestones defined yet" %}</li>

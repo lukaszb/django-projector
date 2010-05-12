@@ -18,7 +18,7 @@
         <ul class="nav-vertical">
             {% for revision in task.revisions %}
             {% if not forloop.first %}
-            <li><a href="{{ revision.task.get_absolute_url }}#revision:{{ revision.revision }}">{{ revision }} {% trans "by" %} {{ revision.author }} {% trans "at" %} {{ revision.created_at|date:"Y-m-d" }}</a></li>
+            <li><a href="{{ revision.task.get_absolute_url }}#revision:{{ revision.revision }}">#{{ revision.revision }} {% trans "by" %} {{ revision.author }} {% trans "at" %} {{ revision.created_at|date:"Y-m-d" }}</a></li>
             {% endif %}
             {% endfor %}
         </ul>
