@@ -89,7 +89,7 @@ urlpatterns += patterns('projector.views.project',
     url(r'^projects/(?P<project_slug>[-\w]+)/teams/add/$',
         view='project_teams_add',
         name='projector_project_teams_add'),
-    url(r'^projects/(?P<project_slug>[-\w]+)/teams/(?P<name>\w+)/$',
+    url(r'^projects/(?P<project_slug>[-\w]+)/teams/(?P<name>[-_ \w]+)/$',
         view='project_teams_edit',
         name='projector_project_teams_edit'),
 
