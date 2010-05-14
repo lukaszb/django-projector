@@ -4,8 +4,10 @@ import logging
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from livesettings import config_register, StringValue, IntegerValue,\
+from livesettings import config_register, config_value
+from livesettings import StringValue, IntegerValue,\
     BooleanValue, ConfigurationGroup
+from livesettings.models import SettingNotSet
 
 from richtemplates.extras.livesettingsext import RichMultipleStringValue
 
@@ -131,4 +133,13 @@ config_register(RichMultipleStringValue(
         for codename in editable_perm_codenames
     ],
 ))
+
+def get_config_value(key):
+    """
+    Needed if we want to use livesettings at models.
+    """
+    try:
+        return PROJECTOR[key].value
+    except SettingNotSet:
+        return PROJECTOR[key].default
 

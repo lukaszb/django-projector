@@ -39,6 +39,7 @@ setup(
         'django-signals-ahoy',
         'django-registration',
         'docutils',
+        'south',
     ],
     classifiers = ['Development Status :: 4 - Beta',
                    'Environment :: Web Environment',

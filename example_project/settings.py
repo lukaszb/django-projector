@@ -30,7 +30,6 @@ INSTALLED_APPS = (
     'admin_tools.menu',
     'admin_tools.dashboard',
 
-    'native_tags',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,13 +55,14 @@ INSTALLED_APPS = (
     'registration',
     'richtemplates',
     'signals_ahoy',
-    'south',
     'tagging',
     'projector',
     'projector.extras.users',
     'vcs.web.simplevcs',
+    'devserver',
 
     'example_project',
+    'native_tags',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -133,6 +133,4 @@ NATIVE_TAGS = (
     'richtemplates.templatetags.native',
     'projector.templatetags.native',
 )
-
-#ADMIN_TOOLS_MENU = 'example_project.menu.CustomMenu'
 

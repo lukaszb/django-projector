@@ -498,8 +498,8 @@ class Milestone(models.Model):
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
-        datetime.timedelta(days=config_value('PROJECTOR',
-            'MILESTONE_DEADLINE_DELTA')))
+        datetime.timedelta(days=
+            projector_settings.get_config_value('MILESTONE_DEADLINE_DELTA')))
     date_completed = models.DateField(_('date completed'), null=True,
         blank=True)
 

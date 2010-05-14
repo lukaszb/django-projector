@@ -40,7 +40,14 @@
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}
                 </td>
-                <td>{{ changeset.author|tooltip:"15" }}</td>
+                <td>
+                    {% fetch_user changeset.author as "author" %}
+                    {% if author %}
+                    <a href="{{ author.get_absolute_url }}">{{ author.username|tooltip:"15" }}</a>
+                    {% else %}
+                    {{ changeset.author|tooltip:"15" }}
+                    {% endif %}
+                </td>
                 <td>{{ changeset.message|tooltip:"90" }}</td>
             </tr>
             {% endfor %}
@@ -48,7 +55,6 @@
     </table>
         
     {% paginate %}
-
 </div>
 </div>
 

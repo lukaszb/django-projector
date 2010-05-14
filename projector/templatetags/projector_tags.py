@@ -8,6 +8,7 @@ from django import template
 from django.utils.translation import ugettext as _
 
 from projector.models import Task
+from projector.extras.users.models import get_user_from_string
 
 register = template.Library()
 
@@ -54,4 +55,47 @@ def changeset_message(value, project=None, path=None):
     if path:
         raise NotImplementedError
     return mark_safe(value)
+
+class FetchUserNode(template.Node):
+    def __init__(self, value, context_var, get_from_context):
+        self.value = value
+        self.context_var = context_var
+        self.get_from_context = get_from_context
+
+    def render(self, context):
+        if self.get_from_context:
+            try:
+                var = template.Variable(self.value).resolve(context)
+            except template.VariableDoesNotExist:
+                raise template.TemplateSyntaxError("Cannot resolve %s from "
+                    "context" % self.value)
+            user = get_user_from_string(var)
+        else:
+            user = get_user_from_string(self.value)
+        context[self.context_var] = user
+        return ''
+
+@register.tag(name='fetch_user')
+def do_fetch_user(parser, token):
+    """
+    Parses ``fetch_user`` tag which should be in format:
+    {% fetch_user RAWID as "context_var" %}
+    """
+    format = '{% fetch_user RAWID as "context_var" %}'
+    bits = token.split_contents()
+    error_msg = "fetch_user tag should be in format: %s" % format
+    if len(bits) == 4:
+        if bits[2] != 'as':
+            raise template.TemplateSyntaxError(error_msg)
+        if bits[3][0] not in ['"', "'"] or bits[3][0] != bits[3][-1]:
+            raise template.TemplateSyntaxError(error_msg)
+        context_var = bits[3][1:-1]
+        value = bits[1]
+        if value[0] in '"\'' and value[0] == value[-1]:
+            value = value.strip('"\'')
+            get_from_context = False
+        else:
+            get_from_context = True
+        return FetchUserNode(value, context_var, get_from_context)
+    raise template.TemplateSyntaxError(error_msg)
 
