@@ -29,7 +29,6 @@ setup(
     install_requires = [
         'djalog',
         'django-richtemplates',
-        'django-annoying',
         'django-pagination>=1.0.7',
         'django-attachments',
         'django-tagging',

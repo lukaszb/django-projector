@@ -4,26 +4,26 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.template import RequestContext
+from django.shortcuts import render_to_response
 
-from annoying.decorators import render_to
 from projector.models import Team, Project
 from projector.extras.users.forms import UserProfileForm
 
-@render_to('projector/accounts/user_list.html')
-def user_list(request):
+def user_list(request, template_name='projector/accounts/user_list.html'):
     user_list = User.objects.all()
     context = {
         'user_list': user_list,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/accounts/user_homepage.html')
-def user_homepage(request):
+def user_homepage(request,
+        template_name='projector/accounts/user_homepage.html'):
     if not request.user.is_authenticated():
         msg = _("You are not logged in. You may view only public content "
             "of this website")
         messages.warning(request, msg)
-        return {}
+        return render_to_response(template_name, {}, RequestContext(request))
     # Authed user homepage
     context = {
         'profile': request.user.get_profile(),
@@ -33,10 +33,10 @@ def user_homepage(request):
             .filter(status__is_resolved=False)\
             .order_by('project')
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
-@render_to('projector/accounts/profile.html')
-def profile_detail(request, username):
+def profile_detail(request, username,
+        template_name='projector/accounts/profile.html'):
     """
     Public profile of the given user.
     """
@@ -46,11 +46,11 @@ def profile_detail(request, username):
         'project_list': Project.objects.for_user(request.user),
         'teams': Team.objects.for_user(user)
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-@render_to('richtemplates/accounts/profile_edit.html')
-def profile_edit(request, username):
+def profile_edit(request, username,
+        template_name='projector/accounts/profile_edit.html'):
     """
     Edit profile view.
     """
@@ -66,5 +66,5 @@ def profile_edit(request, username):
     context = {
         'form': form,
     }
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 

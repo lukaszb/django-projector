@@ -30,6 +30,7 @@ INSTALLED_APPS = (
     'admin_tools.menu',
     'admin_tools.dashboard',
 
+    'native_tags',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +44,6 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
 
     # External
-    'annoying',
     'attachments',
     'authority',
     'djalog',
@@ -59,10 +59,9 @@ INSTALLED_APPS = (
     'projector',
     'projector.extras.users',
     'vcs.web.simplevcs',
-    'devserver',
+    'mailer',
 
     'example_project',
-    'native_tags',
 )
 
 MIDDLEWARE_CLASSES = (

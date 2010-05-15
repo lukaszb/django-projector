@@ -9,8 +9,6 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from annoying.decorators import render_to
-
 from authority.decorators import permission_required_or_403
 
 from livesettings import config_value
@@ -149,8 +147,7 @@ def project_task_list(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-@render_to('projector/project/create.html')
-def project_create(request):
+def project_create(request, template_name='projector/project/create.html'):
     """
     New project creation view.
     """
@@ -165,12 +162,12 @@ def project_create(request):
         'form' : form,
     }
 
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
     (Project, 'slug', 'project_slug'))
-@render_to('projector/project/edit.html')
-def project_edit(request, project_slug):
+def project_edit(request, project_slug,
+        template_name='projector/project/edit.html'):
     """
     Update project view.
     """
@@ -191,7 +188,7 @@ def project_edit(request, project_slug):
         'project': form.instance,
     }
 
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
 def project_milestones(request, project_slug,
         template_name='projector/project/milestones/home.html'):
@@ -656,8 +653,8 @@ def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
     }
     return diff_file(request, **diff_info)
 
-@render_to('projector/project/repository/changeset_list.html')
-def project_changesets(request, project_slug):
+def project_changesets(request, project_slug,
+        template_name='projector/project/repository/changeset_list.html'):
     """
     Returns repository's changesets view.
     """
@@ -676,5 +673,5 @@ def project_changesets(request, project_slug):
     context['repository'] = project.repository
     context['CHANGESETS_PAGINATE_BY'] = config_value('PROJECTOR',
         'CHANGESETS_PAGINATE_BY')
-    return context
+    return render_to_response(template_name, context, RequestContext(request))
 
