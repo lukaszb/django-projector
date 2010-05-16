@@ -3,17 +3,9 @@
 Installation
 ============
 
-``django-projector`` is aimed to work with Django 1.2 which is going to be
-released in march 2010. Till then you would need to use alpha/beta/trunk of
-Django. Moreover, I strongly suggest to use ``virtualenv`` and
-``virtualenvwrapper`` - great tools for creating temporary environment to work
-on.
-
-.. note::
-    Well, in fact, as the time of writing only ``messages`` application is
-    used from new Django_ version. And to use this new application you can
-    simply copy ``django/contrib/messages`` folder into working installation
-    of Django on your system.
+``django-projector`` is aimed to work with Django 1.2 or later. Moreover, we
+strongly suggest to use ``virtualenv`` and ``virtualenvwrapper`` - great tools
+for creating temporary environment to work on.
 
 Requirements
 ------------
@@ -27,7 +19,7 @@ Following packages are needed to get ``django-projector`` working:
 - `django-extensions`_
 - `django-keyedcache`_
 - `django-livesettings`_
-- `django-pagination`_ (preferred 1.0.5 as 1.0.6 is bugged)
+- `django-pagination`_
 - `django-richtemplates`_
 - `django-signals-ahoy`_
 - `django-sorting`_
