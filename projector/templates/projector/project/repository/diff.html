@@ -3,14 +3,20 @@
 {% load i18n %}
 {% load native %}
 
+{% block extra_head %}{{ block.super }}
+<style>
+
+</style>    
+{% endblock %}
+
 {% block col_left %}
 {% with file1 as root %}{{ block.super }}{% endwith %}
 {% endblock %}
 
 {% block browse_content %}
 {% if diff_content %}
-    <div class="codeblock">
-        {% highlight diff_content udiff linenos=true anchorlinenos=true lineanchors=line cssclass="code-highlight" %}
+    <div class="diffblock">
+        {{ differ.as_HTML|safe }}
     </div>
 {% else %}
     <ul class="messages">

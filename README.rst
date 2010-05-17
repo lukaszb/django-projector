@@ -2,11 +2,10 @@
 django-projector
 ================
 
-``django-projector`` is a project management application with task tracker
-and repository backend integration. Aimed to work with upcoming, version
-1.2 of Django_ framework. We are sick of Trac [1]_ and wanted to create
-simple application which can be easily customized or plugged into
-existing systems.
+``django-projector`` is a project management application with task tracker and
+repository backend integration. Aimed to work with Django_ 1.2 or later. We are
+sick of Trac [1]_ and wanted to create simple application which can be easily
+customized or plugged into existing systems.
 
 Features
 --------

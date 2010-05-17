@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     # External
     'attachments',
     'authority',
+    'dajax',
+    'dajaxice',
     'djalog',
     'django_extensions',
     'django_sorting',
