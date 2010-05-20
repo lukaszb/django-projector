@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
@@ -652,6 +652,22 @@ def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
         },
     }
     return diff_file(request, **diff_info)
+
+def project_file_raw(request, project_slug, revision, rel_repo_url):
+    """
+    Returns raw page of the file at given ``rel_repo_url``.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private() or \
+            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
+        check = ProjectPermission(request.user)
+        if not request.user.is_authenticated() or \
+            not check.read_repository_project(project):
+            raise PermissionDenied()
+    node = project.repository.request(rel_repo_url, revision)
+    response = HttpResponse(node.content, mimetype=node.mimetype)
+    response['Content-Disposition'] = 'attachment; filename=%s' % node.name
+    return response
 
 def project_changesets(request, project_slug,
         template_name='projector/project/repository/changeset_list.html'):

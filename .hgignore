@@ -13,3 +13,4 @@ dist
 *.orig
 
 example_project/media
+example_project/conf/local_settings.py

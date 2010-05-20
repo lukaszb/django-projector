@@ -3,6 +3,7 @@
 {% load markup %}
 {% load i18n %}
 {% load permissions %}
+{% load native %}
 
 {% block extra_head %}{{ block.super }}
 <script type="text/javascript">
@@ -122,10 +123,11 @@
         </ul>
         {% endifhasperm %}
 
+        {% with project.get_repo_url|put_username_into_url:user as "project_url" %}
         <ul class="messages">
             <li class="message message-info">{% trans "Clone repository" %}:
-            <input id="id_project_repository_url" value="hg clone {{ project.get_repo_url }}"
-                size="{{ project.get_repo_url|length|add:'11' }}"
+            <input id="id_project_repository_url" value="hg clone {{ project_url }}"
+                size="{{ project.get_repo_url|put_username_into_url:user|length|add:'11' }}"
                 onblur="this.value='hg clone {{ project.get_repo_url }}';"/></li>
             {% if "://example.com" in project.get_repo_url %}
             <li class="message message-warning">
@@ -134,6 +136,7 @@
             </li>
             {% endif %}
         </ul>
+        {% endwith %}
     
     </div>
 </div>

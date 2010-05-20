@@ -1,0 +1,17 @@
+{% load i18n %}
+{% trans "Project" %}: {{ task.project.name }}
+{% trans "Task" %}: #{{ task.id }} - {{ task.summary }}
+
+{% trans "Created at" %}: {{ task.created_at }}
+{% trans "Reported by" %}: {{ task.author }}
+{% if task.revision > 1 %}
+{% trans "Edited at" %}: {{ task.edited_at }}
+{% trans "Edited by" %}: {{ task.author }}
+{% endif %}
+{% trans "Component" %}: {{ task.component }}
+{% trans "Status" %}: {{ task.status }}
+{% trans "Priority" %}: {{ task.priority }}
+
+{% trans "Content" %}:
+{{ task.description }}
+

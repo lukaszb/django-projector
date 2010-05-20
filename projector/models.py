@@ -1,4 +1,5 @@
 import os
+import string
 import datetime
 import logging
 
@@ -7,8 +8,10 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
 from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
@@ -20,8 +23,52 @@ from projector.conf import default_workflow
 from projector.utils import abspath
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
-from projector.managers import ProjectManager, TeamManager
+from projector.managers import ProjectManager, TeamManager, WatchedItemManager
 from vcs.web.simplevcs.models import Repository
+
+class WatchedItem(models.Model):
+    """
+    Projects, Tasks and other items watched by the User.
+    """
+    user = models.ForeignKey(User)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    objects = WatchedItemManager()
+
+    class Meta:
+        unique_together = ('user', 'content_type', 'object_id')
+
+    def __unicode__(self):
+        return u'%s watched by %s' % (self.content_object, self.user)
+
+class Watchable(object):
+    def watch(self, user):
+        item, created = WatchedItem.objects.get_or_create(
+            user = user,
+            content_type = ContentType.objects.get_for_model(self),
+            object_id = self.pk,
+        )
+        return item, created
+
+    def unwatch(self, user):
+        WatchedItem.objects.filter(
+            user = user,
+            content_type = ContentType.objects.get_for_model(self),
+            object_id = self.pk,
+        ).delete()
+
+    def is_watched(self, user):
+        try:
+            WatchedItem.objects.get(
+                user = user,
+                content_type = ContentType.objects.get_for_model(self),
+                object_id = self.pk)
+            return True
+        except WatchedItem.DoesNotExist:
+            return False
+
 
 class DictModel(models.Model):
     name = models.CharField(_('name'), max_length=32)
@@ -74,7 +121,7 @@ def validate_project_name(name):
     if name.lower() in projector_settings.BANNED_PROJECT_NAMES:
         raise ValidationError(_("This name is restricted"))
 
-class Project(models.Model):
+class Project(models.Model, Watchable):
     name = models.CharField(_('name'), max_length=64, unique=True,
         validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
@@ -686,7 +733,7 @@ class AbstractTask(models.Model):
     class Meta:
         abstract = True
 
-class Task(AbstractTask):
+class Task(AbstractTask, Watchable):
     id_pk = models.AutoField(primary_key=True)
     id = models.IntegerField(editable=False)
     project = models.ForeignKey(Project, verbose_name=_('project'))
@@ -731,14 +778,28 @@ class Task(AbstractTask):
     def get_absolute_url(self):
         return ('projector_task_details', (), {
             'project_slug': self.project.slug,
-            'task_id' : self.id,
+            'task_id': self.id,
         })
 
     @models.permalink
     def get_edit_url(self):
         return ('projector_task_edit', (), {
             'project_slug': self.project.slug,
-            'task_id' : self.id,
+            'task_id': self.id,
+        })
+
+    @models.permalink
+    def get_watch_url(self):
+        return ('projector_task_watch', (), {
+            'project_slug': self.project.slug,
+            'task_id': self.id,
+        })
+
+    @models.permalink
+    def get_unwatch_url(self):
+        return ('projector_task_unwatch', (), {
+            'project_slug': self.project.slug,
+            'task_id': self.id,
         })
 
     def save(self, *args, **kwargs):
@@ -848,6 +909,21 @@ class Task(AbstractTask):
         if hasattr(self, '_revisions'):
             self._revisions.append(revision)
         return revision
+
+    def get_long_summary(self):
+        #raw = projector_settings\
+        #    .get_config_value('TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
+        raw = config_value('PROJECTOR', 'TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
+        tmpl = string.Template(raw)
+        return tmpl.safe_substitute(project=self.project.name,
+            id=self.id, summary=self.summary)
+
+    def get_long_content(self):
+        """
+        Returns content of the task, suitable as email message's body.
+        """
+        result = render_to_string('projector/task/mail.html', {'task': self})
+        return result
 
 class TaskRevision(AbstractTask):
     task = models.ForeignKey(Task)

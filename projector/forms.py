@@ -11,6 +11,7 @@ from projector.models import Task
 from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
+from projector.models import WatchedItem
 from projector.utils.basic import codename_to_label
 
 from livesettings import config_value
@@ -74,6 +75,7 @@ class TaskForm(LimitingModelForm):
         attr='username', label=_('Owner'), required=False)
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
+    watch_changes = forms.BooleanField(False, label=_('Watch for changes'))
 
     class Meta:
         model = Task
@@ -101,7 +103,10 @@ class TaskForm(LimitingModelForm):
             self.instance.author_ip = editor_ip
         id = self.instance._calculate_id()
         logging.debug("Calculated id: %s" % id)
-        return super(TaskForm, self).save(commit)
+        task = super(TaskForm, self).save(commit)
+        if commit and self.cleaned_data['watch_changes']:
+            task.watch(editor)
+        return task
 
 class TaskEditForm(TaskForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),

@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from livesettings import config_register, config_value
+from livesettings import config_value, config_register
 from livesettings import StringValue, IntegerValue,\
     BooleanValue, ConfigurationGroup
 from livesettings.models import SettingNotSet
@@ -36,6 +36,9 @@ BANNED_PROJECT_NAMES += (
 
 CREATE_PROJECT_ASYNCHRONOUSLY = getattr(settings,
     'PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY', True)
+
+SEND_MAIL_ASYNCHRONOUSELY = getattr(settings,
+    'PROJECTOR_SEND_MAIL_ASYNCHRONOUSELY', True)
 
 PROJECTS_ROOT_DIR = getattr(settings, 'PROJECTOR_PROJECTS_ROOT_DIR', None)
 if PROJECTS_ROOT_DIR is None:
@@ -134,12 +137,46 @@ config_register(RichMultipleStringValue(
     ],
 ))
 
+config_register(BooleanValue(
+    PROJECTOR,
+    'SEND_MAILS_USING_MAILER',
+    description = _("Send mails using django-mailer app"),
+    help_text = _("django-mailer (http://github.com/jtauber/django-mailer) "
+                  "would first store mails at database; it is necessary to "
+                  "call 'send_mail' and 'retry_deferred' regularly (cron) "),
+    default = False,
+))
+
+config_register(StringValue(
+    PROJECTOR,
+    'FROM_EMAIL_ADDRESS',
+    description = _("Email address from which mails are send to the users"),
+    default = settings.DEFAULT_FROM_EMAIL,
+))
+
+config_register(BooleanValue(
+    PROJECTOR,
+    'ALWAYS_SEND_MAILS_TO_MEMBERS',
+    description = _("Always send mails to project's members"),
+    help_text = _("If this flag is set, all project's members would be "
+                  "notified by mail for all project's changes"),
+    default = False,
+))
+
+config_register(StringValue(
+    PROJECTOR,
+    'TASK_EMAIL_SUBJECT_SUMMARY_FORMAT',
+    description = _("Format of emails related with issues"),
+    help_text = _("You may use following placeholders: $project $summary $id"),
+    default = "$project - #$id: $summary",
+))
+
 def get_config_value(key):
     """
     Needed if we want to use livesettings at models.
     """
     try:
-        return PROJECTOR[key].value
+        return config_value('PROJECTOR', key)
     except SettingNotSet:
         return PROJECTOR[key].default
 

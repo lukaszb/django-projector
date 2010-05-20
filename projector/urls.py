@@ -97,6 +97,9 @@ urlpatterns += patterns('projector.views.project',
     url(r'^projects/(?P<project_slug>[-\w]+)/src/diff/(?P<revision1>[\w]*)-(?P<revision2>[\w]*)/(?P<rel_repo_url>.*)$',
         view='project_file_diff',
         name='projector_project_file_diff'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='project_file_raw',
+        name='projector_project_sources_raw'),
     url(r'^projects/(?P<project_slug>[-\w]+)/src/changesets/$',
         view='project_changesets',
         name='projector_project_changesets'),
@@ -112,6 +115,7 @@ urlpatterns += patterns('projector.views.project',
         name='projector_task_list'),
 )
 
+# Tasks
 urlpatterns += patterns('projector.views.task',
     url(r'^projects/(?P<project_slug>[-\w]+)/tasks/create/$',
         view='task_create', name='projector_task_create'),
@@ -119,6 +123,10 @@ urlpatterns += patterns('projector.views.task',
         view='task_details', name='projector_task_details'),
     url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/edit/$',
         view='task_edit', name='projector_task_edit'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/watch/$',
+        view='task_watch', name='projector_task_watch'),
+    url(r'^projects/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/unwatch/$',
+        view='task_unwatch', name='projector_task_unwatch'),
 )
 
 urlpatterns += patterns('projector.views.reports',

@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
@@ -9,14 +9,16 @@ from django.forms.formsets import formset_factory
 from django import forms
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.utils import simplejson
 
 from authority.decorators import permission_required_or_403
 
 from projector.models import Task, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.permissions import ProjectPermission
+from projector.signals import messanger
 
-from richtemplates.shortcuts import get_first_or_None
+from richtemplates.shortcuts import get_first_or_None, get_json_response
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
 def task_details(request, project_slug, task_id,
@@ -25,17 +27,21 @@ def task_details(request, project_slug, task_id,
     Task details view.
     Users may update task here.
     """
-    logging.info("task_details: project_slug given is '%s'" % project_slug)
-    logging.info("task_details: task_id given is '%s'" % task_id)
     task = get_object_or_404(
         Task.objects.select_related('type', 'priority', 'status', 'owner',
             'author', 'editor', 'milestone', 'component', 'project'),
         id=task_id, project__slug=project_slug)
 
+    check = ProjectPermission(request.user)
+
+    if task.project.is_private():
+        if not check.has_perm('project_permission.view_tasks_project',
+            task.project):
+            raise PermissionDenied()
+
     # We create formset for comment here as comment is only optional
     CommentFormset = formset_factory(TaskCommentForm, extra=1)
 
-    check = ProjectPermission(request.user)
     destinations = task.status.destinations.all()
     # Init choices
     task_action_choices = [
@@ -54,6 +60,9 @@ def task_details(request, project_slug, task_id,
 
     comment_formset = CommentFormset(request.POST or None)
     if request.method == 'POST':
+        if not check.has_perm('project_permission.change_task_project',
+                task.project):
+            raise PermissionDenied()
 
         if action_form.is_valid() and comment_formset.is_valid():
             # Comment handler
@@ -84,6 +93,7 @@ def task_details(request, project_slug, task_id,
 
     context = {
         'task' : task,
+        'is_watched': task.is_watched(request.user),
         'now' : datetime.datetime.now(),
         'action_form' : action_form,
         'comment_formset' : comment_formset,
@@ -180,4 +190,36 @@ def task_edit(request, project_slug, task_id,
     }
 
     return render_to_response(template_name, context, RequestContext(request))
+
+def task_watch(request, project_slug, task_id):
+    """
+    Makes request's user watching this task.
+    """
+    task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
+    check = ProjectPermission(request.user)
+    if request.method == 'POST' and (task.project.is_public() or
+        check.has_perm('project_permission.view_tasks_project', task.project)):
+        task.watch(request.user)
+        if request.is_ajax():
+            return get_json_response()
+        return redirect(task.get_absolute_url())
+    else:
+        # Only POST methods are allowed here
+        raise PermissionDenied()
+
+def task_unwatch(request, project_slug, task_id):
+    """
+    Makes request's user watching this task.
+    """
+    task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
+    check = ProjectPermission(request.user)
+    if request.method == 'POST' and (task.project.is_public() or
+        check.has_perm('project_permission.view_tasks_project', task.project)):
+        if request.is_ajax():
+            return get_json_response()
+        task.unwatch(request.user)
+        return redirect(task.get_absolute_url())
+    else:
+        # Only POST methods are allowed here
+        raise PermissionDenied()
 

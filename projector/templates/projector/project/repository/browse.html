@@ -15,7 +15,7 @@
                         <th>{% trans "Path" %}</th>
                         <td><a class="show-tipsy"
                                href="{% url projector_project_sources_browse project.slug root.changeset.id root.path %}"
-                               title="{% trans "Show node" %}">{{ root.path|default:"/" }}</a>
+                               title="{% trans "Show node" %} {{ root.path }}">{{ root.path|default:"/"|slice:"20" }}</a>
                         </td>
                     </tr>
                     <tr>
@@ -26,16 +26,24 @@
                     </tr>
                     {% if root.is_file %}
                     <tr>
-                        <th>{% trans "Size" %}</th>
-                        <td>{% if root.is_file %}{{ root.size|filesizeformat }}{% endif %}</td>
-                    </tr>
-                    <tr>
                         <th>{% trans "Last committer" %}</th>
                         <td>{{ root.last_changeset.author|tooltip:"20" }}</td>
                     </tr>
                     <tr>
                         <th>{% trans "Last modified" %}</th>
                         <td><span class="show-tipsy" title="{{ root.last_changeset.date }}">{{ root.last_changeset.date|timesince }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Size" %}</th>
+                        <td>{% if root.is_file %}{{ root.size|filesizeformat }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Mimetype" %}</th>
+                        <td>{{ root.mimetype }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Download" %}</th>
+                        <td><a href="{% url projector_project_sources_raw project.slug root.changeset.id root.path %}">{% trans "raw" %}</a></td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -45,11 +53,16 @@
             <ul class="nav-vertical">
                 {% for changeset in root.history %}
                 <li>
-                    <a href="{% url projector_project_file_diff project.slug root.changeset.id changeset.id root.path %}"
+                    <a href="{% url projector_project_sources_browse project.slug changeset.id root.path %}"
                        class="show-tipsy"
-                       title="{% trans "Show diff" %}">{{ changeset.revision }}:{{ changeset.id }}</a>
+                       title="{% trans "Show at revision" %}">{{ changeset.revision }}:{{ changeset.id }}</a>
+                (<a href="{% url projector_project_file_diff project.slug root.changeset.id changeset.id root.path %}"
+                   class="show-tipsy"
+                   title="{% trans "Show diff" %}">{% trans "diff" %}</a>)
+           {% comment %}
                     <span class="show-tipsy" title="{{ changeset.date }}">{{ changeset.date|timesince }}</span>
                     {% trans "ago" %}
+            {% endcomment %}
                 </li>
                 {% endfor %}
             </ul>
