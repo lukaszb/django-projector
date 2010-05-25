@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.util import NestedObjects
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -16,11 +17,13 @@ from livesettings import config_value
 from projector.models import Project, Membership, Team, Task
 from projector.models import Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm
+from projector.forms import MembershipDeleteForm
 from projector.forms import StatusForm, StatusFormSet, ComponentForm
 from projector.forms import TeamForm, ProjectMembershipPermissionsForm,\
     ProjectTeamPermissionsForm
-from projector.permissions import ProjectPermission
+from projector.permissions import ProjectPermission, get_perms_for_user
 from projector.filters import TaskFilter
+from projector.utils.basic import codename_to_label
 
 from richtemplates.shortcuts import get_first_or_None
 
@@ -48,7 +51,7 @@ def project_details(request, project_slug,
                 "be: %s" % request.path)
         if project.is_private():
             check = ProjectPermission(user=request.user)
-            if not check.view_project(project):
+            if not check.has_perm('project_permission.view_project', project):
                 raise PermissionDenied()
         context = {
             'project': project,
@@ -483,8 +486,8 @@ def project_members_edit(request, project_slug, username,
     """
     Manages membership settings and permissions of project's member.
     """
-    membership = get_object_or_404(Membership,
-        project__slug=project_slug, member__username=username)
+    membership = get_object_or_404(Membership, project__slug=project_slug,
+        member__username=username)
     member = membership.member
     project = membership.project
     if not request.user.is_superuser and project.author == member:
@@ -515,6 +518,49 @@ def project_members_edit(request, project_slug, username,
         'member_permissions': member_permissions,
     }
     return render_to_response(template_name, context, RequestContext(request))
+
+@permission_required_or_403('project_permission.delete_member_project',
+    (Project, 'slug', 'project_slug'))
+def project_members_delete(request, project_slug, username,
+        template_name='projector/project/members/delete.html'):
+    """
+    Removes member from project.
+    """
+    membership = get_object_or_404(Membership, project__slug=project_slug,
+        member__username=username)
+    member = membership.member
+    project = membership.project
+
+    if project.author == member and not request.user.is_superuser:
+        messages.warning(request, _("Project owner's membership cannot be "
+            "removed."))
+        return redirect(project.get_members_url())
+    collector = NestedObjects()
+    membership._collect_sub_objects(collector)
+    form = MembershipDeleteForm(request.POST or None)
+    perms_to_delete = get_perms_for_user(member, project)
+
+    if request.method == 'POST':
+        # Confirm removal
+        if form.is_valid():
+            msg = _("Membership removed")
+            messages.success(request, msg)
+            membership.delete()
+            perms_to_delete.update(approved=False)
+            return redirect(project.get_members_url())
+        else:
+            msg = _("Couldn't remove membership")
+            messages.error(request, msg)
+    context = {
+        'project': project,
+        'membership': membership,
+        'form': form,
+        'to_delete': collector.nested(),
+        'perms_to_delete': perms_to_delete,
+    }
+
+    return render_to_response(template_name, context, RequestContext(request))
+
 
 # Teams
 
@@ -626,8 +672,8 @@ def project_browse_repository(request, project_slug, rel_repo_url='',
     }
     return browse_repository(request, **repo_info)
 
-def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
-        template_name='projector/project/repository/diff.html'):
+def project_file_diff(request, project_slug, revision_old, revision_new,
+        rel_repo_url, template_name='projector/project/repository/diff.html'):
     """
     Returns diff page of the file at given ``rel_repo_url``.
     """
@@ -643,8 +689,8 @@ def project_file_diff(request, project_slug, revision1, revision2, rel_repo_url,
             "configure project preferences first."))
     diff_info = {
         'repository': project.repository,
-        'revision1': revision1,
-        'revision2': revision2,
+        'revision_old': revision_old,
+        'revision_new': revision_new,
         'file_path': rel_repo_url,
         'template_name': template_name,
         'extra_context': {
@@ -668,6 +714,29 @@ def project_file_raw(request, project_slug, revision, rel_repo_url):
     response = HttpResponse(node.content, mimetype=node.mimetype)
     response['Content-Disposition'] = 'attachment; filename=%s' % node.name
     return response
+
+def project_file_annotate(request, project_slug, revision, rel_repo_url,
+        template_name='projector/project/repository/annotate.html'):
+    """
+    Returns raw page of the file at given ``rel_repo_url``.
+    """
+    project = get_object_or_404(Project, slug=project_slug)
+    if project.is_private() or \
+            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
+        check = ProjectPermission(request.user)
+        if not request.user.is_authenticated() or \
+            not check.read_repository_project(project):
+            raise PermissionDenied()
+    repo_info = {
+            'repository': project.repository,
+            'revision': revision,
+            'node_path': rel_repo_url,
+            'template_name': template_name,
+            'extra_context': {
+                'project': project,
+            },
+        }
+    return browse_repository(request, **repo_info)
 
 def project_changesets(request, project_slug,
         template_name='projector/project/repository/changeset_list.html'):

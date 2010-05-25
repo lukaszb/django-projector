@@ -161,6 +161,7 @@ NATIVE_TAGS = (
 
 REQUEST_IGNORE_PATHS = (
     r'^%s' % MEDIA_URL.lstrip('/'),
+    r'^%s' % ADMIN_MEDIA_PREFIX.lstrip('/'),
 )
 
 try:

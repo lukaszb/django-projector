@@ -1,0 +1,15 @@
+{% extends "projector/project/repository/browse.html" %}
+
+{% load i18n %}
+{% load native %}
+{% load breadcrumber %}
+
+{% block browse_content %}
+<div id="repo-browser">
+
+    <div class="codeblock">
+        {% annotate_content root linenos=true anchorlinenos=true lineanchors=line cssclass="code-highlight" %}
+    </div>
+
+</div>
+{% endblock %}

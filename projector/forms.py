@@ -11,7 +11,6 @@ from projector.models import Task
 from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
-from projector.models import WatchedItem
 from projector.utils.basic import codename_to_label
 
 from livesettings import config_value
@@ -150,6 +149,9 @@ class MembershipForm(LimitingModelForm):
 def get_editable_perms():
     return ((codename, codename_to_label(codename)) for codename in
             config_value('PROJECTOR', 'PROJECT_EDITABLE_PERMISSIONS'))
+
+class MembershipDeleteForm(forms.Form):
+    post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
 
 class ProjectMembershipPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(

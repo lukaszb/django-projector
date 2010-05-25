@@ -2,15 +2,10 @@
 
 {% load i18n %}
 {% load native %}
-
-{% block extra_head %}{{ block.super }}
-<style>
-
-</style>    
-{% endblock %}
+{% load breadcrumber %}
 
 {% block col_left %}
-{% with file1 as root %}{{ block.super }}{% endwith %}
+{% with file_old as root %}{{ block.super }}{% endwith %}
 {% endblock %}
 
 {% block browse_content %}
@@ -23,12 +18,12 @@
         <li class="message message-warning">
             {% trans "No changes have been made between revisions" %}
             <a class="show-tipsy"
-               href="{% url projector_project_sources_browse project.slug file1.changeset.id '' %}"
-               title="{% trans "Show changeset" %}">{{ file1.changeset.revision }}:{{ file1.changeset.id }}</a>
+               href="{% url projector_project_sources_browse project.slug file_old.changeset.id '' %}"
+               title="{% trans "Show changeset" %}">{{ file_old.changeset.revision }}:{{ file_old.changeset.id }}</a>
             -
             <a class="show-tipsy"
-               href="{% url projector_project_sources_browse project.slug file2.changeset.id '' %}"
-               title="{% trans "Show changeset" %}">{{ file2.changeset.revision }}:{{ file2.changeset.id }}</a>
+               href="{% url projector_project_sources_browse project.slug file_new.changeset.id '' %}"
+               title="{% trans "Show changeset" %}">{{ file_new.changeset.revision }}:{{ file_new.changeset.id }}</a>
         </li>
     </ul>
 {% endif %}

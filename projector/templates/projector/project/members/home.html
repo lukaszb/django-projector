@@ -29,6 +29,7 @@
                 <th>{% anchor member "Username" %}</th>
                 <th>{% anchor created_at "Joined at" %}</th>
                 <th>{% trans "Permissions" %}</th>
+                <th>{% trans "Remove" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
@@ -40,8 +41,17 @@
                     {% if project.author == membership.member %}
                     {% trans "Owner has all permissions" %}
                     {% else %}
-                    <a class="block-link" href="{{ membership.get_absolute_url }}">{% trans "Manage" %}</a></td>
+                    <a class="block-link" href="{{ membership.get_absolute_url }}">{% trans "Manage" %}</a>
                     {% endif %}
+                </td>
+                <td>
+                    {% if project.author == membership.member %}
+                    -
+                    {% else %}
+                    <a href="{{ membership.get_delete_url }}"
+                       class="block-link deletelink">{% trans "Delete" %}</a>
+                    {% endif %}
+                </tr>
             </tr>
             {% endfor %}
         </tbody>

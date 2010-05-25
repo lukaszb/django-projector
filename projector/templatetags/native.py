@@ -1,4 +1,9 @@
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
+
 from projector.models import Membership, Watchable
+from vcs.utils.annotate import annotate_highlight
+from native_tags.decorators import function, filter
 
 def get_project_permissions(project=None, for_bit=None, user=None):
     """
@@ -29,7 +34,7 @@ def put_username_into_url(value, user):
             value = ''.join((
                 value[:len(prefix)], user.username, '@', value[len(prefix):]))
     return value
-put_username_into_url.filter = True
+put_username_into_url = filter(put_username_into_url)
 
 def is_watched(watchable, by_bit=None, user=None):
     """
@@ -47,4 +52,28 @@ def is_watched(watchable, by_bit=None, user=None):
     assert user
     return watchable.is_watched(user)
 is_watched.function = True
+
+def annotate_content(context, filenode, **options):
+    """
+    Usage::
+
+       {% annotate_content filenode cssclass="code-highlight" %}
+    """
+    def annotate_changeset(changeset):
+        template_name = "projector/project/repository/"\
+                        "annotate_changeset_cell.html"
+
+        context['line_changeset'] = changeset
+        out = render_to_string(template_name, context)
+        return out
+
+    order = ['ls', 'annotate', 'code']
+    headers = {
+        'ls': _('Line no'),
+        'annotate': _('Annotate'),
+        'code': _('Code'),
+    }
+    return annotate_highlight(filenode, order=order, headers=headers,
+        annotate_from_changeset_func=annotate_changeset, **options)
+annotate_content = function(annotate_content, is_safe=True, takes_context=True)
 

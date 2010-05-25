@@ -10,6 +10,24 @@
     {% endblock %}
 {% endif %}
 
+{% block info_block %}
+<div class="richtemplates-panel">
+    <h5>{% trans "Node's information" %}</h5>
+    <div class="richtemplates-panel-content">
+        <div class="richblock">
+            <table class="richblock-properties">
+                <tbody>
+                    <tr>
+                        <th>{% trans "Changesets count" %}</th>
+                        <td>{{ repository.revisions|length }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block col_main_extra %}
 
 <div class="richtemplates-panel">
@@ -35,7 +53,7 @@
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td><a href="{% url projector_project_sources_browse project.slug changeset.id '' %}"
                        class="browser-changeset block-link show-tipsy-left"
-                       title="{% trans "Browse revision's content" %}">{{ changeset.revision }}</a>
+                       title="{% trans "Browse revision's content" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
                 </td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}

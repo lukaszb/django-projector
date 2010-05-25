@@ -137,6 +137,16 @@ class ProjectAdmin(admin.ModelAdmin):
     inlines = [MilestoneInline, ComponentInline, TaskTypeInline,
         StatusInline, PriorityInline]
 
+    actions = ['make_public', 'make_private']
+
+    def make_public(self, request, queryset):
+        queryset.update(public=True)
+    make_public.short_description = _("Make all selected projects public")
+
+    def make_private(self, request, queryset):
+        queryset.update(public=False)
+    make_private.short_description = _("Make all selected projects private")
+
 class ComponentAdmin(admin.ModelAdmin):
     list_display = 'project', 'name', 'description'
     list_display_links = 'name',

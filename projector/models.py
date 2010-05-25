@@ -473,6 +473,13 @@ class Membership(models.Model):
             'username': self.member.username,
         })
 
+    @models.permalink
+    def get_delete_url(self):
+        return ('projector_project_members_delete', (), {
+            'project_slug': self.project.slug,
+            'username': self.member.username,
+        })
+
     @LazyProperty
     def perms(self):
         """

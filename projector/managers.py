@@ -20,11 +20,17 @@ class ProjectManager(models.Manager):
             if user.is_superuser:
                 pass
             else:
-                qset = qset & Q(public=True) | Q(public=False,
-                    membership__member=user)
+                qset = qset & \
+                    Q(public=True) | \
+                    Q(public=False, membership__member=user) | \
+                    Q(public=False, team__group__in=user.groups.all)
         else:
             qset = qset & Q(public=True)
-        qs = qs.filter(qset).select_related('membership__member')
+        qs = qs.filter(qset)\
+            .select_related('membership__member')\
+            .order_by('name')\
+            .distinct()
+
         return qs
 
 class TeamManager(models.Manager):
