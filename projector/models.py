@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
@@ -60,6 +60,8 @@ class Watchable(object):
         ).delete()
 
     def is_watched(self, user):
+        if isinstance(user, AnonymousUser):
+            return False
         try:
             WatchedItem.objects.get(
                 user = user,

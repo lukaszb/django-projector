@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     'request',
     'vcs.web.simplevcs',
     'mailer',
+    'gunicorn',
 
     'example_project',
 )

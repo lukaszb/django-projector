@@ -119,7 +119,7 @@ def _project_detail_hg(request, project):
 
 def project_list(request, template_name='projector/project/list.html'):
     project_list = Project.objects.for_user(user=request.user)\
-        .annotate(Count('task'))
+        .annotate(Count('task', distinct=True))
     context = {
         'project_list' : project_list,
     }
