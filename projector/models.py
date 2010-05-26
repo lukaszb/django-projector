@@ -15,6 +15,7 @@ from django.contrib.contenttypes import generic
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
+from django.contrib.sites.models import Site
 
 from authority.models import Permission
 from autoslug import AutoSlugField
@@ -360,7 +361,6 @@ class Project(models.Model, Watchable):
         Returns full url of the project (with domain based on
         django sites framework).
         """
-        from django.contrib.sites.models import Site
         current_site = Site.objects.get_current()
         if settings.DEBUG:
             prefix = 'http://'
@@ -991,7 +991,12 @@ class Task(AbstractTask, Watchable):
         """
         Returns content of the task, suitable as email message's body.
         """
-        result = render_to_string('projector/task/mail.html', {'task': self})
+        task_url = 'http://%s/%s' % (Site.objects.get_current().domain,
+            self.get_absolute_url())
+        result = render_to_string('projector/task/mail.html', {
+            'task': self,
+            'task_url': task_url,
+        })
         return result
 
 class TaskRevision(AbstractTask):

@@ -358,7 +358,7 @@ def project_component_edit(request, username, project_slug, component_slug,
     form = ComponentForm(request.POST or None, instance=component)
     if request.method == 'POST' and form.is_valid():
         component = form.save()
-        msg = _("Milestone updated successfully")
+        msg = _("Component updated successfully")
         messages.success(request, msg)
         return redirect(component.get_absolute_url())
     context = {

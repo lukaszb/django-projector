@@ -1,6 +1,7 @@
 {% load i18n %}
 {% trans "Project" %}: {{ task.project.name }}
 {% trans "Task" %}: #{{ task.id }} - {{ task.summary }}
+{% trans "Link" %}: {{ task_url }}
 
 {% trans "Created at" %}: {{ task.created_at }}
 {% trans "Reported by" %}: {{ task.author }}

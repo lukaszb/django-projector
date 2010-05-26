@@ -18,15 +18,19 @@ abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
 BANNED_PROJECT_NAMES = getattr(settings, 'PROJECTOR_BANNED_PROJECT_NAMES', ())
 BANNED_PROJECT_NAMES += (
-    'accounts',
+    'account', 'accounts',
     'add',
     'admin',
     'api',
     'author', 'authors',
     'category', 'categories',
     'create',
-    'edit',
+    'edit', 'edits',
     'issue', 'issues',
+    'mail', 'mails',
+    'message', 'messages',
+    'manager', 'managers',
+    'profile', 'profiles',
     'projects',
     'register', 'registration',
     'task', 'tasks',
