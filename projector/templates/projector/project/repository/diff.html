@@ -18,11 +18,11 @@
         <li class="message message-warning">
             {% trans "No changes have been made between revisions" %}
             <a class="show-tipsy"
-               href="{% url projector_project_sources_browse project.slug file_old.changeset.id '' %}"
+               href="{% url projector_project_sources_browse project.author.username project.slug file_old.changeset.id '' %}"
                title="{% trans "Show changeset" %}">{{ file_old.changeset.revision }}:{{ file_old.changeset.id }}</a>
             -
             <a class="show-tipsy"
-               href="{% url projector_project_sources_browse project.slug file_new.changeset.id '' %}"
+               href="{% url projector_project_sources_browse project.author.username project.slug file_new.changeset.id '' %}"
                title="{% trans "Show changeset" %}">{{ file_new.changeset.revision }}:{{ file_new.changeset.id }}</a>
         </li>
     </ul>

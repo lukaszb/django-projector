@@ -9,19 +9,17 @@ from django.forms.formsets import formset_factory
 from django import forms
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django.utils import simplejson
 
 from authority.decorators import permission_required_or_403
 
 from projector.models import Task, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.permissions import ProjectPermission
-from projector.signals import messanger
 
 from richtemplates.shortcuts import get_first_or_None, get_json_response
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
-def task_details(request, project_slug, task_id,
+def task_details(request, username, project_slug, task_id,
     template_name='projector/task/details.html'):
     """
     Task details view.
@@ -30,7 +28,9 @@ def task_details(request, project_slug, task_id,
     task = get_object_or_404(
         Task.objects.select_related('type', 'priority', 'status', 'owner',
             'author', 'editor', 'milestone', 'component', 'project'),
-        id=task_id, project__slug=project_slug)
+        id = task_id,
+        project__author__username = username,
+        project__slug = project_slug)
 
     check = ProjectPermission(request.user)
 
@@ -102,13 +102,15 @@ def task_details(request, project_slug, task_id,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_task_project',
-    (Project, 'slug', 'project_slug'))
-def task_create(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def task_create(request, username, project_slug,
     template_name='projector/task/create.html'):
     """
     New Task creation view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not check.add_task_project(project):
@@ -162,13 +164,15 @@ def task_create(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_task_project',
-    (Project, 'slug', 'project_slug'))
-def task_edit(request, project_slug, task_id,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def task_edit(request, username, project_slug, task_id,
     template_name='projector/task/create.html'):
     """
     Edit Task meta information. task_details edits the rest.
     """
-    task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
+    task = get_object_or_404(Task, id=task_id,
+        project__author__username=username, project__slug=project_slug)
 
     if request.method == 'POST':
         form = TaskEditForm(request.POST, instance=task)
@@ -191,11 +195,12 @@ def task_edit(request, project_slug, task_id,
 
     return render_to_response(template_name, context, RequestContext(request))
 
-def task_watch(request, project_slug, task_id):
+def task_watch(request, username, project_slug, task_id):
     """
     Makes request's user watching this task.
     """
-    task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
+    task = get_object_or_404(Task, id=task_id,
+        project__author__username=username, project__slug=project_slug)
     check = ProjectPermission(request.user)
     if request.method == 'POST' and (task.project.is_public() or
         check.has_perm('project_permission.view_tasks_project', task.project)):
@@ -207,11 +212,12 @@ def task_watch(request, project_slug, task_id):
         # Only POST methods are allowed here
         raise PermissionDenied()
 
-def task_unwatch(request, project_slug, task_id):
+def task_unwatch(request, username, project_slug, task_id):
     """
     Makes request's user watching this task.
     """
-    task = get_object_or_404(Task, id=task_id, project__slug=project_slug)
+    task = get_object_or_404(Task, id=task_id,
+        project__author__username=username, project__slug=project_slug)
     check = ProjectPermission(request.user)
     if request.method == 'POST' and (task.project.is_public() or
         check.has_perm('project_permission.view_tasks_project', task.project)):

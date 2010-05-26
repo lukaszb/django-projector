@@ -104,8 +104,8 @@
             <li class="richbuttonset"><a class="button-link" href="{{ project.get_browse_repo_url }}">{% trans "Sources" %}</a></li>
             {% endif %}
             <li class="richbuttonset">
+                <a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Tasks" %}</a>
                 <a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a>
-                <a class="button-link" href="{{ project.get_task_list_url }}">{% trans "Task list" %}</a>
                 <a class="button-link" href="{{ project.get_components_url }}">{% trans "Components" %}</a>
                 <a class="button-link" href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
             </li>

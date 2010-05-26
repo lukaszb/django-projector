@@ -114,7 +114,9 @@ class ProjectCategory(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_category_details', (), {
-            'project_category_slug' : self.slug })
+            'username': self.project.author.username,
+            'project_category_slug' : self.slug,
+        })
 
 def validate_project_name(name):
     """
@@ -145,6 +147,8 @@ class Project(models.Model, Watchable):
     outdated = models.BooleanField(_('outdated'), default=False)
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
+    fork = models.ForeignKey('self', null=True, blank=True,
+        editable=False)
 
     objects = ProjectManager()
 
@@ -182,93 +186,138 @@ class Project(models.Model, Watchable):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_details', (), {'project_slug' : self.slug })
+        return ('projector_project_details', (), {
+            'username': self.author.username,
+            'project_slug' : self.slug,
+        })
 
     @models.permalink
     def get_edit_url(self):
-        return ('projector_project_edit', (), {'project_slug' : self.slug })
+        return ('projector_project_edit', (), {
+            'username': self.author.username,
+            'project_slug' : self.slug,
+        })
 
     @models.permalink
     def get_members_url(self):
-        return ('projector_project_members', (), {'project_slug' : self.slug })
+        return ('projector_project_members', (), {
+            'username': self.author.username,
+            'project_slug' : self.slug,
+        })
 
     @models.permalink
     def get_members_add_url(self):
-        return ('projector_project_members_add', (),
-            {'project_slug': self.slug })
+        return ('projector_project_members_add', (), {
+            'username': self.author.username,
+            'project_slug' : self.slug,
+        })
 
     @models.permalink
     def get_members_edit_url(self, username):
-        return ('projector_project_members_edit', (),
-            {'project_slug': self.slug, 'username': username})
+        return ('projector_project_members_edit', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+            'member_username': username,
+        })
 
     @models.permalink
     def get_teams_url(self):
-        return ('projector_project_teams', (), {'project_slug': self.slug})
+        return ('projector_project_teams', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_teams_add_url(self):
-        return ('projector_project_teams_add', (),
-            {'project_slug': self.slug })
+        return ('projector_project_teams_add', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_teams_edit_url(self, name):
-        return ('projector_project_teams_edit', (),
-            {'project_slug': self.slug, 'name': name})
+        return ('projector_project_teams_edit', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+            'name': name,
+        })
 
     @models.permalink
     def get_create_task_url(self):
-        return ('projector_task_create', (), {'project_slug': self.slug})
+        return ('projector_task_create', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_task_list_url(self):
-        return ('projector_task_list', (), {'project_slug': self.slug})
+        return ('projector_task_list', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_milestones_url(self):
-        return ('projector_project_milestones', (),
-            {'project_slug': self.slug })
+        return ('projector_project_milestones', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_milestones_add_url(self):
-        return ('projector_project_milestones_add', (),
-            {'project_slug': self.slug })
+        return ('projector_project_milestones_add', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_components_url(self):
-        return ('projector_project_components', (),
-            {'project_slug': self.slug })
+        return ('projector_project_components', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_component_add_url(self):
-        return ('projector_project_component_add', (),
-            {'project_slug': self.slug })
+        return ('projector_project_component_add', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_workflow_url(self):
-        return ('projector_project_workflow_detail', (),
-            {'project_slug': self.slug })
+        return ('projector_project_workflow_detail', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_workflow_edit_url(self):
-        return ('projector_project_workflow_edit', (),
-            {'project_slug': self.slug })
+        return ('projector_project_workflow_edit', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_workflow_add_status_url(self):
-        return ('projector_project_workflow_add_status', (),
-            {'project_slug': self.slug })
+        return ('projector_project_workflow_add_status', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     @models.permalink
     def get_browse_repo_url(self):
         return ('projector_project_sources', (), {
+            'username': self.author.username,
             'project_slug': self.slug,
         })
 
     @models.permalink
     def get_changesets_url(self):
-        return ('projector_project_changesets', (),
-            {'project_slug': self.slug})
+        return ('projector_project_changesets', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
 
     def get_task(self, id):
         queryset = Task.objects.filter(project=self)
@@ -446,6 +495,7 @@ class Component(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_component_detail', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'component_slug': self.slug,
         })
@@ -453,6 +503,7 @@ class Component(models.Model):
     @models.permalink
     def get_edit_url(self):
         return ('projector_project_component_edit', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'component_slug': self.slug,
         })
@@ -471,15 +522,17 @@ class Membership(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_members_edit', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
-            'username': self.member.username,
+            'member_username': self.member.username,
         })
 
     @models.permalink
     def get_delete_url(self):
         return ('projector_project_members_delete', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
-            'username': self.member.username,
+            'member_username': self.member.username,
         })
 
     @LazyProperty
@@ -536,6 +589,7 @@ class Team(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_teams_edit', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'name': self.group.name,
         })
@@ -571,6 +625,7 @@ class Milestone(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_project_milestone_detail', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'milestone_slug': self.slug,
         })
@@ -578,6 +633,7 @@ class Milestone(models.Model):
     @models.permalink
     def get_edit_url(self):
         return ('projector_project_milestone_edit', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'milestone_slug': self.slug,
         })
@@ -786,6 +842,7 @@ class Task(AbstractTask, Watchable):
     @models.permalink
     def get_absolute_url(self):
         return ('projector_task_details', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'task_id': self.id,
         })
@@ -793,6 +850,7 @@ class Task(AbstractTask, Watchable):
     @models.permalink
     def get_edit_url(self):
         return ('projector_task_edit', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'task_id': self.id,
         })
@@ -800,6 +858,7 @@ class Task(AbstractTask, Watchable):
     @models.permalink
     def get_watch_url(self):
         return ('projector_task_watch', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'task_id': self.id,
         })
@@ -807,6 +866,7 @@ class Task(AbstractTask, Watchable):
     @models.permalink
     def get_unwatch_url(self):
         return ('projector_task_unwatch', (), {
+            'username': self.project.author.username,
             'project_slug': self.project.slug,
             'task_id': self.id,
         })

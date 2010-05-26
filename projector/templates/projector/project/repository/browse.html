@@ -15,14 +15,14 @@
                     <tr>
                         <th>{% trans "Path" %}</th>
                         <td><a class="show-tipsy"
-                               href="{% url projector_project_sources_browse project.slug root.changeset.id root.path %}"
+                               href="{% url projector_project_sources_browse project.author.username project.slug root.changeset.id root.path %}"
                                title="{% trans "Show node" %} {{ root.path }}">{{ root.path|default:"/"|slice:"20" }}{% if root.path|length > 20 %}...{% endif %}</a>
                         </td>
                     </tr>
                     <tr>
                         <th>{% trans "Revision" %}</th>
                         <td><a class="show-tipsy"
-                               href="{% url projector_project_sources_browse project.slug root.changeset.id '' %}"
+                               href="{% url projector_project_sources_browse project.author.username project.slug root.changeset.id '' %}"
                                title="{% trans "Show changeset" %}">{{ root.changeset.revision }}:{{ root.changeset.raw_id }}</a></td>
                     </tr>
                     {% if root.is_file %}
@@ -44,11 +44,11 @@
                     </tr>
                     <tr>
                         <th>{% trans "Download" %}</th>
-                        <td><a href="{% url projector_project_sources_raw project.slug root.changeset.id root.path %}">{% trans "raw file" %}</a></td>
+                        <td><a href="{% url projector_project_sources_raw project.author.username project.slug root.changeset.id root.path %}">{% trans "raw file" %}</a></td>
                     </tr>
                     <tr>
                         <th>{% trans "Annotate" %}</th>
-                        <td><a href="{% url projector_project_sources_annotate project.slug root.changeset.id root.path %}">{% trans "annotate" %}</a></td>
+                        <td><a href="{% url projector_project_sources_annotate project.author.username project.slug root.changeset.id root.path %}">{% trans "annotate" %}</a></td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -58,10 +58,10 @@
             <ul class="nav-vertical">
                 {% for changeset in root.history %}
                 <li>
-                    <a href="{% url projector_project_sources_browse project.slug changeset.id root.path %}"
+                    <a href="{% url projector_project_sources_browse project.author.username project.slug changeset.id root.path %}"
                        class="show-tipsy"
                        title="{% trans "Show at revision" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
-                (<a href="{% url projector_project_file_diff project.slug changeset.id root.changeset.id root.path %}"
+                (<a href="{% url projector_project_file_diff project.author.username project.slug changeset.id root.changeset.id root.path %}"
                    class="show-tipsy"
                    title="{% trans "Show diff" %}">{% trans "diff" %}</a>)
            {% comment %}
@@ -128,7 +128,7 @@
                 <tr class="even hoverable">
                     <td>
                         <a class="browser-dir"
-                            href="{% url projector_project_sources_browse project.slug changeset.id root.parent.path %}">..</a>
+                            href="{% url projector_project_sources_browse project.author.username project.slug changeset.id root.parent.path %}">..</a>
                     </td>
                     <td class="righted"></td>
                     <td class="righted width-10"></td>
@@ -142,7 +142,7 @@
                 <tr class="{% cycle "odd" "even" %} hoverable">
                     <td>
                         <a class="{% if node.is_dir %}browser-dir{% else %}browser-file{% endif %}"
-                           href="{% url projector_project_sources_browse project.slug node.changeset.id node.path %}"
+                           href="{% url projector_project_sources_browse project.author.username project.slug node.changeset.id node.path %}"
                             >{{ node.name }}</a>
                     </td>
                     {% if node.is_dir %}
@@ -151,7 +151,7 @@
                     <td class="righted">{% if node.is_file %}{{ node.size|filesizeformat }}{% endif %}</td>
                     <td class="righted">
                         <a class="show-tipsy"
-                           href="{% url projector_project_sources_browse project.slug node.last_changeset.id '' %}"
+                           href="{% url projector_project_sources_browse project.author.username project.slug node.last_changeset.id '' %}"
                            title="{% trans "Browse revision's content" %}"
                            >{{ node.last_changeset.revision }}</a>
                     </td>

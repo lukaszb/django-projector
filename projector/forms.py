@@ -303,7 +303,7 @@ class ComponentForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if self.instance.project.component_set\
+        if not self.instance.pk and self.instance.project.component_set\
             .filter(name__iexact=name)\
             .exists():
             raise forms.ValidationError(_("Component with same name already "

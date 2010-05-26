@@ -1,11 +1,14 @@
 {% extends "projector/home.html" %}
 
+{% load i18n %}
+
 {% block extra_head %}{{ block.super }}
     {{ form.media }}
 {% endblock %}
 
 {% block col_left %}{% endblock %}
 
+{% block col_main_title %}{% trans "Projector global settings" %}{% endblock %}
 {% block col_main_content %}
 
 <form method="post">
