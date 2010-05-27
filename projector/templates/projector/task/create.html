@@ -20,7 +20,7 @@
         <div>
             <input id="id_submit" type="submit" name="submit"
             value="{% if form.instance.id %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %} {% trans "task" %}"/>
-            <input type="button" onclick="window.location='{% if form.instance %}{{ form.instance.get_absolute_url }}{% endif %}'"
+            <input type="button" onclick="window.location='{% if form.instance.project %}{{ form.instance.project.get_absolute_url }}{% endif %}'"
             value="{% trans "Cancel" %}"/>
         </div>
     </form>

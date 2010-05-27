@@ -23,7 +23,6 @@ from projector.forms import TeamForm, ProjectMembershipPermissionsForm,\
     ProjectTeamPermissionsForm
 from projector.permissions import ProjectPermission, get_perms_for_user
 from projector.filters import TaskFilter
-from projector.utils.basic import codename_to_label
 
 from richtemplates.shortcuts import get_first_or_None
 
@@ -33,7 +32,7 @@ from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
 from vcs.web.simplevcs.views import browse_repository, diff_file
 
-def project_details(request, project_slug,
+def project_details(request, username, project_slug,
         template_name='projector/project/details.html'):
     """
     Returns selected project's detail for user given in ``request``.
@@ -42,7 +41,8 @@ def project_details(request, project_slug,
     permission requirements.
     """
     try:
-        project = get_object_or_404(Project, slug=project_slug)
+        project = get_object_or_404(Project, slug=project_slug,
+            author__username=username)
         if is_mercurial(request):
             return _project_detail_hg(request, project)
         last_part = request.path.split('/')[-1]
@@ -125,9 +125,10 @@ def project_list(request, template_name='projector/project/list.html'):
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_task_list(request, project_slug,
+def project_task_list(request, username, project_slug,
         template_name='projector/project/task_list.html'):
-    project = Project.objects.get(slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not check.has_perm('project_permission.view_tasks_project',
@@ -150,7 +151,8 @@ def project_task_list(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-def project_create(request, template_name='projector/project/create.html'):
+def project_create(request, username,
+        template_name='projector/project/create.html'):
     """
     New project creation view.
     """
@@ -168,13 +170,15 @@ def project_create(request, template_name='projector/project/create.html'):
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
+    (Project, 'author__username', 'username'),
     (Project, 'slug', 'project_slug'))
-def project_edit(request, project_slug,
+def project_edit(request, username, project_slug,
         template_name='projector/project/edit.html'):
     """
     Update project view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.public:
         project.public = u'public'
     else:
@@ -193,12 +197,13 @@ def project_edit(request, project_slug,
 
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_milestones(request, project_slug,
+def project_milestones(request, username, project_slug,
         template_name='projector/project/milestones/home.html'):
     """
     Returns milestones view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(user=request.user)
         if not check.view_project(project):
@@ -212,12 +217,13 @@ def project_milestones(request, project_slug,
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_milestone_detail(request, project_slug, milestone_slug,
+def project_milestone_detail(request, username, project_slug, milestone_slug,
         template_name='projector/project/milestones/detail.html'):
     """
     Returns milestone detail view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     milestone = get_object_or_404(Milestone,
         project=project, slug=milestone_slug)
     if project.is_private():
@@ -231,13 +237,15 @@ def project_milestone_detail(request, project_slug, milestone_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_milestones_add(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_milestones_add(request, username, project_slug,
         template_name='projector/project/milestones/add.html'):
     """
     Adds milestone for project.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     milestone = Milestone(project=project, author=request.user)
     form = MilestoneForm(request.POST or None, instance=milestone)
     if request.method == 'POST' and form.is_valid():
@@ -252,13 +260,15 @@ def project_milestones_add(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_milestone_edit(request, project_slug, milestone_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_milestone_edit(request, username, project_slug, milestone_slug,
         template_name='projector/project/milestones/edit.html'):
     """
     Edits chosen milestone.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     milestone = get_object_or_404(Milestone, slug=milestone_slug)
     form = MilestoneForm(request.POST or None, instance=milestone)
     if request.method == 'POST' and form.is_valid():
@@ -272,12 +282,13 @@ def project_milestone_edit(request, project_slug, milestone_slug,
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_components(request, project_slug,
+def project_components(request, username, project_slug,
         template_name='projector/project/components/home.html'):
     """
     Returns components view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(user=request.user)
         if not check.view_project(project):
@@ -290,12 +301,13 @@ def project_components(request, project_slug,
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_component_detail(request, project_slug, component_slug,
+def project_component_detail(request, username, project_slug, component_slug,
         template_name='projector/project/components/detail.html'):
     """
     Returns component detail view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     component = get_object_or_404(Component, project=project,
         slug=component_slug)
     if project.is_private():
@@ -309,13 +321,15 @@ def project_component_detail(request, project_slug, component_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_component_add(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_component_add(request, username, project_slug,
         template_name='projector/project/components/add.html'):
     """
     Adds component for project.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     component = Component(project=project)
     form = ComponentForm(request.POST or None, instance=component)
     if request.method == 'POST' and form.is_valid():
@@ -330,19 +344,21 @@ def project_component_add(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_component_edit(request, project_slug, component_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_component_edit(request, username, project_slug, component_slug,
         template_name='projector/project/components/edit.html'):
     """
     Edits chosen component.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     component = get_object_or_404(Component,
         project=project, slug=component_slug)
     form = ComponentForm(request.POST or None, instance=component)
     if request.method == 'POST' and form.is_valid():
         component = form.save()
-        msg = _("Milestone updated successfully")
+        msg = _("Component updated successfully")
         messages.success(request, msg)
         return redirect(component.get_absolute_url())
     context = {
@@ -351,12 +367,13 @@ def project_component_edit(request, project_slug, component_slug,
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_workflow_detail(request, project_slug,
+def project_workflow_detail(request, username, project_slug,
         template_name='projector/project/workflow/detail.html'):
     """
     Returns project's workflow detail view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(user=request.user)
         if not check.view_project(project):
@@ -369,13 +386,15 @@ def project_workflow_detail(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_workflow_edit(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_workflow_edit(request, username, project_slug,
         template_name='projector/project/workflow/edit.html'):
     """
     Edits chosen project's workflow.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     formset = StatusFormSet(request.POST or None,
         queryset=Status.objects.filter(project=project))
     if request.method == 'POST':
@@ -404,13 +423,15 @@ def project_workflow_edit(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'))
-def project_workflow_add_status(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_workflow_add_status(request, username, project_slug,
         template_name='projector/project/workflow/add_status.html'):
     """
     Adds status for project.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     _max_order_status = get_first_or_None(
         project.status_set.only('order').order_by('-order'))
     status = Status(project=project,
@@ -433,12 +454,13 @@ def project_workflow_add_status(request, project_slug,
 
 # Members
 
-def project_members(request, project_slug,
+def project_members(request, username, project_slug,
         template_name='projector/project/members/home.html'):
     """
     Shows/updates project's members and groups view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not check.has_perm('project_permission.view_members_project',
@@ -453,13 +475,15 @@ def project_members(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_member_project',
-    (Project, 'slug', 'project_slug'))
-def project_members_add(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_members_add(request, username, project_slug,
         template_name='projector/project/members/add.html'):
     """
     Adds member for a project.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     membership = Membership(
         project = project,
     )
@@ -480,14 +504,15 @@ def project_members_add(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_member_project',
-    (Project, 'slug', 'project_slug'))
-def project_members_edit(request, project_slug, username,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_members_edit(request, username, project_slug, member_username,
         template_name='projector/project/members/edit.html'):
     """
     Manages membership settings and permissions of project's member.
     """
     membership = get_object_or_404(Membership, project__slug=project_slug,
-        member__username=username)
+        project__author__username=username, member__username=username)
     member = membership.member
     project = membership.project
     if not request.user.is_superuser and project.author == member:
@@ -520,14 +545,15 @@ def project_members_edit(request, project_slug, username,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.delete_member_project',
-    (Project, 'slug', 'project_slug'))
-def project_members_delete(request, project_slug, username,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_members_delete(request, username, project_slug, member_username,
         template_name='projector/project/members/delete.html'):
     """
     Removes member from project.
     """
     membership = get_object_or_404(Membership, project__slug=project_slug,
-        member__username=username)
+        project__author__username=username, member__username=username)
     member = membership.member
     project = membership.project
 
@@ -564,12 +590,13 @@ def project_members_delete(request, project_slug, username,
 
 # Teams
 
-def project_teams(request, project_slug,
+def project_teams(request, username, project_slug,
         template_name='projector/project/teams/home.html'):
     """
     Shows/updates project's teams view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private():
         check = ProjectPermission(request.user)
         if not check.has_perm('project_permission.view_teams_project',
@@ -584,13 +611,15 @@ def project_teams(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_team_project',
-    (Project, 'slug', 'project_slug'))
-def project_teams_add(request, project_slug,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_teams_add(request, username, project_slug,
         template_name='projector/project/teams/add.html'):
     """
     Adds team for a project.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     team = Team(
         project = project,
     )
@@ -611,13 +640,14 @@ def project_teams_add(request, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_team_project',
-    (Project, 'slug', 'project_slug'))
-def project_teams_edit(request, project_slug, name,
+    (Project, 'slug', 'project_slug'),
+    (Project, 'author__username', 'username'))
+def project_teams_edit(request, username, project_slug, name,
         template_name='projector/project/teams/edit.html'):
     """
     Manages settings and permissions of project's team.
     """
-    team = get_object_or_404(Team,
+    team = get_object_or_404(Team, project__author__username=username,
         project__slug=project_slug, group__name=name)
     project = team.project
     team_permissions = team.perms
@@ -645,13 +675,14 @@ def project_teams_edit(request, project_slug, name,
     return render_to_response(template_name, context, RequestContext(request))
 
 
-def project_browse_repository(request, project_slug, rel_repo_url='',
+def project_browse_repository(request, username, project_slug, rel_repo_url='',
         revision='tip',
         template_name='projector/project/repository/browse.html'):
     """
     Handles project's repository browser.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private() or \
             not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
@@ -672,12 +703,14 @@ def project_browse_repository(request, project_slug, rel_repo_url='',
     }
     return browse_repository(request, **repo_info)
 
-def project_file_diff(request, project_slug, revision_old, revision_new,
-        rel_repo_url, template_name='projector/project/repository/diff.html'):
+def project_file_diff(request, username, project_slug, revision_old,
+        revision_new, rel_repo_url,
+        template_name='projector/project/repository/diff.html'):
     """
     Returns diff page of the file at given ``rel_repo_url``.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private() or \
             not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
@@ -699,11 +732,12 @@ def project_file_diff(request, project_slug, revision_old, revision_new,
     }
     return diff_file(request, **diff_info)
 
-def project_file_raw(request, project_slug, revision, rel_repo_url):
+def project_file_raw(request, username, project_slug, revision, rel_repo_url):
     """
     Returns raw page of the file at given ``rel_repo_url``.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private() or \
             not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
@@ -715,12 +749,14 @@ def project_file_raw(request, project_slug, revision, rel_repo_url):
     response['Content-Disposition'] = 'attachment; filename=%s' % node.name
     return response
 
-def project_file_annotate(request, project_slug, revision, rel_repo_url,
+def project_file_annotate(request, username, project_slug, revision,
+        rel_repo_url,
         template_name='projector/project/repository/annotate.html'):
     """
     Returns raw page of the file at given ``rel_repo_url``.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private() or \
             not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)
@@ -738,12 +774,13 @@ def project_file_annotate(request, project_slug, revision, rel_repo_url,
         }
     return browse_repository(request, **repo_info)
 
-def project_changesets(request, project_slug,
+def project_changesets(request, username, project_slug,
         template_name='projector/project/repository/changeset_list.html'):
     """
     Returns repository's changesets view.
     """
-    project = get_object_or_404(Project, slug=project_slug)
+    project = get_object_or_404(Project, slug=project_slug,
+        author__username=username)
     if project.is_private() or \
             not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
         check = ProjectPermission(request.user)

@@ -26,7 +26,7 @@
                 <input id="id_submit" type="submit" name="submit"
                     value="{% trans "Create component" %}"/>
                 <input type="button" onclick="window.location='{% spaceless %}
-                    {% url projector_project_components project.slug %}
+                    {% url projector_project_components project.author.username project.slug %}
                     {% endspaceless %}'" value="{% trans "Cancel" %}"/>
             </div>
         </form>

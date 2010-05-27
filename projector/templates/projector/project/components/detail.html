@@ -20,16 +20,16 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <h2>{% trans "Description" %}:</h2>
-        <div class="block-rst">
-            {% if component.description %}
-            {{ component.description|restructuredtext }}
-            {% else %}
-            <ul class="messages">
-                <li class="message message-warning">{% trans "No description has been set" %}</li>
-            </ul>
-            {% endif %}
+            <h2>{% trans "Description" %}:</h2>
+            <div class="block-rst">
+                {% if component.description %}
+                {{ component.description|restructuredtext }}
+                {% else %}
+                <ul class="messages">
+                    <li class="message message-warning">{% trans "No description has been set" %}</li>
+                </ul>
+                {% endif %}
+            </div>
         </div>
 
     </div>

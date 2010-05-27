@@ -44,7 +44,7 @@
             {% for component in component_list %}
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td><a class="block-link {% if component.description %}show-tipsy{% endif %}"
-                        href="{% url projector_project_component_detail project.slug component.slug %}"
+                        href="{% url projector_project_component_detail project.author.username project.slug component.slug %}"
                         title="{{ component.description }}">{{ component.name }}</a>
                 </td>
                 <td><a class="block-link show-tipsy centered"

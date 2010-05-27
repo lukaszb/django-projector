@@ -33,7 +33,7 @@
                 <li><a href="{% url projector_project_category_create %}">{% trans "Project Category Add" %}</a></li>
                 
                 <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
-                <li><a href="{% url projector_project_create %}">{% trans "Project Add" %}</a></li>
+                <li><a href="{% url projector_project_create request.user.username %}">{% trans "Project Add" %}</a></li>
 
                 {#<li><a href="{% url projector_task_reports %}">{% trans "Task reports" %}</a></li>#}
 
