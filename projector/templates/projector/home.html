@@ -25,18 +25,11 @@
 {% block col_left %}
     
     <div class="richtemplates-panel">
-	    <h5>Tracker links</h5>
+	    <h5>{% trans "Quicklinks" %}</h5>
 	    <div class="richtemplates-panel-content">
 	    	
 			<ul class="nav-vertical">
-                <li><a href="{% url projector_project_category_list %}">{% trans "Project Categories" %}</a></li>
-                <li><a href="{% url projector_project_category_create %}">{% trans "Project Category Add" %}</a></li>
-                
                 <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
-                <li><a href="{% url projector_project_create request.user.username %}">{% trans "Project Add" %}</a></li>
-
-                {#<li><a href="{% url projector_task_reports %}">{% trans "Task reports" %}</a></li>#}
-
 	    	</ul>
 
 	    </div>

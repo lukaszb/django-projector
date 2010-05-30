@@ -174,6 +174,22 @@ class Project(models.Model, Watchable):
     def __unicode__(self):
         return self.name
 
+    def _set_author_permissions(self):
+        """
+        Creates all permissions for project's author.
+        """
+        from projector.permissions import ProjectPermission
+        from projector.permissions import get_or_create_permisson
+        codenames = ['%s.%s' % (ProjectPermission.label, check) for check in
+            ProjectPermission.get_local_checks() if check != 'add_project']
+        for codename in codenames:
+            get_or_create_permisson(
+                codename = codename,
+                obj = self,
+                user = self.author,
+                creator = self.author,
+            )
+
     def is_public(self):
         return self.public
 
@@ -183,7 +199,13 @@ class Project(models.Model, Watchable):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         self.full_clean()
-        super(Project, self).save(*args, **kwargs)
+        project = super(Project, self).save(*args, **kwargs)
+        # Add necessary permissions for author - we need to do this
+        # *NOT* asynchronousely as isntant redirect after project creation
+        # may cause it's author not to be able to see project page
+        self._set_author_permissions()
+        return project
+
 
     @models.permalink
     def get_absolute_url(self):
@@ -475,6 +497,19 @@ class Project(models.Model, Watchable):
         transitions = Transition.objects\
             .filter(source__in=self.status_set.all())
         return transitions
+
+'''
+    def get_config(self):
+        """
+        Returns ProjectConfig for this project.
+        """
+        return ProjectConfig.objects.get(project=self)
+
+class ProjectConfig(self):
+    project = models.ForeignKey(Project, unique=True)
+    basic_realm = models.CharField(max_length=64, default="Basic Auth Realm")
+    always_mail_members = models.BooleanField(default=False)
+'''
 
 class Component(models.Model):
     project = models.ForeignKey(Project)
@@ -998,6 +1033,16 @@ class Task(AbstractTask, Watchable):
             'task_url': task_url,
         })
         return result
+
+    def get_last_revision(self):
+        """
+        Returns last TaskRevision (not self) attached to this task. If there
+        were no changes made yet, None is returned.
+        """
+        if self.revision == 0:
+            return None
+        else:
+            return self.taskrevision_set.get(revision=self.revision-1)
 
 class TaskRevision(AbstractTask):
     task = models.ForeignKey(Task)

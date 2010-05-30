@@ -10,7 +10,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from authority.decorators import permission_required_or_403
+from projector.decorators import permission_required_or_403
 
 from livesettings import config_value
 
@@ -151,7 +151,7 @@ def project_task_list(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
-def project_create(request, username,
+def project_create(request, username=None,
         template_name='projector/project/create.html'):
     """
     New project creation view.
@@ -170,8 +170,8 @@ def project_create(request, username,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'author__username', 'username'),
-    (Project, 'slug', 'project_slug'))
+    (Project, 'author__username', 'username', 'slug', 'project_slug', 'a'))
+    #(Project, 'slug', 'project_slug'))
 def project_edit(request, username, project_slug,
         template_name='projector/project/edit.html'):
     """
@@ -260,8 +260,7 @@ def project_milestones_add(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_milestone_edit(request, username, project_slug, milestone_slug,
         template_name='projector/project/milestones/edit.html'):
     """
@@ -321,8 +320,7 @@ def project_component_detail(request, username, project_slug, component_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_component_add(request, username, project_slug,
         template_name='projector/project/components/add.html'):
     """
@@ -344,8 +342,7 @@ def project_component_add(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_component_edit(request, username, project_slug, component_slug,
         template_name='projector/project/components/edit.html'):
     """
@@ -386,8 +383,7 @@ def project_workflow_detail(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_workflow_edit(request, username, project_slug,
         template_name='projector/project/workflow/edit.html'):
     """
@@ -423,8 +419,7 @@ def project_workflow_edit(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_workflow_add_status(request, username, project_slug,
         template_name='projector/project/workflow/add_status.html'):
     """
@@ -475,8 +470,7 @@ def project_members(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_member_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_members_add(request, username, project_slug,
         template_name='projector/project/members/add.html'):
     """
@@ -504,8 +498,7 @@ def project_members_add(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_member_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_members_edit(request, username, project_slug, member_username,
         template_name='projector/project/members/edit.html'):
     """
@@ -545,8 +538,7 @@ def project_members_edit(request, username, project_slug, member_username,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.delete_member_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_members_delete(request, username, project_slug, member_username,
         template_name='projector/project/members/delete.html'):
     """
@@ -611,8 +603,7 @@ def project_teams(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_team_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_teams_add(request, username, project_slug,
         template_name='projector/project/teams/add.html'):
     """
@@ -640,8 +631,7 @@ def project_teams_add(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_team_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def project_teams_edit(request, username, project_slug, name,
         template_name='projector/project/teams/edit.html'):
     """

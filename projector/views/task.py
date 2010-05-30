@@ -102,8 +102,7 @@ def task_details(request, username, project_slug, task_id,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.add_task_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def task_create(request, username, project_slug,
     template_name='projector/task/create.html'):
     """
@@ -164,8 +163,7 @@ def task_create(request, username, project_slug,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_task_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
+    (Project, 'slug', 'project_slug', 'author__username', 'username'))
 def task_edit(request, username, project_slug, task_id,
     template_name='projector/task/create.html'):
     """
