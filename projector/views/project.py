@@ -32,6 +32,8 @@ from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
 from vcs.web.simplevcs.views import browse_repository, diff_file
 
+from projector.views.project_repository import RepositoryBrowseView
+
 def project_details(request, username, project_slug,
         template_name='projector/project/details.html'):
     """
@@ -170,8 +172,7 @@ def project_create(request, username=None,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'author__username', 'username', 'slug', 'project_slug', 'a'))
-    #(Project, 'slug', 'project_slug'))
+    (Project, 'author__username', 'username', 'slug', 'project_slug'))
 def project_edit(request, username, project_slug,
         template_name='projector/project/edit.html'):
     """

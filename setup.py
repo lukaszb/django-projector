@@ -37,6 +37,7 @@ setup(
         'django-keyedcache',
         'django-signals-ahoy',
         'django-registration',
+        'django-clsview',
         'docutils',
         'south',
     ],
