@@ -97,28 +97,45 @@ urlpatterns += patterns('projector.views.project',
         name='projector_project_teams_edit'),
 
     # Repository sources
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision_old>[\w]*)-(?P<revision_new>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='project_file_diff',
-        name='projector_project_file_diff'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='project_file_raw',
-        name='projector_project_sources_raw'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/annotate/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='project_file_annotate',
-        name='projector_project_sources_annotate'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/changesets/$',
-        view='project_changesets',
-        name='projector_project_changesets'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='project_browse_repository',
-        name='projector_project_sources_browse'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
-        view='project_browse_repository',
-        name='projector_project_sources'),
+    #url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+    #    view='project_browse_repository',
+    #    name='projector_project_sources_browse'),
+    #url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
+    #    view='project_browse_repository',
+    #    name='projector_project_sources'),
 
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/$',
         view='project_task_list',
         name='projector_task_list'),
+)
+
+# Project's repository browsing
+
+urlpatterns += patterns('projector.views.project_repository',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision_old>[\w]*)-(?P<revision_new>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='RepositoryFileDiffView',
+        name='projector_project_file_diff'),
+
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='RepositoryFileRaw',
+        name='projector_project_sources_raw'),
+
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/annotate/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='RepositoryFileAnnotate',
+        name='projector_project_sources_annotate'),
+
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/changesets/$',
+        view='RepositoryChangesets',
+        name='projector_project_changesets'),
+
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
+        view='RepositoryBrowseView',
+        name='projector_project_sources_browse'),
+
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
+        view='RepositoryBrowseView',
+        name='projector_project_sources'),
+
 )
 
 # Tasks

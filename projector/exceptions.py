@@ -3,3 +3,7 @@ class ProjectorError(Exception):
 
 class NotApplicableError(ProjectorError):
     pass
+
+class NotRequestError(ProjectorError):
+    pass
+

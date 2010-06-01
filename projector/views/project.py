@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.util import NestedObjects
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
@@ -30,7 +30,6 @@ from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
 from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
-from vcs.web.simplevcs.views import browse_repository, diff_file
 
 def project_details(request, username, project_slug,
         template_name='projector/project/details.html'):
@@ -170,8 +169,7 @@ def project_create(request, username=None,
     return render_to_response(template_name, context, RequestContext(request))
 
 @permission_required_or_403('project_permission.change_project',
-    (Project, 'author__username', 'username', 'slug', 'project_slug', 'a'))
-    #(Project, 'slug', 'project_slug'))
+    (Project, 'author__username', 'username', 'slug', 'project_slug'))
 def project_edit(request, username, project_slug,
         template_name='projector/project/edit.html'):
     """
@@ -505,7 +503,7 @@ def project_members_edit(request, username, project_slug, member_username,
     Manages membership settings and permissions of project's member.
     """
     membership = get_object_or_404(Membership, project__slug=project_slug,
-        project__author__username=username, member__username=username)
+        project__author__username=username, member__username=member_username)
     member = membership.member
     project = membership.project
     if not request.user.is_superuser and project.author == member:
@@ -662,128 +660,5 @@ def project_teams_edit(request, username, project_slug, name,
         'team_permissions': team_permissions,
     }
 
-    return render_to_response(template_name, context, RequestContext(request))
-
-
-def project_browse_repository(request, username, project_slug, rel_repo_url='',
-        revision='tip',
-        template_name='projector/project/repository/browse.html'):
-    """
-    Handles project's repository browser.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private() or \
-            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        check = ProjectPermission(request.user)
-        if not request.user.is_authenticated() or \
-            not check.read_repository_project(project):
-            raise PermissionDenied()
-    if not project._get_repo_path():
-        messages.error(request, _("Repository's url is not set! Please "
-            "configure project preferences first."))
-    repo_info = {
-        'repository': project.repository,
-        'revision': revision,
-        'node_path': rel_repo_url,
-        'template_name': template_name,
-        'extra_context': {
-            'project': project,
-        },
-    }
-    return browse_repository(request, **repo_info)
-
-def project_file_diff(request, username, project_slug, revision_old,
-        revision_new, rel_repo_url,
-        template_name='projector/project/repository/diff.html'):
-    """
-    Returns diff page of the file at given ``rel_repo_url``.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private() or \
-            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        check = ProjectPermission(request.user)
-        if not request.user.is_authenticated() or \
-            not check.read_repository_project(project):
-            raise PermissionDenied()
-    if not project._get_repo_path():
-        messages.error(request, _("Repository's url is not set! Please "
-            "configure project preferences first."))
-    diff_info = {
-        'repository': project.repository,
-        'revision_old': revision_old,
-        'revision_new': revision_new,
-        'file_path': rel_repo_url,
-        'template_name': template_name,
-        'extra_context': {
-            'project': project,
-        },
-    }
-    return diff_file(request, **diff_info)
-
-def project_file_raw(request, username, project_slug, revision, rel_repo_url):
-    """
-    Returns raw page of the file at given ``rel_repo_url``.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private() or \
-            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        check = ProjectPermission(request.user)
-        if not request.user.is_authenticated() or \
-            not check.read_repository_project(project):
-            raise PermissionDenied()
-    node = project.repository.request(rel_repo_url, revision)
-    response = HttpResponse(node.content, mimetype=node.mimetype)
-    response['Content-Disposition'] = 'attachment; filename=%s' % node.name
-    return response
-
-def project_file_annotate(request, username, project_slug, revision,
-        rel_repo_url,
-        template_name='projector/project/repository/annotate.html'):
-    """
-    Returns raw page of the file at given ``rel_repo_url``.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private() or \
-            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        check = ProjectPermission(request.user)
-        if not request.user.is_authenticated() or \
-            not check.read_repository_project(project):
-            raise PermissionDenied()
-    repo_info = {
-            'repository': project.repository,
-            'revision': revision,
-            'node_path': rel_repo_url,
-            'template_name': template_name,
-            'extra_context': {
-                'project': project,
-            },
-        }
-    return browse_repository(request, **repo_info)
-
-def project_changesets(request, username, project_slug,
-        template_name='projector/project/repository/changeset_list.html'):
-    """
-    Returns repository's changesets view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private() or \
-            not config_value('PROJECTOR', 'ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
-        check = ProjectPermission(request.user)
-        if not check.read_repository_project(project):
-            raise PermissionDenied()
-    if not project._get_repo_path():
-        messages.error(request, _("Repository's url is not set! Please "
-            "configure project preferences first."))
-    context = {
-        'project': project,
-    }
-    context['repository'] = project.repository
-    context['CHANGESETS_PAGINATE_BY'] = config_value('PROJECTOR',
-        'CHANGESETS_PAGINATE_BY')
     return render_to_response(template_name, context, RequestContext(request))
 
