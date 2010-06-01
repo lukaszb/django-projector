@@ -34,11 +34,14 @@ class ProjectView(BaseView):
             return self.perms
 
     def check_permissions(self):
+        if self.project.author == self.request.user:
+            return
         self.check = ProjectPermission(self.request.user)
         if (self.project.is_private() or not
             get_config_value('ALWAYS_ALLOW_READ_PUBLIC_PROJECTS')):
             for perm in self.get_required_perms():
-                if not self.check.has_perm(perm, self.project):
+                fullperm = '.'.join((self.check.label, perm))
+                if not self.check.has_perm(fullperm, self.project):
                     raise PermissionDenied()
 
 class RepositoryBrowseView(ProjectView):
