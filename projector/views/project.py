@@ -14,15 +14,16 @@ from projector.decorators import permission_required_or_403
 
 from livesettings import config_value
 
-from projector.models import Project, Membership, Team, Task
+from projector.core.controllers import View
+from projector.models import Project, Membership, Team
 from projector.models import Milestone, Status, Transition, Component
 from projector.forms import ProjectForm, MembershipForm, MilestoneForm
 from projector.forms import MembershipDeleteForm
 from projector.forms import StatusForm, StatusFormSet, ComponentForm
-from projector.forms import TeamForm, ProjectMembershipPermissionsForm,\
-    ProjectTeamPermissionsForm
+from projector.forms import TeamForm, ProjectMembershipPermissionsForm
+from projector.forms import ProjectTeamPermissionsForm
 from projector.permissions import ProjectPermission, get_perms_for_user
-from projector.filters import TaskFilter
+from projector.settings import get_config_value
 
 from richtemplates.shortcuts import get_first_or_None
 
@@ -30,6 +31,49 @@ from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
 from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
+
+class ProjectView(View):
+    """
+    Base class for all projector views.
+
+    Logic should be implemented at ``__call__`` method. It does *NOT* accept
+    any parameters.
+
+    Would check necessary permissions defined by class attributes: ``perms``,
+    ``GET_perms`` and ``POST_perms``. ``perms`` are always checked,
+    ``GET_perms`` are additional checks which would be made for ``GET`` method
+    requets only and ``POST_perms`` would be made for ``POST`` method requests.
+    """
+
+    perms = ['view_project']
+    GET_perms = []
+    POST_perms = []
+
+    def __init__(self, request, username, project_slug):
+        self.request = request
+        self.project = get_object_or_404(Project, slug=project_slug,
+            author__username=username)
+        self.author = self.project.author
+        self.check_permissions()
+
+    def get_required_perms(self):
+        if self.request.method == 'GET':
+            return set(self.perms + self.GET_perms)
+        elif self.request.method == 'POST':
+            return set(self.perms + self.POST_perms)
+        else:
+            return self.perms
+
+    def check_permissions(self):
+        if self.project.author == self.request.user:
+            return
+        self.check = ProjectPermission(self.request.user)
+        if (self.project.is_private() or not
+            get_config_value('ALWAYS_ALLOW_READ_PUBLIC_PROJECTS')):
+            for perm in self.get_required_perms():
+                fullperm = '.'.join((self.check.label, perm))
+                if not self.check.has_perm(fullperm, self.project):
+                    raise PermissionDenied()
 
 def project_details(request, username, project_slug,
         template_name='projector/project/details.html'):
@@ -124,30 +168,6 @@ def project_list(request, template_name='projector/project/list.html'):
     }
     return render_to_response(template_name, context, RequestContext(request))
 
-def project_task_list(request, username, project_slug,
-        template_name='projector/project/task_list.html'):
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(request.user)
-        if not check.has_perm('project_permission.view_tasks_project',
-            project):
-            raise PermissionDenied()
-
-    task_list = Task.objects.filter(project__id=project.id)\
-            .select_related('priority', 'status', 'author', 'project')
-    filters = TaskFilter(request.GET,
-        queryset=task_list, project=project)
-    if request.GET and 'id' in request.GET and request.GET['id'] and \
-        filters.qs.count() == 1:
-        task = filters.qs[0]
-        messages.info(request, _("One task matched - redirecting..."))
-        return redirect(task.get_absolute_url())
-    context = {
-        'project': project,
-        'filters': filters,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
 
 @login_required
 def project_create(request, username=None,

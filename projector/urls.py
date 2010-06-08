@@ -96,17 +96,6 @@ urlpatterns += patterns('projector.views.project',
         view='project_teams_edit',
         name='projector_project_teams_edit'),
 
-    # Repository sources
-    #url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
-    #    view='project_browse_repository',
-    #    name='projector_project_sources_browse'),
-    #url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
-    #    view='project_browse_repository',
-    #    name='projector_project_sources'),
-
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/$',
-        view='project_task_list',
-        name='projector_task_list'),
 )
 
 # Project's repository browsing
@@ -135,21 +124,28 @@ urlpatterns += patterns('projector.views.project_repository',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
         view='RepositoryBrowseView',
         name='projector_project_sources'),
-
 )
 
 # Tasks
 urlpatterns += patterns('projector.views.task',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/$',
+        view='ProjectTaskListView',
+        name='projector_task_list'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/create/$',
-        view='task_create', name='projector_task_create'),
+        view='task_create',
+        name='projector_task_create'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/$',
-        view='task_details', name='projector_task_details'),
+        view='task_details',
+        name='projector_task_details'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/edit/$',
-        view='task_edit', name='projector_task_edit'),
+        view='task_edit',
+        name='projector_task_edit'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/watch/$',
-        view='task_watch', name='projector_task_watch'),
+        view='task_watch',
+        name='projector_task_watch'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/unwatch/$',
-        view='task_unwatch', name='projector_task_unwatch'),
+        view='task_unwatch',
+        name='projector_task_unwatch'),
 )
 
 # ========== #

@@ -46,8 +46,6 @@ INSTALLED_APPS = (
     # External
     'attachments',
     'authority',
-    'dajax',
-    'dajaxice',
     'djalog',
     'django_extensions',
     'django_sorting',
@@ -76,6 +74,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
 
+    'request.middleware.RequestMiddleware',
     'richtemplates.middleware.Http403Middleware',
     'django_sorting.middleware.SortingMiddleware',
     'djalog.middleware.SQLLoggingMiddleware',
