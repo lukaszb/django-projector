@@ -73,39 +73,40 @@ class ProjectView(View):
                 if not self.check.has_perm(fullperm, self.project):
                     raise PermissionDenied()
 
-def project_details(request, username, project_slug,
-        template_name='projector/project/details.html'):
+class ProjectDetailView(ProjectView):
     """
     Returns selected project's detail for user given in ``request``.
     We make necessary permission checks *after* dispatching between
     normal and mercurial request, as mercurial requests has it's own
     permission requirements.
     """
-    try:
-        project = get_object_or_404(Project, slug=project_slug,
-            author__username=username)
-        if is_mercurial(request):
-            return _project_detail_hg(request, project)
-        last_part = request.path.split('/')[-1]
-        if last_part and last_part != project_slug:
-            raise Http404("Not a mercurial request and path longer than should "
-                "be: %s" % request.path)
-        if project.is_private():
-            check = ProjectPermission(user=request.user)
-            if not check.has_perm('project_permission.view_project', project):
-                raise PermissionDenied()
-        context = {
-            'project': project,
-        }
-        return render_to_response(template_name, context,
-            RequestContext(request))
-    except Exception, err:
-        dont_log_exceptions = (PermissionDenied,)
-        if not isinstance(err, dont_log_exceptions):
-            log_error(err)
-        raise err
 
-project_details.csrf_exempt = True
+    template_name = 'projector/project/details.html'
+    csrf_exempt = True
+
+    def get_required_perms(self):
+        if is_mercurial(self.request):
+            return []
+        return super(ProjectDetailView, self).get_required_perms()
+
+    def response(self, request, username, project_slug):
+        try:
+            if is_mercurial(request):
+                return _project_detail_hg(request, self.project)
+            last_part = request.path.split('/')[-1]
+            if last_part and last_part != project_slug:
+                raise Http404("Not a mercurial request and path longer than should "
+                    "be: %s" % request.path)
+
+            context = {
+                'project': self.project,
+            }
+            return context
+        except Exception, err:
+            dont_log_exceptions = (PermissionDenied,)
+            if not isinstance(err, dont_log_exceptions):
+                log_error(err)
+            raise err
 
 def _project_detail_hg(request, project):
     """

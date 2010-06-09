@@ -30,7 +30,7 @@ urlpatterns += patterns('projector.views.project',
         view='project_edit',
         name='projector_project_edit'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
-        view='project_details', name='projector_project_details'),
+        view='ProjectDetailView', name='projector_project_details'),
 
     # Milestones
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/$',
