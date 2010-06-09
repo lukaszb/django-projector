@@ -5,12 +5,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^$', 'projector.extras.users.views.user_homepage'),
+    (r'^$', 'projector.views.users.UserHomepageView'),
 
     (r'^accounts/', include('registration.urls')),
     (r'^attachments/', include('attachments.urls')),
     (r'^projector/', include('projector.urls')),
-    (r'^users/', include('projector.extras.users.urls')),
 
     (r'^admin_tools/', include('admin_tools.urls')),
     (r'^admin/', include(admin.site.urls)),

@@ -11,13 +11,14 @@ from projector.models import Task
 from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
+from projector.models import UserProfile
 from projector.utils.basic import codename_to_label
-
-from livesettings import config_value
+from projector.settings import get_config_value
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     ModelByNameField
 from richtemplates.widgets import RichCheckboxSelectMultiple
+from richtemplates.forms import RichSkinChoiceField, RichCodeStyleChoiceField
 
 import logging
 
@@ -148,7 +149,7 @@ class MembershipForm(LimitingModelForm):
 
 def get_editable_perms():
     return ((codename, codename_to_label(codename)) for codename in
-            config_value('PROJECTOR', 'PROJECT_EDITABLE_PERMISSIONS'))
+            get_config_value('PROJECT_EDITABLE_PERMISSIONS'))
 
 class MembershipDeleteForm(forms.Form):
     post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
@@ -347,4 +348,12 @@ class StatusFormSet(StatusFormSetBase):
         if form.instance.project:
             qs = qs.filter(project = form.instance.project)
             form['destinations'].field.queryset = qs
+
+class UserProfileForm(forms.ModelForm):
+    skin = RichSkinChoiceField()
+    code_style = RichCodeStyleChoiceField()
+
+    class Meta:
+        model = UserProfile
+        exclude = ('user', 'activation_token')
 

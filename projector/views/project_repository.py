@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
 from projector.settings import get_config_value
-from projector.core.controllers import BaseView
 from projector.views.project import ProjectView
 
 from vcs.web.simplevcs.views import browse_repository, diff_file

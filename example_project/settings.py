@@ -19,6 +19,17 @@ DATABASES = {
     },
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'pycenter2',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+        'USER': 'lukaszb',
+        'PASSWORD': '',
+    },
+}
+
 # Make sqlite3 files relative to project's directory
 for db, conf in DATABASES.items():
     if conf['ENGINE'] == 'sqlite3' and not conf['NAME'].startswith(':'):
@@ -57,11 +68,9 @@ INSTALLED_APPS = (
     'signals_ahoy',
     'tagging',
     'projector',
-    'projector.extras.users',
-    'request',
+    #'request',
     'vcs.web.simplevcs',
     'mailer',
-    'gunicorn',
 
     'example_project',
 )
@@ -74,7 +83,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
 
-    'request.middleware.RequestMiddleware',
+    #'request.middleware.RequestMiddleware',
     'richtemplates.middleware.Http403Middleware',
     'django_sorting.middleware.SortingMiddleware',
     'djalog.middleware.SQLLoggingMiddleware',

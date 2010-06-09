@@ -2,16 +2,7 @@ import os
 import logging
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 
-from livesettings import config_value, config_register
-from livesettings import StringValue, IntegerValue,\
-    BooleanValue, ConfigurationGroup
-from livesettings.models import SettingNotSet
-
-from richtemplates.extras.livesettingsext import RichMultipleStringValue
-
-from projector.utils.validators import IntegerValidator
 from projector.utils.basic import codename_to_label
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
@@ -56,8 +47,31 @@ else:
             % PROJECTS_ROOT_DIR)
 
 
+editable_perm_codenames = (
+    'project_permission.view_project',
+
+    'project_permission.view_members_project',
+    'project_permission.add_member_project',
+    'project_permission.change_member_project',
+    'project_permission.delete_member_project',
+
+    'project_permission.view_teams_project',
+    'project_permission.add_team_project',
+    'project_permission.change_team_project',
+    'project_permission.delete_team_project',
+
+    'project_permission.view_tasks_project',
+    'project_permission.add_task_project',
+    'project_permission.change_task_project',
+    'project_permission.delete_task_project',
+
+    'project_permission.read_repository_project',
+    'project_permission.write_repository_project',
+)
+
 # Following settings may be changed dynamically (livesettings)
 
+'''
 PROJECTOR = ConfigurationGroup('PROJECTOR', _("Projector application settings"))
 
 config_register(StringValue(
@@ -107,28 +121,6 @@ config_register(IntegerValue(
     )
 )
 
-editable_perm_codenames = (
-    'project_permission.view_project',
-
-    'project_permission.view_members_project',
-    'project_permission.add_member_project',
-    'project_permission.change_member_project',
-    'project_permission.delete_member_project',
-
-    'project_permission.view_teams_project',
-    'project_permission.add_team_project',
-    'project_permission.change_team_project',
-    'project_permission.delete_team_project',
-
-    'project_permission.view_tasks_project',
-    'project_permission.add_task_project',
-    'project_permission.change_task_project',
-    'project_permission.delete_task_project',
-
-    'project_permission.read_repository_project',
-    'project_permission.write_repository_project',
-)
-
 config_register(RichMultipleStringValue(
     PROJECTOR,
     'PROJECT_EDITABLE_PERMISSIONS',
@@ -174,13 +166,21 @@ config_register(StringValue(
     help_text = _("You may use following placeholders: $project $summary $id"),
     default = "$project - #$id: $summary",
 ))
+'''
+
+PROJECTOR = {
+    'BASIC_AUTH_REALM': 'Projector Basic Auth',
+    'MILESTONE_DEADLINE_DELTA': 60,
+    'CHANGESETS_PAGINATE_BY': 10,
+    #'PROJECT_EDITABLE_PERMISSIONS': [(codename, codename_to_label(codename))
+    #    for codename in editable_perm_codenames],
+    'PROJECT_EDITABLE_PERMISSIONS': editable_perm_codenames,
+    'SEND_MAILS_USING_MAILER': False,
+    'FROM_EMAIL_ADDRESS': settings.DEFAULT_FROM_EMAIL,
+    'ALWAYS_SEND_MAILS_TO_MEMBERS': False,
+    'TASK_EMAIL_SUBJECT_SUMMARY_FORMAT': "$project - #$id: $summary",
+}
 
 def get_config_value(key):
-    """
-    Needed if we want to use livesettings at models.
-    """
-    try:
-        return config_value('PROJECTOR', key)
-    except SettingNotSet:
-        return PROJECTOR[key].default
+    return PROJECTOR[key]
 

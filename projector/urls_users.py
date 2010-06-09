@@ -1,16 +1,16 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('projector.extras.users.views',
+urlpatterns = patterns('projector.views.users',
     url(r'^$',
-        view = 'user_list',
+        view = 'UserListView',
         name = 'projector_user_list'),
 
     url(r'^(?P<username>\w+)/$',
-        view = 'profile_detail',
+        view = 'UserProfileDetailView',
         name = 'projector_users_profile_detail'),
 
     url(r'^(?P<username>\w+)/edit/$',
-        view = 'profile_edit',
+        view = 'UserProfileEditView',
         name = 'projector_users_profile_edit'),
 )
 

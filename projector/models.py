@@ -19,13 +19,15 @@ from django.contrib.sites.models import Site
 
 from authority.models import Permission
 from autoslug import AutoSlugField
-from livesettings import config_value
 from projector.conf import default_workflow
-from projector.utils import abspath
+from projector.utils import abspath, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
+from projector.settings import get_config_value
 from projector.managers import ProjectManager, TeamManager, WatchedItemManager
 from vcs.web.simplevcs.models import Repository
+from richtemplates.models import UserProfile as RichUserProfile
+
 
 class WatchedItem(models.Model):
     """
@@ -643,8 +645,8 @@ class Milestone(models.Model):
     author = models.ForeignKey(User, verbose_name=_('author'))
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
-        datetime.timedelta(days=
-            projector_settings.get_config_value('MILESTONE_DEADLINE_DELTA')))
+        datetime.timedelta(days=10))
+            #projector_settings.get_config_value('MILESTONE_DEADLINE_DELTA')))
     date_completed = models.DateField(_('date completed'), null=True,
         blank=True)
 
@@ -1015,9 +1017,7 @@ class Task(AbstractTask, Watchable):
         return revision
 
     def get_long_summary(self):
-        #raw = projector_settings\
-        #    .get_config_value('TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
-        raw = config_value('PROJECTOR', 'TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
+        raw = get_config_value('TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
         tmpl = string.Template(raw)
         return tmpl.safe_substitute(project=self.project.name,
             id=self.id, summary=self.summary)
@@ -1056,6 +1056,25 @@ class TaskRevision(AbstractTask):
     def __unicode__(self):
         return "#%d %s: Revision %d" % (self.task.id, self.task.summary,
             self.revision)
+
+class UserProfile(RichUserProfile):
+    """
+    Base user profile class for ``django-projector``.
+    Would be abstract if ``AUTH_PROFILE_MODULE`` is not set or doesn't equal
+    with ``projector.UserProfile``.
+    """
+    activation_token = models.CharField(_('activation_token'), max_length=32,
+        editable=False)
+
+    class Meta:
+        app_label = 'projector'
+        verbose_name = _('user profile')
+        verbose_name_plural = _('user profiles')
+        abstract = not using_projector_profile()
+
+    def __unicode__(self):
+        return u"<%s's profile>" % self.user
+
 
 # ================ #
 # Signals handlers #
