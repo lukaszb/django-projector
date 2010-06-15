@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
 
 from projector.decorators import permission_required_or_403
 
@@ -30,6 +31,8 @@ from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
 from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
 
+login_required_m = method_decorator(login_required)
+
 class ProjectView(View):
     """
     Base class for all projector views.
@@ -47,7 +50,8 @@ class ProjectView(View):
     GET_perms = []
     POST_perms = []
 
-    def __init__(self, request, username, project_slug):
+    def __init__(self, request, username=None, project_slug=None, *args,
+            **kwargs):
         self.request = request
         self.project = get_object_or_404(Project, slug=project_slug,
             author__username=username)
@@ -159,144 +163,66 @@ def _project_detail_hg(request, project):
     response = get_mercurial_response(request, **mercurial_info)
     return response
 
-def project_list(request, template_name='projector/project/list.html'):
-    project_list = Project.objects.for_user(user=request.user)\
-        .annotate(Count('task', distinct=True))
-    context = {
-        'project_list' : project_list,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
+class ProjectListView(View):
+    template_name = 'projector/project/list.html'
 
+    def response(self, request):
+        project_list = Project.objects.for_user(user=request.user)\
+            .annotate(Count('task', distinct=True))
+        context = {
+            'project_list' : project_list,
+        }
+        return context
 
-@login_required
-def project_create(request, username=None,
-        template_name='projector/project/create.html'):
+class ProjectCreateView(View):
     """
     New project creation view.
     """
-    project = Project(
-        author=request.user,
-    )
-    form = ProjectForm(request.POST or None, instance=project)
-    if request.method == 'POST' and form.is_valid():
-        project = form.save()
-        return HttpResponseRedirect(project.get_absolute_url())
-    context = {
-        'form' : form,
-    }
 
-    return render_to_response(template_name, context, RequestContext(request))
+    template_name = 'projector/project/create.html'
 
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'author__username', 'username', 'slug', 'project_slug'))
-def project_edit(request, username, project_slug,
-        template_name='projector/project/edit.html'):
+    @login_required_m
+    def response(self, request, username=None):
+        # TODO: what with username param? should it be required?
+        # it's not used for now...
+        project = Project(
+            author=request.user,
+        )
+        form = ProjectForm(request.POST or None, instance=project)
+        if request.method == 'POST' and form.is_valid():
+            project = form.save()
+            return HttpResponseRedirect(project.get_absolute_url())
+        context = {
+            'form' : form,
+        }
+        return context
+
+class ProjectEditView(ProjectView):
     """
     Update project view.
     """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.public:
-        project.public = u'public'
-    else:
-        project.public = u'private'
-    form = ProjectForm(request.POST or None, instance=project)
-    if request.method == 'POST' and form.is_valid():
-        project = form.save()
-        message = _("Project edited successfully")
-        messages.success(request, message)
-        return HttpResponseRedirect(project.get_absolute_url())
 
-    context = {
-        'form' : form,
-        'project': form.instance,
-    }
+    template_name = 'projector/project/edit.html'
+    perms = ProjectView.perms + ['change_project']
 
-    return render_to_response(template_name, context, RequestContext(request))
+    def response(self, request, username, project_slug):
+        project = self.project
+        if project.public:
+            project.public = u'public'
+        else:
+            project.public = u'private'
+        form = ProjectForm(request.POST or None, instance=project)
+        if request.method == 'POST' and form.is_valid():
+            project = form.save()
+            message = _("Project edited successfully")
+            messages.success(request, message)
+            return HttpResponseRedirect(project.get_absolute_url())
 
-def project_milestones(request, username, project_slug,
-        template_name='projector/project/milestones/home.html'):
-    """
-    Returns milestones view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    milestone_list = project.milestone_set\
-        .annotate(Count('task'))\
-        .order_by('-created_at')
-    context = {
-        'project': project,
-        'milestone_list': milestone_list,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-def project_milestone_detail(request, username, project_slug, milestone_slug,
-        template_name='projector/project/milestones/detail.html'):
-    """
-    Returns milestone detail view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    milestone = get_object_or_404(Milestone,
-        project=project, slug=milestone_slug)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    context = {
-        'project': project,
-        'milestone': milestone,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug'),
-    (Project, 'author__username', 'username'))
-def project_milestones_add(request, username, project_slug,
-        template_name='projector/project/milestones/add.html'):
-    """
-    Adds milestone for project.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    milestone = Milestone(project=project, author=request.user)
-    form = MilestoneForm(request.POST or None, instance=milestone)
-    if request.method == 'POST' and form.is_valid():
-        milestone = form.save()
-        msg = _("Milestone added successfully")
-        messages.success(request, msg)
-        return redirect(milestone.get_absolute_url())
-    context = {
-        'form': form,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_milestone_edit(request, username, project_slug, milestone_slug,
-        template_name='projector/project/milestones/edit.html'):
-    """
-    Edits chosen milestone.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    milestone = get_object_or_404(Milestone, slug=milestone_slug)
-    form = MilestoneForm(request.POST or None, instance=milestone)
-    if request.method == 'POST' and form.is_valid():
-        milestone = form.save()
-        msg = _("Milestone updated successfully")
-        messages.success(request, msg)
-        return redirect(milestone.get_absolute_url())
-    context = {
-        'form': form,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
+        context = {
+            'form' : form,
+            'project': form.instance,
+        }
+        return context
 
 def project_components(request, username, project_slug,
         template_name='projector/project/components/home.html'):

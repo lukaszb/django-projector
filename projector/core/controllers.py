@@ -12,6 +12,7 @@ class BaseView(object):
 
     @classmethod
     def new(cls, request, *args, **kwargs):
+        print cls.__name__
         obj = object.__new__(cls)
         if not isinstance(request, HttpRequest):
             raise TypeError("Class based views requires HttpRequest "

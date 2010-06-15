@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 from projector.feeds import LatestProjectsFeed
 
 urlpatterns = patterns('projector.views',
-    url(r'^$', 'project.project_list', name='projector_home'),
+    url(r'^$', 'project.ProjectListView', name='projector_home'),
     url(r'^settings/$', 'settings', name='projector_settings'),
 )
 
@@ -21,30 +21,16 @@ urlpatterns += patterns('projector.views.project_category',
 urlpatterns += patterns('projector.views.project',
     # Basic
     url(r'^projects/$',
-        view='project_list',
+        view='ProjectListView',
         name='projector_project_list'),
     url(r'^projects/create_project/$',
-        view='project_create',
+        view='ProjectCreateView',
         name='projector_project_create'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/edit/$',
-        view='project_edit',
+        view='ProjectEditView',
         name='projector_project_edit'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_details'),
-
-    # Milestones
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/$',
-        view='project_milestones',
-        name='projector_project_milestones'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/create/$',
-        view='project_milestones_add',
-        name='projector_project_milestones_add'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/(?P<milestone_slug>[-\w]+)/$',
-        view='project_milestone_detail',
-        name='projector_project_milestone_detail'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/(?P<milestone_slug>[-\w]+)/edit/$',
-        view='project_milestone_edit',
-        name='projector_project_milestone_edit'),
 
     # Components
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/$',
@@ -98,8 +84,23 @@ urlpatterns += patterns('projector.views.project',
 
 )
 
-# Project's repository browsing
+# Milestones
+urlpatterns += patterns('projector.views.project_milestone',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/$',
+        view='MilestoneListView',
+        name='projector_project_milestones'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/create/$',
+        view='MilestoneCreateView',
+        name='projector_project_milestones_add'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/(?P<milestone_slug>[-\w]+)/$',
+        view='MilestoneDetailView',
+        name='projector_project_milestone_detail'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/(?P<milestone_slug>[-\w]+)/edit/$',
+        view='MilestoneEditView',
+        name='projector_project_milestone_edit'),
+)
 
+# Project's repository browsing
 urlpatterns += patterns('projector.views.project_repository',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision_old>[\w]*)-(?P<revision_new>[\w]*)/(?P<rel_repo_url>.*)$',
         view='RepositoryFileDiffView',
