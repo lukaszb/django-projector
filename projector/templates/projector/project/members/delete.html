@@ -11,16 +11,16 @@
     <div class="richtemplates-panel-content">
         {% block members_menu %}{{ block.super }}{% endblock %}
         <ul class="messages">
-            <li class="message message-warning">{% trans "Are you sure you want to remove following objects" %}?</li>
+            <li class="message message-warning">{% trans "Are you sure you want to remove member" %} {{ membership.member }}?</li>
         </ul>
 
         <div class="richblock">
             <h2>{% trans "Removing objects" %}</h2>
             <ul>{{ to_delete|unordered_list }}</ul>
 
-            <h2>{% trans "Permissions currently given to member" %} {{ member }}</h2>
+            <h2>{% trans "Permissions currently given to member" %} {{ membership.member }}</h2>
             <ul>
-                {% for perm in perms_to_delete %}
+                {% for perm in member_perms %}
                 <li>{{ perm }}</li>
                 {% endfor %}
             </ul>

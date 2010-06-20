@@ -322,7 +322,7 @@ def project_members_delete(request, username, project_slug, member_username,
     Removes member from project.
     """
     membership = get_object_or_404(Membership, project__slug=project_slug,
-        project__author__username=username, member__username=username)
+        project__author__username=username, member__username=member_username)
     member = membership.member
     project = membership.project
 
@@ -351,7 +351,7 @@ def project_members_delete(request, username, project_slug, member_username,
         'membership': membership,
         'form': form,
         'to_delete': collector.nested(),
-        'perms_to_delete': perms_to_delete,
+        'member_perms': perms_to_delete,
     }
 
     return render_to_response(template_name, context, RequestContext(request))
