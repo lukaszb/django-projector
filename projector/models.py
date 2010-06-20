@@ -225,21 +225,21 @@ class Project(models.Model, Watchable):
 
     @models.permalink
     def get_members_url(self):
-        return ('projector_project_members', (), {
+        return ('projector_project_member', (), {
             'username': self.author.username,
             'project_slug' : self.slug,
         })
 
     @models.permalink
     def get_members_add_url(self):
-        return ('projector_project_members_add', (), {
+        return ('projector_project_member_add', (), {
             'username': self.author.username,
             'project_slug' : self.slug,
         })
 
     @models.permalink
     def get_members_edit_url(self, username):
-        return ('projector_project_members_edit', (), {
+        return ('projector_project_member_edit', (), {
             'username': self.author.username,
             'project_slug': self.slug,
             'member_username': username,
@@ -558,7 +558,7 @@ class Membership(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_members_edit', (), {
+        return ('projector_project_member_edit', (), {
             'username': self.project.author.username,
             'project_slug': self.project.slug,
             'member_username': self.member.username,
@@ -566,7 +566,7 @@ class Membership(models.Model):
 
     @models.permalink
     def get_delete_url(self):
-        return ('projector_project_members_delete', (), {
+        return ('projector_project_member_delete', (), {
             'username': self.project.author.username,
             'project_slug': self.project.slug,
             'member_username': self.member.username,

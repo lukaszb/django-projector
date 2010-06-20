@@ -32,20 +32,6 @@ urlpatterns += patterns('projector.views.project',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_details'),
 
-    # Members
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/$',
-        view='project_members',
-        name='projector_project_members'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/add/$',
-        view='project_members_add',
-        name='projector_project_members_add'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/(?P<member_username>\w+)/$',
-        view='project_members_edit',
-        name='projector_project_members_edit'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/(?P<member_username>\w+)/delete/$',
-        view='project_members_delete',
-        name='projector_project_members_delete'),
-
     # Teams
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/$',
         view='project_teams',
@@ -102,6 +88,22 @@ urlpatterns += patterns('projector.views.project_workflow',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/create-status/$',
         view='WorkflowAddStatusView',
         name='projector_project_workflow_add_status'),
+)
+
+# Members
+urlpatterns += patterns('projector.views.project_member',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/$',
+        view='MemberListView',
+        name='projector_project_member'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/add/$',
+        view='MemberAddView',
+        name='projector_project_member_add'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/(?P<member_username>\w+)/$',
+        view='MemberEditView',
+        name='projector_project_member_edit'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/(?P<member_username>\w+)/delete/$',
+        view='MemberDeleteView',
+        name='projector_project_member_delete'),
 )
 
 # Project's repository browsing

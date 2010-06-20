@@ -2,7 +2,6 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.util import NestedObjects
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
@@ -14,12 +13,11 @@ from django.utils.decorators import method_decorator
 from projector.decorators import permission_required_or_403
 
 from projector.core.controllers import View
-from projector.models import Project, Membership, Team
-from projector.forms import ProjectForm, MembershipForm
-from projector.forms import MembershipDeleteForm
-from projector.forms import TeamForm, ProjectMembershipPermissionsForm
+from projector.models import Project, Team
+from projector.forms import ProjectForm
+from projector.forms import TeamForm
 from projector.forms import ProjectTeamPermissionsForm
-from projector.permissions import ProjectPermission, get_perms_for_user
+from projector.permissions import ProjectPermission
 from projector.settings import get_config_value
 
 from vcs.web.simplevcs import settings as simplevcs_settings
@@ -223,139 +221,6 @@ class ProjectEditView(ProjectView):
 # ========================== #
 # Membership - user & groups #
 # ========================== #
-
-# Members
-
-def project_members(request, username, project_slug,
-        template_name='projector/project/members/home.html'):
-    """
-    Shows/updates project's members and groups view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(request.user)
-        if not check.has_perm('project_permission.view_members_project',
-            project):
-            raise PermissionDenied()
-    memberships = Membership.objects.filter(project=project)
-
-    context = {
-        'project': project,
-        'memberships': memberships,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.add_member_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_members_add(request, username, project_slug,
-        template_name='projector/project/members/add.html'):
-    """
-    Adds member for a project.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    membership = Membership(
-        project = project,
-    )
-    form = MembershipForm(request.POST or None, instance=membership)
-
-    if request.method == 'POST' and form.is_valid():
-        logging.info("Saving member %s for project '%s'"
-            % (form.instance.member, form.instance.project))
-        form.save()
-        return redirect(project.get_members_url())
-    elif form.errors:
-        logging.error("Form contains errors:\n%s" % form.errors)
-
-    context = {
-        'project': form.instance.project,
-        'form': form,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_member_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_members_edit(request, username, project_slug, member_username,
-        template_name='projector/project/members/edit.html'):
-    """
-    Manages membership settings and permissions of project's member.
-    """
-    membership = get_object_or_404(Membership, project__slug=project_slug,
-        project__author__username=username, member__username=member_username)
-    member = membership.member
-    project = membership.project
-    if not request.user.is_superuser and project.author == member:
-        # allow if requested by superuser
-        messages.warning(request, _("Project owner's membership cannot be "
-            "modified. He/She has all permissions for this project."))
-        return redirect(project.get_members_url())
-    member_permissions = membership.all_perms
-    codenames = [str(p.codename) for p in member_permissions]
-
-    form = ProjectMembershipPermissionsForm(request.POST or None,
-        membership = membership,
-        initial_permissions = codenames,
-        request = request)
-    if request.method == 'POST':
-        if form.is_valid():
-            logging.info("Form's data:\n%s" % form.cleaned_data)
-            messages.success(request, _("Permissions updated"))
-            form.save()
-        else:
-            messages.error(request,
-                _("Errors occured while processing the form"))
-        return redirect(membership.get_absolute_url())
-    context = {
-        'project': project,
-        'form': form,
-        'membership': membership,
-        'member_permissions': member_permissions,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.delete_member_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_members_delete(request, username, project_slug, member_username,
-        template_name='projector/project/members/delete.html'):
-    """
-    Removes member from project.
-    """
-    membership = get_object_or_404(Membership, project__slug=project_slug,
-        project__author__username=username, member__username=member_username)
-    member = membership.member
-    project = membership.project
-
-    if project.author == member and not request.user.is_superuser:
-        messages.warning(request, _("Project owner's membership cannot be "
-            "removed."))
-        return redirect(project.get_members_url())
-    collector = NestedObjects()
-    membership._collect_sub_objects(collector)
-    form = MembershipDeleteForm(request.POST or None)
-    perms_to_delete = get_perms_for_user(member, project)
-
-    if request.method == 'POST':
-        # Confirm removal
-        if form.is_valid():
-            msg = _("Membership removed")
-            messages.success(request, msg)
-            membership.delete()
-            perms_to_delete.update(approved=False)
-            return redirect(project.get_members_url())
-        else:
-            msg = _("Couldn't remove membership")
-            messages.error(request, msg)
-    context = {
-        'project': project,
-        'membership': membership,
-        'form': form,
-        'to_delete': collector.nested(),
-        'member_perms': perms_to_delete,
-    }
-
-    return render_to_response(template_name, context, RequestContext(request))
-
 
 # Teams
 
