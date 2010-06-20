@@ -32,17 +32,6 @@ urlpatterns += patterns('projector.views.project',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_details'),
 
-    # Workflow
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/$',
-        view='project_workflow_detail',
-        name='projector_project_workflow_detail'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/edit/$',
-        view='project_workflow_edit',
-        name='projector_project_workflow_edit'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/create-status/$',
-        view='project_workflow_add_status',
-        name='projector_project_workflow_add_status'),
-
     # Members
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/$',
         view='project_members',
@@ -100,6 +89,19 @@ urlpatterns += patterns('projector.views.project_component',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/edit/$',
         view='ComponentEditView',
         name='projector_project_component_edit'),
+)
+
+# Workflow
+urlpatterns += patterns('projector.views.project_workflow',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/$',
+        view='WorkflowDetailView',
+        name='projector_project_workflow_detail'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/edit/$',
+        view='WorkflowEditView',
+        name='projector_project_workflow_edit'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/create-status/$',
+        view='WorkflowAddStatusView',
+        name='projector_project_workflow_add_status'),
 )
 
 # Project's repository browsing

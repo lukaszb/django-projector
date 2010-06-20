@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.util import NestedObjects
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
@@ -15,16 +15,12 @@ from projector.decorators import permission_required_or_403
 
 from projector.core.controllers import View
 from projector.models import Project, Membership, Team
-from projector.models import Status, Transition
 from projector.forms import ProjectForm, MembershipForm
 from projector.forms import MembershipDeleteForm
-from projector.forms import StatusForm, StatusFormSet
 from projector.forms import TeamForm, ProjectMembershipPermissionsForm
 from projector.forms import ProjectTeamPermissionsForm
 from projector.permissions import ProjectPermission, get_perms_for_user
 from projector.settings import get_config_value
-
-from richtemplates.shortcuts import get_first_or_None
 
 from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
@@ -223,85 +219,6 @@ class ProjectEditView(ProjectView):
             'project': form.instance,
         }
         return context
-
-def project_workflow_detail(request, username, project_slug,
-        template_name='projector/project/workflow/detail.html'):
-    """
-    Returns project's workflow detail view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    context = {
-        'project': project,
-        # indicates that this is workflow detail page at templates
-        'workflow': True,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_workflow_edit(request, username, project_slug,
-        template_name='projector/project/workflow/edit.html'):
-    """
-    Edits chosen project's workflow.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    formset = StatusFormSet(request.POST or None,
-        queryset=Status.objects.filter(project=project))
-    if request.method == 'POST':
-        if formset.is_valid():
-            msg = _("Workflow updated successfully")
-            messages.success(request, msg)
-            for form in formset.forms:
-                # update status instance
-                form.instance.save()
-                destinations = form.cleaned_data['destinations']
-                # remove unchecked
-                Transition.objects.filter(~Q(destination__in=destinations),
-                    source=form.instance)\
-                    .delete()
-                # add new
-                for destination in destinations:
-                    Transition.objects.get_or_create(source=form.instance,
-                        destination=destination)
-        else:
-            msg = _("Errors occured while processing formset")
-            messages.error(request, msg)
-    context = {
-        'formset': formset,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_workflow_add_status(request, username, project_slug,
-        template_name='projector/project/workflow/add_status.html'):
-    """
-    Adds status for project.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    _max_order_status = get_first_or_None(
-        project.status_set.only('order').order_by('-order'))
-    status = Status(project=project,
-        order=_max_order_status and _max_order_status.order+1 or 1)
-    form = StatusForm(request.POST or None, instance=status)
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        msg = _("Status added successfully")
-        messages.success(request, msg)
-        return redirect(project.get_workflow_url())
-    context = {
-        'form': form,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
 
 # ========================== #
 # Membership - user & groups #
