@@ -15,10 +15,10 @@ from projector.decorators import permission_required_or_403
 
 from projector.core.controllers import View
 from projector.models import Project, Membership, Team
-from projector.models import Milestone, Status, Transition, Component
-from projector.forms import ProjectForm, MembershipForm, MilestoneForm
+from projector.models import Status, Transition
+from projector.forms import ProjectForm, MembershipForm
 from projector.forms import MembershipDeleteForm
-from projector.forms import StatusForm, StatusFormSet, ComponentForm
+from projector.forms import StatusForm, StatusFormSet
 from projector.forms import TeamForm, ProjectMembershipPermissionsForm
 from projector.forms import ProjectTeamPermissionsForm
 from projector.permissions import ProjectPermission, get_perms_for_user
@@ -223,89 +223,6 @@ class ProjectEditView(ProjectView):
             'project': form.instance,
         }
         return context
-
-def project_components(request, username, project_slug,
-        template_name='projector/project/components/home.html'):
-    """
-    Returns components view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    component_list = project.component_set\
-        .annotate(Count('task'))
-    context = {
-        'project': project,
-        'component_list': component_list,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-def project_component_detail(request, username, project_slug, component_slug,
-        template_name='projector/project/components/detail.html'):
-    """
-    Returns component detail view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    component = get_object_or_404(Component, project=project,
-        slug=component_slug)
-    if project.is_private():
-        check = ProjectPermission(user=request.user)
-        if not check.view_project(project):
-            raise PermissionDenied()
-    context = {
-        'project': project,
-        'component': component,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_component_add(request, username, project_slug,
-        template_name='projector/project/components/add.html'):
-    """
-    Adds component for project.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    component = Component(project=project)
-    form = ComponentForm(request.POST or None, instance=component)
-    if request.method == 'POST' and form.is_valid():
-        component = form.save()
-        msg = _("Component added successfully")
-        messages.success(request, msg)
-        return redirect(component.get_absolute_url())
-    context = {
-        'form': form,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_component_edit(request, username, project_slug, component_slug,
-        template_name='projector/project/components/edit.html'):
-    """
-    Edits chosen component.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    component = get_object_or_404(Component,
-        project=project, slug=component_slug)
-    form = ComponentForm(request.POST or None, instance=component)
-    if request.method == 'POST' and form.is_valid():
-        component = form.save()
-        msg = _("Component updated successfully")
-        messages.success(request, msg)
-        return redirect(component.get_absolute_url())
-    context = {
-        'form': form,
-        'project': project,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
 
 def project_workflow_detail(request, username, project_slug,
         template_name='projector/project/workflow/detail.html'):

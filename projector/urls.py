@@ -32,20 +32,6 @@ urlpatterns += patterns('projector.views.project',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_details'),
 
-    # Components
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/$',
-        view='project_components',
-        name='projector_project_components'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/create/$',
-        view='project_component_add',
-        name='projector_project_component_add'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/$',
-        view='project_component_detail',
-        name='projector_project_component_detail'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/edit/$',
-        view='project_component_edit',
-        name='projector_project_component_edit'),
-
     # Workflow
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/workflow/$',
         view='project_workflow_detail',
@@ -98,6 +84,22 @@ urlpatterns += patterns('projector.views.project_milestone',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/(?P<milestone_slug>[-\w]+)/edit/$',
         view='MilestoneEditView',
         name='projector_project_milestone_edit'),
+)
+
+# Components
+urlpatterns += patterns('projector.views.project_component',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/$',
+        view='ComponentListView',
+        name='projector_project_components'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/create/$',
+        view='ComponentCreateView',
+        name='projector_project_component_add'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/$',
+        view='ComponentDetailView',
+        name='projector_project_component_detail'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/components/(?P<component_slug>[-\w]+)/edit/$',
+        view='ComponentEditView',
+        name='projector_project_component_edit'),
 )
 
 # Project's repository browsing

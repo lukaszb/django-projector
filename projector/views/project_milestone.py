@@ -39,7 +39,7 @@ class MilestoneDetailView(ProjectView):
 
 class MilestoneCreateView(ProjectView):
     """
-    Edits chosen milestone.
+    Adds milestone for project.
     """
 
     template_name = 'projector/project/milestones/add.html'
@@ -60,6 +60,9 @@ class MilestoneCreateView(ProjectView):
         return context
 
 class MilestoneEditView(ProjectView):
+    """
+    Edits chosen milestone.
+    """
 
     template_name = 'projector/project/milestones/edit.html'
     perms = ProjectView.perms + ['change_project']
