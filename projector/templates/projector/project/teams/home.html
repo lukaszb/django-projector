@@ -7,8 +7,8 @@
 
 {% block col_main_extra %}
 
-{% autosort teams %}
-{% autopaginate teams %}
+{% autosort team_list %}
+{% autopaginate team_list %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Projects' teams" %}</h5>
@@ -33,7 +33,7 @@
                 </tr>
             </thead>
             <tbody class="datatable-tbody">
-                {% for team in teams %}
+                {% for team in team_list %}
                 <tr class="{% cycle "odd" "even" %} hoverable">
                     <td>{{ team.group }}</td>
                     <td><a class="block-link" href="{{ team.get_absolute_url }}">{% trans "Manage" %}</a></td>

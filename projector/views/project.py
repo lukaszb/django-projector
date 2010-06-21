@@ -5,18 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, get_object_or_404, redirect
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
-from projector.decorators import permission_required_or_403
-
 from projector.core.controllers import View
-from projector.models import Project, Team
+from projector.models import Project
 from projector.forms import ProjectForm
-from projector.forms import TeamForm
-from projector.forms import ProjectTeamPermissionsForm
 from projector.permissions import ProjectPermission
 from projector.settings import get_config_value
 
@@ -217,92 +212,4 @@ class ProjectEditView(ProjectView):
             'project': form.instance,
         }
         return context
-
-# ========================== #
-# Membership - user & groups #
-# ========================== #
-
-# Teams
-
-def project_teams(request, username, project_slug,
-        template_name='projector/project/teams/home.html'):
-    """
-    Shows/updates project's teams view.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    if project.is_private():
-        check = ProjectPermission(request.user)
-        if not check.has_perm('project_permission.view_teams_project',
-            project):
-            raise PermissionDenied()
-    teams = Team.objects.filter(project=project)
-
-    context = {
-        'project': project,
-        'teams': teams,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.add_team_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_teams_add(request, username, project_slug,
-        template_name='projector/project/teams/add.html'):
-    """
-    Adds team for a project.
-    """
-    project = get_object_or_404(Project, slug=project_slug,
-        author__username=username)
-    team = Team(
-        project = project,
-    )
-    form = TeamForm(request.POST or None, instance=team)
-
-    if request.method == 'POST' and form.is_valid():
-        logging.info("Saving team %s for project '%s'"
-            % (form.instance.group, form.instance.project))
-        form.save()
-        return redirect(project.get_teams_url())
-    elif form.errors:
-        logging.error("Form contains errors:\n%s" % form.errors)
-
-    context = {
-        'project': form.instance.project,
-        'form': form,
-    }
-    return render_to_response(template_name, context, RequestContext(request))
-
-@permission_required_or_403('project_permission.change_team_project',
-    (Project, 'slug', 'project_slug', 'author__username', 'username'))
-def project_teams_edit(request, username, project_slug, name,
-        template_name='projector/project/teams/edit.html'):
-    """
-    Manages settings and permissions of project's team.
-    """
-    team = get_object_or_404(Team, project__author__username=username,
-        project__slug=project_slug, group__name=name)
-    project = team.project
-    team_permissions = team.perms
-    codenames = [str(p.codename) for p in team_permissions]
-
-    form = ProjectTeamPermissionsForm(request.POST or None,
-        team = team,
-        initial_permissions = codenames,
-        request = request)
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            messages.success(request, _("Permissions updated"))
-        else:
-            messages.error(request,
-                _("Errors occured while processing the form"))
-        return redirect(team.get_absolute_url())
-    context = {
-        'project': project,
-        'form': form,
-        'team': team,
-        'team_permissions': team_permissions,
-    }
-
-    return render_to_response(template_name, context, RequestContext(request))
 

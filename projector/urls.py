@@ -32,17 +32,6 @@ urlpatterns += patterns('projector.views.project',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_details'),
 
-    # Teams
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/$',
-        view='project_teams',
-        name='projector_project_teams'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/add/$',
-        view='project_teams_add',
-        name='projector_project_teams_add'),
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/(?P<name>[-_ \w]+)/$',
-        view='project_teams_edit',
-        name='projector_project_teams_edit'),
-
 )
 
 # Milestones
@@ -104,6 +93,19 @@ urlpatterns += patterns('projector.views.project_member',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/members/(?P<member_username>\w+)/delete/$',
         view='MemberDeleteView',
         name='projector_project_member_delete'),
+)
+
+# Teams
+urlpatterns += patterns('projector.views.project_team',
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/$',
+        view='TeamListView',
+        name='projector_project_teams'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/add/$',
+        view='TeamAddView',
+        name='projector_project_teams_add'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/(?P<name>[-_ \w]+)/$',
+        view='TeamEditView',
+        name='projector_project_teams_edit'),
 )
 
 # Project's repository browsing
