@@ -1,5 +1,5 @@
 """
-Unit tests for ``django-projector``.
+Unit tests for ``django-projector``
 """
 import os
 import sys

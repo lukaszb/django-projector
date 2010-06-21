@@ -1,53 +1,20 @@
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
-from projector.models import Project
 from projector.settings import get_config_value
-from projector.permissions import ProjectPermission
-from projector.core.controllers import BaseView
+from projector.views.project import ProjectView
 
 from vcs.web.simplevcs.views import browse_repository, diff_file
 
-class ProjectView(BaseView):
+class RepositoryView(ProjectView):
+    perms = ProjectView.perms + ['read_repository_project']
 
-    perms = []
-    GET_perms = []
-    POST_perms = []
-
-    def __init__(self, request, username, project_slug):
-        self.request = request
-        self.project = get_object_or_404(Project, slug=project_slug,
-            author__username=username)
-        self.author = self.project.author
-        self.check_permissions()
-
-    def get_required_perms(self):
-        if self.request.method == 'GET':
-            return set(self.perms + self.GET_perms)
-        elif self.request.method == 'POST':
-            return set(self.perms + self.POST_perms)
-        else:
-            return self.perms
-
-    def check_permissions(self):
-        if self.project.author == self.request.user:
-            return
-        self.check = ProjectPermission(self.request.user)
-        if (self.project.is_private() or not
-            get_config_value('ALWAYS_ALLOW_READ_PUBLIC_PROJECTS')):
-            for perm in self.get_required_perms():
-                fullperm = '.'.join((self.check.label, perm))
-                if not self.check.has_perm(fullperm, self.project):
-                    raise PermissionDenied()
-
-class RepositoryBrowseView(ProjectView):
+class RepositoryBrowseView(RepositoryView):
 
     template_name = 'projector/project/repository/browse.html'
-    perms = ProjectView.perms + ['read_repository_project']
 
     def __init__(self, request, username, project_slug, rel_repo_url='',
             revision='tip'):
@@ -72,7 +39,7 @@ class RepositoryBrowseView(ProjectView):
         }
         return browse_repository(self.request, **repo_info)
 
-class RepositoryFileDiffView(ProjectView):
+class RepositoryFileDiffView(RepositoryView):
 
     template_name = 'projector/project/repository/diff.html'
 
@@ -97,7 +64,7 @@ class RepositoryFileDiffView(ProjectView):
         }
         return diff_file(self.request, **diff_info)
 
-class RepositoryFileRaw(ProjectView):
+class RepositoryFileRaw(RepositoryView):
 
     def __init__(self, request, username, project_slug, revision, rel_repo_url):
         super(RepositoryFileRaw, self).__init__(request, username, project_slug)
@@ -110,7 +77,7 @@ class RepositoryFileRaw(ProjectView):
         response['Content-Disposition'] = 'attachment; filename=%s' % node.name
         return response
 
-class RepositoryFileAnnotate(ProjectView):
+class RepositoryFileAnnotate(RepositoryView):
 
     template_name='projector/project/repository/annotate.html'
 
@@ -132,7 +99,7 @@ class RepositoryFileAnnotate(ProjectView):
             }
         return browse_repository(self.request, **repo_info)
 
-class RepositoryChangesets(ProjectView):
+class RepositoryChangesets(RepositoryView):
 
     template_name = 'projector/project/repository/changeset_list.html'
 

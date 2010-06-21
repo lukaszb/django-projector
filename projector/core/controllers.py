@@ -1,9 +1,10 @@
+from django.template import RequestContext
+from django.shortcuts import render_to_response
 from django.http import HttpRequest
-from projector.exceptions import NotRequestError
 
 class BaseView(object):
     """
-
+    Base class for django views.
     """
     def __new__(cls, request, *args, **kwargs):
         view = cls.new(request, *args, **kwargs)
@@ -11,18 +12,21 @@ class BaseView(object):
 
     @classmethod
     def new(cls, request, *args, **kwargs):
+        print cls.__name__
         obj = object.__new__(cls)
-        obj.__init__(request, *args, **kwargs)
-        if request is None or not isinstance(request, HttpRequest):
-            raise NotRequestError("Class based views requires HttpRequest "
+        if not isinstance(request, HttpRequest):
+            raise TypeError("Class based views requires HttpRequest "
                 "to be passed as first argument (got %s)" % request)
+        else:
+            obj.request = request
+        obj.__init__(request, *args, **kwargs)
         obj.args = args
         obj.kwargs = kwargs
         return obj
 
     def __init__(self, request, *args, **kwargs):
         """
-        Should be overridden, for example::
+        May be overridden, for example::
 
             def __init__(self, request, page_slug):
                 self.request = request
@@ -32,6 +36,30 @@ class BaseView(object):
         pass
 
     def __call__(self):
+        if self.args and self.kwargs:
+            response = self.response(self.request, *self.args, **self.kwargs)
+        elif self.args:
+            response = self.response(self.request, *self.args)
+        elif self.kwargs:
+            response = self.response(self.request, **self.kwargs)
+        else:
+            response = self.response(self.request)
+        return response
+
+    def response(self, request):
         raise NotImplementedError("BaseView subclasses should implement "
             "__call__ method (it should return django.http.HttpResponse)")
+
+class View(BaseView):
+
+    def __call__(self):
+        response = super(View, self).__call__()
+
+        if isinstance(response, dict):
+            return render_to_response(self.template_name, response,
+                RequestContext(self.request))
+        return response
+
+    def response(self, request):
+        return {}
 

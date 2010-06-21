@@ -14,10 +14,56 @@ from authority.decorators import permission_required_or_403
 
 from projector.models import Task, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
+from projector.filters import TaskFilter
 from projector.permissions import ProjectPermission
+from projector.views.project import ProjectView
 
 from richtemplates.shortcuts import get_first_or_None, get_json_response
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
+
+class ProjectTaskListView(ProjectView):
+    template_name='projector/project/task_list.html'
+    perms = ProjectView.perms + ['view_tasks_project']
+
+    def __init__(self, request, username, project_slug):
+        super(ProjectTaskListView, self).__init__(request, username,
+            project_slug)
+
+    def __call__(self):
+        task_list = Task.objects.filter(project__id=self.project.id)\
+                .select_related('priority', 'status', 'author', 'project')
+        filters = TaskFilter(self.request.GET, queryset=task_list,
+            project=self.project)
+        if self.request.GET and 'id' in self.request.GET and \
+                self.request.GET['id'] and filters.qs.count() == 1:
+            task = filters.qs[0]
+            messages.info(self.request, _("One task matched - redirecting..."))
+            return redirect(task.get_absolute_url())
+        context = {
+            'project': self.project,
+            'filters': filters,
+        }
+        return render_to_response(self.template_name, context,
+            RequestContext(self.request))
+
+class ProjectTaskDetailView(ProjectView):
+    template_name='projector/task/details.html'
+    perms = ProjectView.perms + ['view_tasks_project']
+
+    def __init__(self, request, username, project_slug, task_id):
+        super(ProjectTaskDetailView, self).__init__(request, username,
+            project_slug, task_id)
+        self.task = get_object_or_404(Task.objects.
+            select_related('type', 'priority', 'status', 'owner',
+                'author', 'editor', 'milestone', 'component', 'project'),
+            id = task_id,
+            project__author__username = username,
+            project__slug = project_slug)
+        self.project = self.task.project
+        self.author = self.project.author
+
+    def __call__(self):
+        pass
 
 def task_details(request, username, project_slug, task_id,
     template_name='projector/task/details.html'):

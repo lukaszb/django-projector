@@ -1,3 +1,4 @@
+import time
 import logging
 
 from django.conf import settings
@@ -34,21 +35,37 @@ def request_new_profile(sender, instance, **kwargs):
 def project_created_listener(sender, instance, **kwargs):
     """
     Creates all necessary related objects like statuses with transitions etc.
-    Could be heavy so should by handled asynchronously.
+
+    Could be heavy so should by handled asynchronously.  On the other hand, new
+    thread doesn't know if project has been already persisted or not - we need
+    to check if it is available from database first.
     """
     if not kwargs.get('created', False):
         # This listener is aimed for newly created projects only
         return
     if projector_settings.PROJECTS_ROOT_DIR:
-        # Hardcoding repository creation process until more backends
-        # are available from ``vcs``
-        repo_path = instance._get_repo_path()
-        alias = 'hg'
-        logging.info("Initializing new mercurial repository at %s" % repo_path)
-        repository = Repository.objects.create(path=repo_path, alias=alias)
-        instance.repository = repository
-        instance.create_workflow()
-        instance.save()
+        while True:
+            try:
+                instance = Project.objects.get(pk=instance.pk)
+                repo_path = instance._get_repo_path()
+
+                logging.info("Trying to initialize new mercurial repository at "
+                    "%s" % repo_path)
+
+                # Hardcoding repository creation process until more backends
+                # are available from ``vcs``
+                alias = 'hg'
+                repository = Repository.objects.create(path=repo_path,
+                    alias=alias)
+                instance.repository = repository
+                instance.create_workflow()
+                instance.save()
+            except Project.DoesNotExist:
+                secs = 1
+                logging.info("Sleeping for %s second(s)" % secs)
+                time.sleep(secs)
+            else:
+                break
     else:
         logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
             "create repository for this project.")
