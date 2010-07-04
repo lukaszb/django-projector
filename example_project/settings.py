@@ -19,17 +19,6 @@ DATABASES = {
     },
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'pycenter',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        'USER': 'lukaszb',
-        'PASSWORD': '',
-    },
-}
-
 # Make sqlite3 files relative to project's directory
 for db, conf in DATABASES.items():
     if conf['ENGINE'] == 'sqlite3' and not conf['NAME'].startswith(':'):
