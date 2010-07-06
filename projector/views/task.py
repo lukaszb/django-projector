@@ -185,7 +185,7 @@ class TaskEditView(ProjectView):
     template_name = 'projector/task/create.html'
     private_perms = ProjectView.private_perms + ['can_change_task']
 
-    def response(request, username, project_slug, task_id):
+    def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
             project__author__username=username, project__slug=project_slug)
 

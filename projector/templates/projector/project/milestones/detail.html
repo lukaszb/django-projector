@@ -24,10 +24,11 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <h2>{% trans "Description" %}:</h2>
-        <div class="block-rst">
-            {{ milestone.description|restructuredtext }}
+            <h2>{% trans "Description" %}:</h2>
+            <div class="block-rst">
+                {{ milestone.description|safe|restructuredtext }}
+            </div>
+            
         </div>
 
         {% include "projector/project/milestones/progress_table.html" %}

@@ -119,6 +119,7 @@ class TaskEditForm(TaskForm):
         label=_('Comment'), widget=forms.Textarea, required=False)
 
     def __init__(self, *args, **kwargs):
+        print args, kwargs
         super(TaskEditForm, self).__init__(*args, **kwargs)
         if 'status' in self.fields:
             status_field = self['status'].field
