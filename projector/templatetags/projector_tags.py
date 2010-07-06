@@ -8,7 +8,7 @@ from django import template
 from django.utils.translation import ugettext as _
 
 from projector.models import Task
-from projector.extras.users.models import get_user_from_string
+from projector.models import get_user_from_string
 
 register = template.Library()
 

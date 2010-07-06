@@ -45,10 +45,10 @@ INSTALLED_APPS = (
 
     # External
     'attachments',
-    'authority',
     'djalog',
     'django_extensions',
     'django_sorting',
+    'guardian',
     'keyedcache',
     'livesettings',
     'pagination',
@@ -166,4 +166,10 @@ try:
     from conf.local_settings import *
 except ImportError:
     pass
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
+ANONYMOUS_USER_ID = -1
 

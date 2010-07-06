@@ -2,11 +2,12 @@
 
 {% load markup %}
 {% load i18n %}
-{% load permissions %}
+{% load guardian_tags %}
 
 {% block col_main_title %}{{ project.name }}{% endblock %}
 
 {% block col_main_extra %}
+{% get_obj_perms request.user for project as "project_perms" %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Workflow schema" %}</h5>
     <div class="richtemplates-panel-content">
@@ -14,16 +15,14 @@
         <ul class="nav-inline">
             <li class="richbuttonset">
                 <a class="button-link"href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
-                {% ifhasperm "project_permission.change_project" request.user project %}
+                {% if "change_project" in project_perms %}
                 <a class="button-link"href="{{ project.get_workflow_add_status_url }}">{% trans "Add status" %}</a>
-                {% endifhasperm %}
+                {% endif %}
             </li>
             <li>
-                {% ifhasperm "project_permission.change_project" request.user project %}
-                {% if workflow %}
+                {% if "change_project" in project_perms and workflow %}
                 <a class="button-link richbutton-wrench"href="{{ project.get_workflow_edit_url }}">{% trans "Edit" %}</a>
                 {% endif %}
-                {% endifhasperm %}
             </li>
         </ul>
         {% endblock %}

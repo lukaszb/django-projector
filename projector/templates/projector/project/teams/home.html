@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load pagination_tags %}
 {% load sorting_tags %}
-{% load permissions %}
+{% load guardian_tags %}
 
 {% block col_main_extra %}
 
@@ -15,12 +15,14 @@
     <div class="richtemplates-panel-content">
 
         {% block teams_menu %}
+        {% get_obj_perms request.user for project as "project_perms" %}
+
         <ul class="nav-inline">
             <li class="richbuttonset">
                 <a class="button-link" href="{{ project.get_teams_url }}">{% trans "Teams" %}</a>
-                {% ifhasperm "project_permission.add_team_project" request.user project %}
-                <a class="button-link" href="{{ project.get_teams_add_url }}">{% trans "Add new team" %}</a>
-                {% endifhasperm %}
+                {% if "can_add_team" in project_perms %}
+                <a class="button-link" href="{{ project.get_teams_add_url }}">{% trans "Add team" %}</a>
+                {% endif %}
             </li>
         </ul>
         {% endblock %}

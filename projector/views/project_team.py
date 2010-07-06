@@ -8,6 +8,8 @@ from projector.models import Team
 from projector.views.project import ProjectView
 from projector.forms import TeamForm, ProjectTeamPermissionsForm
 
+from guardian.shortcuts import get_perms
+
 class TeamListView(ProjectView):
     """
     Returns teams view.
@@ -61,14 +63,17 @@ class TeamEditView(ProjectView):
     template_name = 'projector/project/teams/edit.html'
 
     def response(self, request, username, project_slug, name):
-        team = get_object_or_404(Team, project__author__username=username,
+        team = get_object_or_404(
+            Team.objects.select_related('group', 'project'),
+            project__author__username=username,
             project__slug=project_slug, group__name=name)
-        team_permissions = team.perms
-        codenames = [str(p.codename) for p in team_permissions]
+
+        group, project = team.group, team.project
+        team_perms = get_perms(group, project)
 
         form = ProjectTeamPermissionsForm(request.POST or None,
             team = team,
-            initial_permissions = codenames,
+            initial_permissions = team_perms,
             request = request)
         if request.method == 'POST':
             if form.is_valid():
@@ -82,7 +87,7 @@ class TeamEditView(ProjectView):
             'project': self.project,
             'form': form,
             'team': team,
-            'team_permissions': team_permissions,
+            'team_perms': team_perms,
         }
         return context
 

@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load pagination_tags %}
 {% load sorting_tags %}
-{% load permissions %}
+{% load guardian_tags %}
 
 {% block col_main_extra %}
 
@@ -14,12 +14,14 @@
     <h5>{% trans "Project's members" %}</h5>
     <div class="richtemplates-panel-content">
     {% block members_menu %}
+    {% get_obj_perms request.user for project as "project_perms" %}
+
     <ul class="nav-inline">
         <li class="richbuttonset">
             <a  class="button-link"href="{{ project.get_members_url }}">{% trans "Members" %}</a>
-            {% ifhasperm "project_permission.add_member_project" request.user project %}
-            <a  class="button-link"href="{{ project.get_members_add_url }}">{% trans "Add new member" %}</a>
-            {% endifhasperm %}
+            {% if "can_add_member" in project_perms %}
+            <a  class="button-link"href="{{ project.get_members_add_url }}">{% trans "Add member" %}</a>
+            {% endif %}
         </li>
     </ul>
     {% endblock %}

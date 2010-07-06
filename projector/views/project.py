@@ -12,7 +12,6 @@ from django.utils.decorators import method_decorator
 from projector.core.controllers import View
 from projector.models import Project
 from projector.forms import ProjectForm
-from projector.permissions import ProjectPermission
 from projector.settings import get_config_value
 
 from vcs.web.simplevcs import settings as simplevcs_settings
@@ -26,16 +25,16 @@ class ProjectView(View):
     """
     Base class for all projector views.
 
-    Logic should be implemented at ``__call__`` method. It does *NOT* accept
-    any parameters.
+    Logic should be implemented at ``response`` method.
 
     Would check necessary permissions defined by class attributes: ``perms``,
     ``GET_perms`` and ``POST_perms``. ``perms`` are always checked,
     ``GET_perms`` are additional checks which would be made for ``GET`` method
-    requets only and ``POST_perms`` would be made for ``POST`` method requests.
+    requests only and ``POST_perms`` would be made for ``POST`` method requests.
     """
 
-    perms = ['view_project']
+    perms = []
+    private_perms = ['view_project']
     GET_perms = []
     POST_perms = []
 
@@ -48,23 +47,23 @@ class ProjectView(View):
         self.check_permissions()
 
     def get_required_perms(self):
+        perms = self.perms
         if self.request.method == 'GET':
-            return set(self.perms + self.GET_perms)
-        elif self.request.method == 'POST':
-            return set(self.perms + self.POST_perms)
-        else:
-            return self.perms
+            perms += self.GET_perms
+        if self.request.method == 'POST':
+            perms += self.POST_perms
+        if self.project.is_private():
+            perms += self.private_perms
+        return perms
 
     def check_permissions(self):
+        # Owner's are always allowed to do anything with their projects
+        # this would also make less database hits
         if self.project.author == self.request.user:
             return
-        self.check = ProjectPermission(self.request.user)
-        if (self.project.is_private() or not
-            get_config_value('ALWAYS_ALLOW_READ_PUBLIC_PROJECTS')):
-            for perm in self.get_required_perms():
-                fullperm = '.'.join((self.check.label, perm))
-                if not self.check.has_perm(fullperm, self.project):
-                    raise PermissionDenied()
+        for perm in self.get_required_perms():
+            if not self.request.user.has_perm(perm, self.project):
+                raise PermissionDenied()
 
 class ProjectDetailView(ProjectView):
     """
@@ -79,6 +78,8 @@ class ProjectDetailView(ProjectView):
 
     def get_required_perms(self):
         if is_mercurial(self.request):
+            # For mercurial requests lets undelying view to
+            # manage permissions checking
             return []
         return super(ProjectDetailView, self).get_required_perms()
 
@@ -88,8 +89,8 @@ class ProjectDetailView(ProjectView):
                 return _project_detail_hg(request, self.project)
             last_part = request.path.split('/')[-1]
             if last_part and last_part != project_slug:
-                raise Http404("Not a mercurial request and path longer than should "
-                    "be: %s" % request.path)
+                raise Http404("Not a mercurial request and path longer than "
+                    " should be: %s" % request.path)
 
             context = {
                 'project': self.project,
@@ -130,14 +131,12 @@ def _project_detail_hg(request, project):
         return ask_basic_auth(request,
             realm=get_config_value('BASIC_AUTH_REALM'))
 
-    check = ProjectPermission(request.user)
-
     if project.is_private() and request.method == 'GET' and\
-        not check.read_repository_project(project):
+        not request.user.has_perm('can_read_repository', project):
         raise PermissionDenied("User %s cannot read repository for "
             "project %s" % (request.user, project))
     elif request.method == 'POST' and\
-        not check.write_repository_project(project):
+        not request.user.has_perm('can_write_to_repository',project):
         raise PermissionDenied("User %s cannot write to repository "
             "for project %s" % (request.user, project))
 

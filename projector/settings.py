@@ -3,8 +3,6 @@ import logging
 
 from django.conf import settings
 
-from projector.utils.basic import codename_to_label
-
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
 BANNED_PROJECT_NAMES = getattr(settings, 'PROJECTOR_BANNED_PROJECT_NAMES', ())
@@ -46,27 +44,23 @@ else:
         logging.info("django-projector: created %s directory"
             % PROJECTS_ROOT_DIR)
 
-
 editable_perm_codenames = (
-    'project_permission.view_project',
-
-    'project_permission.view_members_project',
-    'project_permission.add_member_project',
-    'project_permission.change_member_project',
-    'project_permission.delete_member_project',
-
-    'project_permission.view_teams_project',
-    'project_permission.add_team_project',
-    'project_permission.change_team_project',
-    'project_permission.delete_team_project',
-
-    'project_permission.view_tasks_project',
-    'project_permission.add_task_project',
-    'project_permission.change_task_project',
-    'project_permission.delete_task_project',
-
-    'project_permission.read_repository_project',
-    'project_permission.write_repository_project',
+    'change_project',
+    'view_project',
+    'can_read_repository',
+    'can_write_to_repository',
+    'can_change_description',
+    'can_change_category',
+    'can_add_task',
+    'can_change_task',
+    'can_delete_task',
+    'can_view_tasks',
+    'can_add_member',
+    'can_change_member',
+    'can_delete_member',
+    'can_add_team',
+    'can_change_team',
+    'can_delete_team',
 )
 
 # Following settings may be changed dynamically (livesettings)

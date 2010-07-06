@@ -8,9 +8,9 @@ This project management system aims to be used by small to middle companies.
 Object-level permissions
 ------------------------
 
-``django-projector`` make use of `django-authority`_ to handle object-level
+``django-projector`` make use of `django-guardian`_ to handle object-level
 permissions. Check out it's `documentation
-<http://packages.python.org/django-authority/>`_ to see detailed information
+<http://packages.python.org/django-guardian/>`_ to see detailed information
 on the topic.
 
 Project permissions
@@ -18,18 +18,21 @@ Project permissions
 
 Following permissions are defined for each project:
 
-- ``view``
-- ``view_members``
-- ``add_member``
-- ``change_member``
-- ``delete_member``
-- ``view_tasks``
-- ``add_task``
-- ``change_task``
-- ``read_repository``
-- ``write_repository``
+- ``change_project``
+- ``view_project``
+- ``can_read_repository``
+- ``can_write_to_repository``
+- ``can_change_description``
+- ``can_change_category``
+- ``can_add_task``
+- ``can_change_task``
+- ``can_delete_task``
+- ``can_view_tasks``
+- ``can_add_member``
+- ``can_change_member``
+- ``can_delete_member``
+- ``can_add_team``
+- ``can_change_team``
+- ``can_delete_team``
 
-.. note::
-   ``django-authority`` adds suffix ``_project`` for each of this permissions.
-
-.. _django-authority: http://bitbucket.org/jezdez/django-authority/
+.. _django-guardian: http://github.com/lukaszb/django-guardian/

@@ -33,7 +33,7 @@ setup(
         'django-attachments',
         'django-tagging',
         'django-autoslug',
-        'django-authority',
+        'django-guardian',
         'django-keyedcache',
         'django-signals-ahoy',
         'django-registration',

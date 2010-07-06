@@ -4,6 +4,9 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 
+from guardian.shortcuts import assign, remove_perm, get_perms,\
+    get_perms_for_model
+
 from projector.models import Membership
 from projector.models import Team
 from projector.models import Project
@@ -12,7 +15,6 @@ from projector.models import Status
 from projector.models import Component
 from projector.models import Milestone
 from projector.models import UserProfile
-from projector.utils.basic import codename_to_label
 from projector.settings import get_config_value
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
@@ -148,8 +150,11 @@ class MembershipForm(LimitingModelForm):
         return member
 
 def get_editable_perms():
-    return ((codename, codename_to_label(codename)) for codename in
-            get_config_value('PROJECT_EDITABLE_PERMISSIONS'))
+    editable_perms = get_config_value('PROJECT_EDITABLE_PERMISSIONS')
+    perms = [(p.codename, p.name) for p in get_perms_for_model(Project)
+        if p.codename in editable_perms]
+    perms.sort(key=lambda pair: pair[0])
+    return perms
 
 class MembershipDeleteForm(forms.Form):
     post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
@@ -179,38 +184,34 @@ class ProjectMembershipPermissionsForm(forms.Form):
         """
         Saves granted permissions and removes those switched off.
         """
-        from projector.permissions import get_or_create_permisson
-        from projector.permissions import remove_permission
-        granted_codenames = self.cleaned_data['permissions']
-        member_perms = self.membership.all_perms
-        current_codenames = [p.codename for p in member_perms]
-        # Grant permissions
-        for codename in granted_codenames:
-            if codename not in current_codenames:
-                get_or_create_permisson(
-                    codename = codename,
-                    obj = self.membership.project,
-                    user = self.membership.member,
-                    creator = self.request.user,
-                )
-                self._message('info', _("Permission added: %s" % codename))
-        # Remove permissions
-        for codename in current_codenames:
-            if codename not in granted_codenames:
-                remove_permission(
-                    codename = codename,
-                    obj = self.membership.project,
-                    user = self.membership.member,
-                )
-                self._message('warning', _("Permission removed: %s" % codename))
-        # if permission stays after removal - member probably got perm from
-        # his/her team
+        member, project = self.membership.member, self.membership.project
 
-    def get_codenames(self):
-        """
-        Returns codenames of editable permissions.
-        """
-        return [choice[0] for choice in self.fields['permissions'].choices]
+        granted_perms = self.cleaned_data['permissions']
+        logging.info("Granted perms: %s" % granted_perms)
+        member_perms = get_perms(member, project)
+        # Grant permissions
+        for perm in granted_perms:
+            if perm not in member_perms:
+                assign(perm, member, project)
+                self._message('info', _("Permission added: %s" % perm))
+        # Remove permissions
+        for perm in member_perms:
+            if perm not in granted_perms:
+                remove_perm(perm, member, project)
+                # notify user if perm is still granted by member's groups
+                groups_with_perm = member.groups.filter(
+                    groupobjectpermission__permission__codename=perm)
+                if groups_with_perm:
+                    messages.warning(self.request, _("Permission %(perm)s is "
+                        "still granted for %(user)s as following group(s) "
+                        "has/have it: %(groups)s" % {
+                            'perm': perm,
+                            'user': member,
+                            'groups': ', '.join(
+                                (str(group) for group in groups_with_perm)
+                            )
+                        }))
+                self._message('warning', _("Permission removed: %s" % perm))
 
 class ProjectTeamPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(
@@ -236,36 +237,20 @@ class ProjectTeamPermissionsForm(forms.Form):
         """
         Saves granted permissions and removes those switched off.
         """
-        from projector.permissions import get_or_create_permisson
-        from projector.permissions import remove_permission
-        granted_codenames = self.cleaned_data['permissions']
-        team_perms = self.team.perms
-        current_codenames = [p.codename for p in team_perms]
-        # Grant permissions
-        for codename in granted_codenames:
-            if codename not in current_codenames:
-                get_or_create_permisson(
-                    codename = codename,
-                    obj = self.team.project,
-                    group = self.team.group,
-                    creator = self.request.user,
-                )
-                self._message('info', _("Permission added: %s" % codename))
-        # Remove permissions
-        for codename in current_codenames:
-            if codename not in granted_codenames:
-                remove_permission(
-                    codename = codename,
-                    obj = self.team.project,
-                    group = self.team.group,
-                )
-                self._message('warning', _("Permission removed: %s" % codename))
+        group, project = self.team.group, self.team.project
 
-    def get_codenames(self):
-        """
-        Returns codenames of editable permissions.
-        """
-        return [choice[0] for choice in self.fields['permissions'].choices]
+        granted_perms = self.cleaned_data['permissions']
+        team_perms = get_perms(group, project)
+        # Grant permissions
+        for perm in granted_perms:
+            if perm not in team_perms:
+                assign(perm, group, project)
+                self._message('info', _("Permission added: %s" % perm))
+        # Remove permissions
+        for perm in team_perms:
+            if perm not in granted_perms:
+                remove_perm(perm, group, project)
+                self._message('warning', _("Permission removed: %s" % perm))
 
 class TeamForm(LimitingModelForm):
     group = ModelByNameField(queryset=Group.objects.all,

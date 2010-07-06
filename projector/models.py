@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
-from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.auth.models import User, Group, AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
@@ -17,15 +17,19 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.contrib.sites.models import Site
 
-from authority.models import Permission
+from guardian.shortcuts import assign, get_perms, get_perms_for_model
+
 from autoslug import AutoSlugField
+
 from projector.conf import default_workflow
 from projector.utils import abspath, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
 from projector.settings import get_config_value
 from projector.managers import ProjectManager, TeamManager, WatchedItemManager
+
 from vcs.web.simplevcs.models import Repository
+
 from richtemplates.models import UserProfile as RichUserProfile
 
 
@@ -161,6 +165,7 @@ class Project(models.Model, Watchable):
         ordering = ['name']
         get_latest_by = 'created_at'
         permissions = (
+            ('view_project', 'Can view project'),
             ('can_read_repository', 'Can read repository'),
             ('can_write_to_repository', 'Can write to repository'),
             ('can_change_description', 'Can change description'),
@@ -168,9 +173,13 @@ class Project(models.Model, Watchable):
             ('can_add_task', 'Can add task'),
             ('can_change_task', 'Can change task'),
             ('can_delete_task', 'Can delete task'),
+            ('can_view_tasks', 'Can view tasks'),
             ('can_add_member', 'Can add member'),
             ('can_change_member', 'Can change member'),
             ('can_delete_member', 'Can delete member'),
+            ('can_add_team', 'Can add team'),
+            ('can_change_team', 'Can change team'),
+            ('can_delete_team', 'Can delete team'),
         )
 
     def __unicode__(self):
@@ -180,17 +189,10 @@ class Project(models.Model, Watchable):
         """
         Creates all permissions for project's author.
         """
-        from projector.permissions import ProjectPermission
-        from projector.permissions import get_or_create_permisson
-        codenames = ['%s.%s' % (ProjectPermission.label, check) for check in
-            ProjectPermission.get_local_checks() if check != 'add_project']
-        for codename in codenames:
-            get_or_create_permisson(
-                codename = codename,
-                obj = self,
-                user = self.author,
-                creator = self.author,
-            )
+        perms = [p.codename for p in get_perms_for_model(Project)
+            if p.codename != 'add_project']
+        for perm in perms:
+            assign(perm, self.author, self)
 
     def is_public(self):
         return self.public
@@ -419,20 +421,16 @@ class Project(models.Model, Watchable):
             # as superusers has all permissions
             return
         import itertools
-        from projector.permissions import ProjectPermission
-        from projector.permissions import get_or_create_permisson
-        available_permissions = ProjectPermission.get_local_checks()
+        available_permissions = set([p.codename for p in
+            get_perms_for_model(Project) if p.codename != 'add_project'])
 
-        perms = Permission.objects.for_user(self.author, self)
-        perms_set = itertools.chain(perms.values_list('codename'))
+        perms = get_perms(self.author, self)
+        perms_set = set(itertools.chain(perms.values_list('codename')))
         for perm in available_permissions:
             if not perm in perms_set:
                 logging.debug("Project '%s': adding '%s' permission for user "
                     "'%s'" % (self, perm, self.author))
-                get_or_create_permisson(
-                    user = self.author,
-                    obj = self,
-                    codename = perm)
+                assign(perm, self.author, self)
 
     def create_workflow(self, workflow=default_workflow):
         """
@@ -575,16 +573,14 @@ class Membership(models.Model):
     @LazyProperty
     def perms(self):
         """
-        Returns Permission objects (django-authority) for member, not his/her
-        groups.
+        Returns Permission objects for member, not his/her groups.
         """
-        from projector.permissions import get_perms
         return get_perms(self.member, self.project)
 
     @LazyProperty
     def all_perms(self):
         """
-        Returns all Permission objects (django-authority) for member's and
+        Returns all Permission objects for member's and
         his/he groups (to fetch user specific permissions only, use ``perms``
         instead).
         """
@@ -633,7 +629,6 @@ class Team(models.Model):
 
     @LazyProperty
     def perms(self):
-        from projector.permissions import get_perms
         return get_perms(self.group, self.project)
 
 class Milestone(models.Model):
@@ -1075,6 +1070,54 @@ class UserProfile(RichUserProfile):
     def __unicode__(self):
         return u"<%s's profile>" % self.user
 
+
+class UserId(models.Model):
+    """
+    This class would allow to identify users by some kind of id string. Created
+    for repository browser - many scm's allow to use username/email combination
+    and they may vary. User would be allowed to add such combinations in order
+    to be identified by information given from changesets.
+    If email is found within given ``raw_id``, user would need to activate this
+    UserId - message would be send to the email found.
+    """
+    user = models.ForeignKey(User, verbose_name = _('user'))
+    raw_id = models.CharField(_('Raw ID'), max_length=128, unique=True)
+    is_active = models.BooleanField(_('is active'), default=False)
+    activation_token = models.CharField(_('activation_token'), max_length=32,
+        editable=False)
+
+    def __unicode__(self):
+        return self.raw_id
+
+    def save(self, *args, **kwargs):
+        if self.raw_id:
+            user = get_user_from_string(self.raw_id)
+            if user:
+                raise ValidationError(_("User %s has been identified by this "
+                    "value" % user))
+        return super(UserId, self).save(*args, **kwargs)
+
+def get_user_from_string(value):
+    """
+    Returns User instance if given text can be identified or None otherwise.
+    First it tries to match with User.username or User.email, next would try
+    to match with UserId.raw_id.
+    """
+    if not value:
+        return None
+    try:
+        return User.objects.get(username=value)
+    except User.DoesNotExist:
+        pass
+    try:
+        return User.objects.get(email=value)
+    except User.DoesNotExist:
+        pass
+    try:
+        return UserId.objects.get(raw_id=value).user
+    except UserId.DoesNotExist:
+        pass
+    return None
 
 # ================ #
 # Signals handlers #

@@ -4,12 +4,15 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.admin.util import NestedObjects
+from django.contrib.contenttypes.models import ContentType
 
 from projector.models import Membership
 from projector.views.project import ProjectView
 from projector.forms import MembershipForm, ProjectMembershipPermissionsForm
 from projector.forms import MembershipDeleteForm
-from projector.permissions import get_perms_for_user
+
+from guardian.models import UserObjectPermission
+from guardian.shortcuts import get_perms
 
 class MemberListView(ProjectView):
     """
@@ -59,7 +62,7 @@ class MemberEditView(ProjectView):
     Manages membership settings and permissions of project's member.
     """
 
-    perms = ProjectView.perms + ['change_member_project']
+    perms = ProjectView.perms + ['can_change_member']
     template_name = 'projector/project/members/edit.html'
 
     def response(self, request, username, project_slug, member_username):
@@ -76,12 +79,11 @@ class MemberEditView(ProjectView):
             messages.warning(request, _("Project owner's membership cannot be "
                 "modified. He/She has all permissions for this project."))
             return redirect(project.get_members_url())
-        member_permissions = membership.all_perms
-        codenames = [str(p.codename) for p in member_permissions]
+        member_perms = get_perms(member, project)
 
         form = ProjectMembershipPermissionsForm(request.POST or None,
             membership = membership,
-            initial_permissions = codenames,
+            initial_permissions = member_perms,
             request = request)
         if request.method == 'POST':
             if form.is_valid():
@@ -96,7 +98,7 @@ class MemberEditView(ProjectView):
             'project': self.project,
             'form': form,
             'membership': membership,
-            'member_permissions': member_permissions,
+            'member_perms': member_perms,
         }
         return context
 
@@ -125,7 +127,10 @@ class MemberDeleteView(ProjectView):
         collector = NestedObjects()
         membership._collect_sub_objects(collector)
         form = MembershipDeleteForm(request.POST or None)
-        perms_to_delete = get_perms_for_user(member, project)
+        perms_to_delete = UserObjectPermission.objects.filter(
+            user = member,
+            content_type = ContentType.objects.get_for_model(project),
+            object_id = project.id)
 
         if request.method == 'POST':
             # Confirm removal

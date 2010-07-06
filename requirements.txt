@@ -5,12 +5,14 @@ Sphinx==0.6.5
 Sphinx-PyPI-upload==0.2.1
 django-admin-tools==0.2.0
 django-attachments==0.3.1
-django-authority==0.4
 django-autoslug>=1.4.1
 django-devserver==0.0.3
 django-extensions==0.4.1
+django-guardian==0.1.0
 django-keyedcache==1.4-1
 django-filter==0.5.3
+django-mailer==0.1.0
+django-native-tags==0.4
 django-notification==0.1.5
 django-pagination==1.0.7
 django-registration==0.7

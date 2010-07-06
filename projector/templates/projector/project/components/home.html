@@ -1,10 +1,12 @@
 {% extends "projector/project/details.html" %}
 
 {% load i18n %}
-{% load permissions %}
+{% load guardian_tags %}
 {% load richtemplates_tags %}
 
 {% block col_main_extra %}
+
+{% get_obj_perms request.user for project as "project_perms" %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's components" %}</h5>
@@ -13,16 +15,14 @@
     <ul class="nav-inline">
         <li class="richbuttonset">
             <a class="button-link" href="{{ project.get_components_url }}">{% trans "Components" %}</a>
-            {% ifhasperm "project_permission.change_project" request.user project %}
+            {% if "change_project" in project_perms %}
             <a class="button-link" href="{{ project.get_component_add_url }}">{% trans "Add component" %}</a>
-            {% endifhasperm %}
+            {% endif %}
         </li>
         <li>
-            {% ifhasperm "project_permission.change_project" request.user project %}
-            {% if component %}
+            {% if "change_project" in project_perms and component %}
             <a class="button-link richbutton-wrench" href="{{ component.get_edit_url }}">{% trans "Edit" %}</a>
             {% endif %}
-            {% endifhasperm %}
         </li>
     </ul>
     {% endblock %}

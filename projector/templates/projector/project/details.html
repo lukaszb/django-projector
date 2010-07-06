@@ -2,7 +2,7 @@
 
 {% load markup %}
 {% load i18n %}
-{% load permissions %}
+{% load guardian_tags %}
 {% load native %}
 
 {% block extra_head %}{{ block.super }}
@@ -11,16 +11,19 @@
         $('#id_project_repository_url').click(function(){
             this.select();
         });
-        {% ifhasperm "project_permission.change_project" request.user project %}        
+        {% get_obj_perms request.user for project as "project_perms" %}
+        {% if "change_project" in project_perms %}        
         $('#admin-link').button({
             icons: { primary: "ui-icon-wrench" }
         })
-        {% endifhasperm %}
+        {% endif %}
     });
 </script>
 {% endblock %}
 
 {% block col_left %}{{ block.super }}
+
+{% get_obj_perms request.user for project as "project_perms" %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Projects' tasks summary" %}</h5>
@@ -94,6 +97,7 @@
 {% block col_main_title %}{{ project.name }}{% endblock %}
 
 {% block col_main %}
+{% get_obj_perms request.user for project as "project_perms" %}
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
     <div class="richtemplates-panel-content">
@@ -115,13 +119,13 @@
             </li>
         </ul>
 
-        {% ifhasperm "project_permission.change_project" request.user project %}
+        {% if "change_project" in project_perms %}
         <ul class="nav-inline">
             <li class="richbuttonset">
                 <a id="admin-link" class="button-link" href="{{ project.get_edit_url }}">{% trans "Admin" %}</a>
             </li>
         </ul>
-        {% endifhasperm %}
+        {% endif %}
 
         {% with project.get_repo_url|put_username_into_url:user as project_url %}
         <ul class="messages">

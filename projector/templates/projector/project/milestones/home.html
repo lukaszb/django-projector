@@ -1,7 +1,7 @@
 {% extends "projector/project/details.html" %}
 
 {% load i18n %}
-{% load permissions %}
+{% load guardian_tags %}
 {% load richtemplates_tags %}
 
 {% block col_main_extra %}
@@ -10,19 +10,19 @@
     <h5>{% trans "Project's milestones" %}</h5>
     <div class="richtemplates-panel-content">
     {% block milestones_menu %}
+    {% get_obj_perms request.user for project as "project_perms" %}
+
     <ul class="nav-inline">
         <li class="richbuttonset">
             <a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a>
-            {% ifhasperm "project_permission.change_project" request.user project %}
+            {% if "change_project" in project_perms %}
             <a class="button-link" href="{{ project.get_milestones_add_url }}">{% trans "Add milestone" %}</a>
-            {% endifhasperm %}
+            {% endif %}
         </li>
         <li>
-            {% ifhasperm "project_permission.change_project" request.user project %}
-            {% if milestone %}
+            {% if "change_project" in project_perms and milestone %}
             <a class="button-link richbutton-wrench" href="{{ milestone.get_edit_url }}">{% trans "Edit" %}</a>
             {% endif %}
-            {% endifhasperm %}
         </li>            
     </ul>
     {% endblock %}
