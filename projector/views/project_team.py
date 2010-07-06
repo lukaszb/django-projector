@@ -2,13 +2,16 @@ import logging
 
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
+from django.contrib.admin.util import NestedObjects
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 
 from projector.models import Team
 from projector.views.project import ProjectView
-from projector.forms import TeamForm, ProjectTeamPermissionsForm
+from projector.forms import TeamForm, ProjectTeamPermissionsForm, TeamDeleteForm
 
 from guardian.shortcuts import get_perms
+from guardian.models import GroupObjectPermission
 
 class TeamListView(ProjectView):
     """
@@ -88,6 +91,51 @@ class TeamEditView(ProjectView):
             'form': form,
             'team': team,
             'team_perms': team_perms,
+        }
+        return context
+
+class TeamDeleteView(ProjectView):
+    """
+    Removes Group membership from the project.
+    """
+
+    perms = ProjectView.perms + ['can_delete_team']
+    template_name = 'projector/project/teams/delete.html'
+
+    def response(self, request, username, project_slug, name):
+        team = get_object_or_404(
+            Team.objects.select_related('group', 'project'),
+            project__author__username=username,
+            project__slug=project_slug, group__name=name)
+
+        group, project = team.group, team.project
+
+        collector = NestedObjects()
+        team._collect_sub_objects(collector)
+        form = TeamDeleteForm(request.POST or None)
+        perms_to_delete = GroupObjectPermission.objects.filter(
+            group = group,
+            content_type = ContentType.objects.get_for_model(project),
+            object_id = project.id)
+
+        if request.method == 'POST':
+            # Confirm removal
+            if form.is_valid():
+                msg = _("Team removed")
+                messages.success(request, msg)
+                team.delete()
+                perms_to_delete.delete()
+                return redirect(project.get_teams_url())
+            else:
+                msg = _("Couldn't remove team")
+                messages.error(request, msg)
+
+        context = {
+            'project': project,
+            'team': team,
+            'form': form,
+            'to_delete': collector.nested(),
+            'team_perms': perms_to_delete,
         }
         return context
 

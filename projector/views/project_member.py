@@ -137,7 +137,7 @@ class MemberDeleteView(ProjectView):
                 msg = _("Membership removed")
                 messages.success(request, msg)
                 membership.delete()
-                perms_to_delete.update(approved=False)
+                perms_to_delete.delete()
                 return redirect(project.get_members_url())
             else:
                 msg = _("Couldn't remove membership")

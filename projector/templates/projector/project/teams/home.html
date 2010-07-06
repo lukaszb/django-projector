@@ -31,14 +31,21 @@
             <thead class="datatable-thead">
                 <tr class="datatable-thead-subheader">
                     <th>{% trans "Team" %}</th>
+                    <th>{% anchor joined_at "Joined at" %}</th>
                     <th>{% trans "Permissions" %}</th>
+                    <th>{% trans "Remove" %}</th>                    
                 </tr>
             </thead>
             <tbody class="datatable-tbody">
                 {% for team in team_list %}
                 <tr class="{% cycle "odd" "even" %} hoverable">
                     <td>{{ team.group }}</td>
+                    <td>{{ team.joined_at }}</td>
                     <td><a class="block-link" href="{{ team.get_absolute_url }}">{% trans "Manage" %}</a></td>
+                    <td>
+                        <a href="{{ team.get_delete_url }}"
+                           class="block-link deletelink">{% trans "Delete" %}</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

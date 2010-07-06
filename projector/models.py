@@ -627,6 +627,14 @@ class Team(models.Model):
             'name': self.group.name,
         })
 
+    @models.permalink
+    def get_delete_url(self):
+        return ('projector_project_teams_delete', (), {
+            'username': self.project.author.username,
+            'project_slug': self.project.slug,
+            'name': self.group.name,
+        })
+
     @LazyProperty
     def perms(self):
         return get_perms(self.group, self.project)

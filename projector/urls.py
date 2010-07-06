@@ -106,6 +106,9 @@ urlpatterns += patterns('projector.views.project_team',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/(?P<name>[-_ \w]+)/$',
         view='TeamEditView',
         name='projector_project_teams_edit'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/teams/(?P<name>[-_ \w]+)/delete/$',
+        view='TeamDeleteView',
+        name='projector_project_teams_delete'),
 )
 
 # Project's repository browsing

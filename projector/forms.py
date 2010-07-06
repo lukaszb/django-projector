@@ -273,6 +273,9 @@ class TeamForm(LimitingModelForm):
         return group
 
 
+class TeamDeleteForm(forms.Form):
+    post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
+
 class MilestoneForm(forms.ModelForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
