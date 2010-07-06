@@ -74,8 +74,7 @@ class MemberEditView(ProjectView):
 
         member = membership.member
         project = membership.project
-        if not request.user.is_superuser and project.author == member:
-            # allow if requested by superuser only to show message
+        if project.author == member:
             messages.warning(request, _("Project owner's membership cannot be "
                 "modified. He/She has all permissions for this project."))
             return redirect(project.get_members_url())
@@ -120,7 +119,7 @@ class MemberDeleteView(ProjectView):
         member = membership.member
         project = membership.project
 
-        if project.author == member and not request.user.is_superuser:
+        if project.author == member:
             messages.warning(request, _("Project owner's membership cannot be "
                 "removed."))
             return redirect(project.get_members_url())
