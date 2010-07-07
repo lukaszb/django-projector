@@ -74,8 +74,12 @@
                         {{ task.status }}
                     </span>
                 </td>
-                <td><a href="{{ task.author.get_absolute_url }}" class="block-link">{{ task.author }}</a></td>
-                <td><a href="{{ task.owner.get_absolute_url }}" class="block-link">{{ task.owner }}</a></td>
+                <td><a href="{% url projector_users_profile_detail task.author.username %}" 
+                       class="block-link">{{ task.author }}</a>
+                </td>
+                <td><a href="{% url projector_users_profile_detail task.owner.username %}" 
+                       class="block-link">{{ task.owner }}</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

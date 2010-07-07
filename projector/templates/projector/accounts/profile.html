@@ -10,7 +10,7 @@
             {% if user == profile.user %}
 			<ul class="nav-vertical">
                 <li><a href="{{ profile.user.get_absolute_url }}">{% trans "Show your public profile" %}</a></li>
-                <li><a href="{% url projector_users_profile_edit profile.user.username %}">{% trans "Edit" %}</a></li>
+                <li><a href="{% url projector_dashboard %}">{% trans "Dashboard" %}</a></li>
             </ul>
             {% endif %}
 	    </div>

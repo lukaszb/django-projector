@@ -161,7 +161,7 @@
                     </tr>
                     <tr>
                         <th>{% trans "Author" %}</th>
-                        <td>{{ project.author }}</td>
+                        <td><a href="{% url projector_users_profile_detail project.author.username %}">{{ project.author }}</a></td>
                     </tr>
                     <tr>
                         <th>{% trans "Visibility" %}</th>

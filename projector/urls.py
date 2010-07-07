@@ -166,13 +166,13 @@ urlpatterns += patterns('projector.views.users',
         view = 'UserListView',
         name = 'projector_user_list'),
 
-    url(r'^users/(?P<username>\w+)/$',
+    url(r'^dashboard/$',
+        view = 'UserDashboardView',
+        name = 'projector_dashboard'),
+
+    url(r'^(?P<username>\w+)/$',
         view = 'UserProfileDetailView',
         name = 'projector_users_profile_detail'),
-
-    url(r'^users/(?P<username>\w+)/edit/$',
-        view = 'UserProfileEditView',
-        name = 'projector_users_profile_edit'),
 )
 
 # ========== #

@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 
 from projector.core.controllers import View
 from projector.forms import UserProfileForm
@@ -53,23 +54,24 @@ class UserProfileDetailView(View):
         }
         return context
 
-class UserProfileEditView(View):
+class UserDashboardView(View):
     """
     Edit profile view.
     """
-    template_name = 'projector/accounts/profile_edit.html'
 
-    def response(self, request, username):
-        user = get_object_or_404(User, username=username)
-        if request.user != user:
+    template_name = 'projector/accounts/dashboard.html'
+
+    def response(self, request):
+        if request.user.is_anonymous() or not request.user.is_active:
             raise PermissionDenied
         form = UserProfileForm(request.POST or None,
-            instance=user.get_profile())
+            instance=request.user.get_profile())
         if request.method == 'POST' and form.is_valid():
             form.save()
             message = _("Profile updated successfully")
             messages.success(request, message)
-            return redirect(user.get_absolute_url())
+            return redirect(reverse('projector_users_profile_detail',
+                kwargs={'username': request.user.username}))
         context = {
             'form': form,
         }
