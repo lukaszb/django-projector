@@ -2,6 +2,22 @@
 
 {% load i18n %}
 
+{% block col_left %}
+    
+    <div class="richtemplates-panel">
+        <h5>{% trans "User" %}: {{ profile.user }}</h5>
+	    <div class="richtemplates-panel-content">
+            {% if user == profile.user %}
+			<ul class="nav-vertical">
+                <li><a href="{{ profile.user.get_absolute_url }}">{% trans "Show your public profile" %}</a></li>
+                <li><a href="{% url projector_dashboard %}">{% trans "Dashboard" %}</a></li>
+            </ul>
+            {% endif %}
+	    </div>
+	</div>
+
+{% endblock %}
+
 {% block col_main_title %}{% trans "User profile" %}{% endblock %}
 {% block col_main_content %}
     <form action="." method="post">

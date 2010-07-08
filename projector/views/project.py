@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -177,13 +178,54 @@ class ProjectCreateView(View):
             author=request.user,
         )
         form = ProjectForm(request.POST or None, instance=project)
-        if request.method == 'POST' and form.is_valid():
+        if request.method == 'POST' and form.is_valid() and \
+                self.can_create(request.user, request):
             project = form.save()
             return HttpResponseRedirect(project.get_absolute_url())
         context = {
             'form' : form,
         }
         return context
+
+    @staticmethod
+    def can_create(user, request=None):
+        """
+        Checks if given user can create project. If
+        MILIS_BETWEEN_PROJECT_CREATION is greater than miliseconds from last
+        time this user has created a project then he or she is allowed to
+        create new one.
+
+        If user is trying to create more project than specified by
+        MAX_PROJECTS_PER_USER configuration value then we disallow
+
+        If request is given, send messages.
+        """
+
+        def send_error(request, message):
+            if request:
+                messages.error(request, message)
+
+        try:
+            date = Project.objects.filter(author=user)\
+                .only('name', 'created_at')\
+                .order_by('-created_at')[0].created_at
+            delta = datetime.datetime.now() - date
+            milis = delta.seconds * 1000
+            need_to_wait = get_config_value('MILIS_BETWEEN_PROJECT_CREATION')\
+                - milis
+            need_to_wait /= 1000
+            if need_to_wait > 0:
+                send_error(request, _("You would be allowed to create a new "
+                    "project in %s seconds" % need_to_wait))
+                return False
+        except IndexError:
+            pass
+        count = user.project_set.count()
+        too_many = count - get_config_value('MAX_PROJECTS_PER_USER')
+        if too_many > 0:
+            send_error(request, _("You cannot create more projects"))
+            return False
+        return True
 
 class ProjectEditView(ProjectView):
     """

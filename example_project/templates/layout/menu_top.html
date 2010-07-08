@@ -17,16 +17,18 @@
     {% if user.is_authenticated and user.is_staff %}
     <li><a href="{% url admin:index %}">Admin panel</a></li>
     {% endif %}
+
     {% if user.is_authenticated %}
     <li><a href="{% url projector_dashboard %}"
            class="show-tipsy-bottom"
            title="{% trans "Manage your account" %}"
            >{% trans "Dashboard" %}</a>
     </li>
-    {% endif %}
-    
     <li>{% trans "Logged as" %} <a href="{% url projector_users_profile_detail user.username %}"
         class="show-tipsy-bottom"
-        title="{% trans "Show user's public profile" %}">{{ user }}</a></li>
+        title="{% trans "Show user's public profile" %}">{{ user }}</a>
+    </li>
+    {% endif %}
+
 {% endblock %}
 

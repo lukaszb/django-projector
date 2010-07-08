@@ -1,11 +1,15 @@
+import sys
 import time
 import logging
+import datetime
+import traceback
 
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.contenttypes.models import ContentType
+from django.core.mail import mail_admins
 
 from signals_ahoy.asynchronous import AsynchronousListener
 
@@ -35,42 +39,77 @@ def request_new_profile(sender, instance, **kwargs):
 def project_created_listener(sender, instance, **kwargs):
     """
     Creates all necessary related objects like statuses with transitions etc.
-
-    Could be heavy so should by handled asynchronously.  On the other hand, new
-    thread doesn't know if project has been already persisted or not - we need
-    to check if it is available from database first.
     """
-    if not kwargs.get('created', False):
-        # This listener is aimed for newly created projects only
+    if kwargs['created'] is False:
         return
-    if projector_settings.PROJECTS_ROOT_DIR:
-        while True:
-            try:
-                instance = Project.objects.get(pk=instance.pk)
-                repo_path = instance._get_repo_path()
 
-                logging.info("Trying to initialize new mercurial repository at "
-                    "%s" % repo_path)
+    repo_path = instance._get_repo_path()
 
-                # Hardcoding repository creation process until more backends
-                # are available from ``vcs``
-                alias = 'hg'
-                repository = Repository.objects.create(path=repo_path,
-                    alias=alias)
-                instance.repository = repository
-                instance.create_workflow()
-                instance.save()
-            except Project.DoesNotExist:
-                secs = 1
-                logging.info("Sleeping for %s second(s)" % secs)
-                time.sleep(secs)
-            else:
-                break
-    else:
-        logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
-            "create repository for this project.")
+    logging.info("Trying to initialize new mercurial repository"
+        " at %s" % repo_path)
 
-async_project_created_listener = AsynchronousListener(project_created_listener)
+    # Hardcoding repository creation process until more backends
+    # are available from ``vcs``
+    alias = 'hg'
+    repository = Repository.objects.create(path=repo_path,
+        alias=alias)
+    instance.repository = repository
+    instance.create_workflow()
+    instance.save()
+
+def async_project_created_listener(sender, instance, **kwargs):
+    """
+    Project creation could be heavy so should by handled asynchronously.  On
+    the other hand, new thread doesn't know if project has been already
+    persisted or not - we need to check if it is available from database first.
+    """
+    try:
+        if not kwargs.get('created', False):
+            # This listener is aimed for newly created projects only
+            return
+        if projector_settings.PROJECTS_ROOT_DIR:
+            iter = 0
+            while True:
+                try:
+                    if iter > 10:
+                        raise Exception("Couldn't run post-save project script")
+                    else:
+                        iter += 1
+                    instance = Project.objects.get(pk=instance.pk)
+                    project_created_listener(sender, instance, **kwargs)
+                except Project.DoesNotExist:
+                    secs = 1
+                    logging.info("Sleeping for %s second(s) while waiting for "
+                                 " '%s' project to be persisted" %
+                                 (secs, instance))
+                    time.sleep(secs)
+                else:
+                    break
+        else:
+            logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
+                "create repository for this project.")
+    except (MemoryError, KeyboardInterrupt):
+        pass
+    except Exception, err:
+        # We need to notify about any serious error
+        subject = "[Projector Dev] Project %s was not created!" % instance.name
+        traceback_msg = '\n'.join(traceback.format_exception(*(sys.exc_info())))
+        msg = [
+            "Unexpected error occured while creating project.",
+            "",
+            "Project: %s" % instance.name,
+            "Error: %s" % err,
+            "Error time: %s" % datetime.datetime.now(),
+            "",
+            "Traceback:",
+            "==========",
+            "",
+            traceback_msg]
+        msg = '\n'.join(msg)
+        mail_admins(subject, msg)
+
+async_project_created_listener = AsynchronousListener(
+    async_project_created_listener)
 
 def task_save_listener(sender, instance, **kwargs):
     """
