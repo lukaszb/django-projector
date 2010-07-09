@@ -118,8 +118,8 @@ def task_save_listener(sender, instance, **kwargs):
     if kwargs['created'] is True:
         # Task was created
         mail_info = {
-            'subject': instance.get_long_summary,
-            'body': instance.get_long_content,
+            'subject': instance.get_long_summary(),
+            'body': instance.get_long_content(),
             'recipient_list': [instance.author.email],
         }
         messanger.send(None, **mail_info)
