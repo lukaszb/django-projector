@@ -1,4 +1,5 @@
 from django.core import mail
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 from projector.models import Project, Task
@@ -15,5 +16,6 @@ class EmailTest(TestCase):
 
     def test_send_mail_to_task_author(self):
         # needs project to be created first
-        project = Project.objects.all()[0]
-        Task.objects
+        jack = User.objects.create(username='jack')
+        project = Project.objects.create(author=jack, name='Black Jack')
+

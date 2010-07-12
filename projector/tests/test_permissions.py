@@ -1,12 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.template.defaultfilters import slugify
+#from django.core.urlresolvers import reverse
 from django.test.client import Client
-#from django.http import HttpResponse
 
 from projector.models import Project
-from projector.permissions import ProjectPermission
 
 class ProjectorPermissionTests(TestCase):
 
@@ -21,118 +18,54 @@ class ProjectorPermissionTests(TestCase):
             email = 'admin@example.com',
             password = 'admin',
         )
-        self.john_doe = User.objects.create_user(
-            username = 'john_doe',
-            email = 'john_doe@example.com',
-            password = 'john_doe',
+        self.admin._plain_password = 'admin'
+
+        self.jack = User.objects.create_user(
+            username = 'jack',
+            email = 'jack@example.com',
+            password = 'jack',
         )
+        self.jack._plain_password = 'jack'
+
+        self.joe = User.objects.create_user(
+            username = 'joe',
+            email = 'joe@example.com',
+            password = 'joe',
+        )
+        self.joe._plain_password = 'joe'
+
         self.noperms = User.objects.create_user(
             username = 'noperms',
             email = 'noperms@nodomain.net',
             password = 'noperms',
         )
+        self.noperms._plain_password = 'noperms'
+
         # Create projects
         self.public_project = Project.objects.create(
-            name = 'public project',
-            slug = slugify('public project'),
-            author = self.john_doe,
+            name = 'Public Project',
+            author = self.jack,
             public = True,
         )
-        self.john_project = Project.objects.create(
-            name = 'john project',
-            slug = slugify('john project'),
-            author = self.john_doe,
+        self.private_project = Project.objects.create(
+            name = 'Private Project',
+            author = self.joe,
             public = False,
         )
 
     def test_public_project(self):
-        public_project = Project.objects.filter(public=True)[0]
-        for user in User.objects.all():
-            check = ProjectPermission(user=user)
-            #self.failUnless(
-            #    check.has_perm('can_read_repository_project', public_project))
-
-    def _assert_url_code(self, url, status_code):
-        response = self.client.get(url)
-        self.assertTrue(response.status_code == status_code,
-            "Status code should be %s, is %s for url '%s'"
-            % (status_code, response.status_code, url))
-
-    def _assert_urls_code(self, urls, status_code):
-        if not isinstance(urls, tuple):
-            raise RuntimeError("Given ``urls`` need to be a tuple")
-        for url in urls:
-            self._assert_url_code(url, status_code)
-
-    def test_views_anonymous(self):
-        self.client.logout()
-        urls_200 = (
-            reverse('projector_home'),
-            reverse('projector_project_list'),
-            self.public_project.get_absolute_url(),
-            self.public_project.get_members_url(),
-            self.public_project.get_task_list_url(),
-        )
-        self._assert_urls_code(urls_200, 200)
-
-        urls_302 = (
-            reverse('projector_project_create'),
-        )
-        self._assert_urls_code(urls_302, 302)
-
-        urls_403 = (
-            self.public_project.get_edit_url(),
-            self.public_project.get_members_add_url(),
-            self.public_project.get_members_edit_url('john_doe'),
-            self.public_project.get_create_task_url(),
-            self.public_project.get_edit_url(),
-            self.public_project.get_milestones_add_url(),
-            self.john_project.get_absolute_url(),
-            self.john_project.get_edit_url(),
-            self.john_project.get_milestones_add_url(),
-            self.john_project.get_members_url(),
-        )
-        self._assert_urls_code(urls_403, 403)
-
-    def test_views_logged(self):
-        self.client.logout()
-        logged = self.client.login(username='noperms', password='noperms')
-        self.assertTrue(logged)
-        urls_200 = (
-            reverse('projector_home'),
-            reverse('projector_project_list'),
-            reverse('projector_project_create'),
-            self.public_project.get_absolute_url(),
-            self.public_project.get_members_url(),
-        )
-        self._assert_urls_code(urls_200, 200)
-
-        urls_403 = (
-            self.john_project.get_absolute_url(),
-            self.john_project.get_edit_url(),
-            self.john_project.get_milestones_add_url(),
-            self.john_project.get_members_url(),
-        )
-        self._assert_urls_code(urls_403, 403)
-        self.client.logout()
-
-    def test_views_johndoe(self):
-        self.client.logout()
-        self.client.login(username='john_doe', password='john_doe')
-        urls_200 = (
-            self.public_project.get_absolute_url(),
-            self.public_project.get_members_url(),
-        )
-        self._assert_urls_code(urls_200, 200)
-
-        urls_403 = (
-            self.public_project.get_create_task_url(),
-        )
-        self._assert_urls_code(urls_403, 403)
-
-    def test_project_details_views(self):
-        urls_200 = (
-            self.public_project.get_absolute_url(),
-        )
-        self._assert_urls_code(urls_200, 200)
+        for user in (self.admin, self.noperms, self.joe, self.jack):
+            client = Client()
+            client.login(username=user.username, password=user._plain_password)
+            response = client.get(self.public_project.get_absolute_url())
+            self.failUnless(response.status_code == 200,
+                "User %s doesn't have permission to view public project!"
+                % user)
+            client.logout()
+        # Test anonymous user
+        client.logout()
+        response = self.client.get(self.public_project.get_absolute_url())
+        self.failUnless(response.status_code == 200,
+            "User %s doesn't have permission to view public project!"
+            % user)
 

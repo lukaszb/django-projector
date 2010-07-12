@@ -421,12 +421,11 @@ class Project(models.Model, Watchable):
             # we don't need to add permissions for superuser
             # as superusers has all permissions
             return
-        import itertools
         available_permissions = set([p.codename for p in
             get_perms_for_model(Project) if p.codename != 'add_project'])
 
         perms = get_perms(self.author, self)
-        perms_set = set(itertools.chain(perms.values_list('codename')))
+        perms_set = set(perms)
         for perm in available_permissions:
             if not perm in perms_set:
                 logging.debug("Project '%s': adding '%s' permission for user "
