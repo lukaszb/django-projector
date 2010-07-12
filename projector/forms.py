@@ -88,7 +88,7 @@ class TaskForm(LimitingModelForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
     watch_changes = forms.BooleanField(False, label=_('Watch for changes'),
-        default=True)
+        initial=True)
 
     class Meta:
         model = Task

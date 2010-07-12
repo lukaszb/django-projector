@@ -13,6 +13,8 @@
 {% trans "Status" %}: {{ task.status }}
 {% trans "Priority" %}: {{ task.priority }}
 
-{% trans "Content" %}:
+{% trans "Content" %}
+{% for x in _("Content") %}={% endfor %}
+
 {{ task.description }}
 

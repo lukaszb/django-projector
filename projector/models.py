@@ -1064,7 +1064,7 @@ class Task(AbstractTask, Watchable):
         return revision
 
     def get_long_summary(self):
-        raw = get_config_value('TASK_EMAIL_SUBJECT_SUMMARY_FORMAT')
+        raw = self.project.config.task_email_summary_format
         tmpl = string.Template(raw)
         return tmpl.safe_substitute(project=self.project.name,
             id=self.id, summary=self.summary)

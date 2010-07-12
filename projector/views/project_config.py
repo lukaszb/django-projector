@@ -11,7 +11,8 @@ class ConfigEditView(ProjectView):
     template_name = 'projector/project/config/home.html'
 
     def response(self, request, username, project_slug):
-        form = ConfigForm(request.POST or None)
+        config = self.project.config
+        form = ConfigForm(request.POST or None, instance=config)
         if request.method == 'POST':
             if form.is_valid():
                 form.instance.editor = request.user

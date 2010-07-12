@@ -130,7 +130,7 @@ def _project_detail_hg(request, project):
     request.user = basic_auth(request)
     if request.user is None:
         return ask_basic_auth(request,
-            realm=get_config_value('BASIC_AUTH_REALM'))
+            realm=project.config.basic_realm)
 
     if project.is_private() and request.method == 'GET' and\
         not request.user.has_perm('can_read_repository', project):

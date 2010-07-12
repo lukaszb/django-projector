@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
-from projector.settings import get_config_value
 from projector.views.project import ProjectView
 
 from vcs.web.simplevcs.views import browse_repository, diff_file
@@ -108,8 +107,8 @@ class RepositoryChangesets(RepositoryView):
             'project': self.project,
         }
         context['repository'] = self.project.repository
-        context['CHANGESETS_PAGINATE_BY'] = get_config_value(
-            'CHANGESETS_PAGINATE_BY')
+        context['CHANGESETS_PAGINATE_BY'] = \
+            self.project.config.changesets_paginate_by
         return render_to_response(self.template_name, context,
             RequestContext(self.request))
 
