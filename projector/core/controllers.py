@@ -1,6 +1,9 @@
+import logging
+
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpRequest
+from django.conf import settings
 
 class BaseView(object):
     """
@@ -52,6 +55,10 @@ class BaseView(object):
 class View(BaseView):
 
     def __call__(self):
+
+        if settings.DEBUG:
+            logging.debug("[%s] Called for template: %s" % (self.__class__,
+                self.template_name))
         response = super(View, self).__call__()
 
         if isinstance(response, dict):

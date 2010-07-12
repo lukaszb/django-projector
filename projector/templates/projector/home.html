@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load i18n %}
+{% load guardian_tags %}
 
 {% block extra_head %}
     {{ block.super }}
@@ -15,8 +16,11 @@
         <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
     </ul>
     <ul class="menu-top-right">
-        {% if user.is_authenticated and user.is_superuser %}
-        <li><a href="{% url projector_settings %}">{% trans "Settings" %}</a></li>
+        {% if project %}
+            {% get_obj_perms request.user for project as "project_perms" %}
+            {% if "change_config_project" in project_perms %}
+            <li><a href="{% url projector_project_config project.author.username project.slug %}">{% trans "Settings" %}</a></li>
+            {% endif %}
         {% endif %}
     </ul>
 </div>

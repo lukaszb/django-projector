@@ -1,13 +1,15 @@
 import datetime
 import logging
 
+from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
-from django import forms
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
 
 from projector.models import Task, Project
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
@@ -16,6 +18,8 @@ from projector.views.project import ProjectView
 
 from richtemplates.shortcuts import get_first_or_None, get_json_response
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
+
+login_required_m = method_decorator(login_required)
 
 class TaskListView(ProjectView):
     """
@@ -126,16 +130,15 @@ class TaskCreateView(ProjectView):
     template_name = 'projector/task/create.html'
     private_perms = ProjectView.private_perms + ['can_add_task']
 
+    @login_required_m
     def response(self, request, username, project_slug):
-        project = get_object_or_404(Project, slug=project_slug,
-            author__username=username)
         initial = {
             'owner': request.user.username, # form's owner is UserByNameField
         }
-        status = get_first_or_None(project.status_set.filter(is_initial=True))
-        type = get_first_or_None(project.tasktype_set)
-        priority = get_first_or_None(project.priority_set)
-        component = get_first_or_None(project.component_set)
+        status = get_first_or_None(self.project.status_set.filter(is_initial=True))
+        type = get_first_or_None(self.project.tasktype_set)
+        priority = get_first_or_None(self.project.priority_set)
+        component = get_first_or_None(self.project.component_set)
 
         for attr in (status, type, priority, component):
             if attr is None:
@@ -146,7 +149,7 @@ class TaskCreateView(ProjectView):
                 return {}
 
         instance = Task(
-            project=project,
+            project = self.project,
             author = request.user,
             author_ip = request.META['REMOTE_ADDR'],
             editor = request.user,

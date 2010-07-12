@@ -18,7 +18,6 @@ Following packages are needed to get ``django-projector`` working:
 - `django-extensions`_
 - `django-guardian`_
 - `django-keyedcache`_
-- `django-livesettings`_
 - `django-pagination`_
 - `django-richtemplates`_
 - `django-signals-ahoy`_
@@ -41,7 +40,6 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
 .. _django-guardian: http://packages.python.org/django-guardian/
 .. _django-keyedcache: http://bitbucket.org/bkroeze/django-keyedcache/
-.. _django-livesettings: http://bitbucket.org/bkroeze/django-livesettings/
 .. _django-signals-ahoy: http://bitbucket.org/bkroeze/django-signals-ahoy/
 .. _django-pagination: http://code.google.com/p/django-pagination/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/

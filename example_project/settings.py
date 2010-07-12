@@ -50,7 +50,6 @@ INSTALLED_APPS = (
     'django_sorting',
     'guardian',
     'keyedcache',
-    'livesettings',
     'pagination',
     'registration',
     'richtemplates',

@@ -7,3 +7,6 @@ class NotApplicableError(ProjectorError):
 class NotRequestError(ProjectorError):
     pass
 
+class ConfigAlreadyExist(ProjectorError):
+    pass
+

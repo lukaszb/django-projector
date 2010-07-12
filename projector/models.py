@@ -22,6 +22,7 @@ from guardian.shortcuts import assign, get_perms, get_perms_for_model
 from autoslug import AutoSlugField
 
 from projector.conf import default_workflow
+from projector.exceptions import ConfigAlreadyExist
 from projector.utils import abspath, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
@@ -166,6 +167,7 @@ class Project(models.Model, Watchable):
         get_latest_by = 'created_at'
         permissions = (
             ('view_project', 'Can view project'),
+            ('change_config_project', 'Can change config'),
             ('can_read_repository', 'Can read repository'),
             ('can_write_to_repository', 'Can write to repository'),
             ('can_change_description', 'Can change description'),
@@ -209,7 +211,6 @@ class Project(models.Model, Watchable):
         # may cause it's author not to be able to see project page
         self._set_author_permissions()
         return project
-
 
     @models.permalink
     def get_absolute_url(self):
@@ -498,18 +499,61 @@ class Project(models.Model, Watchable):
             .filter(source__in=self.status_set.all())
         return transitions
 
-'''
     def get_config(self):
         """
-        Returns ProjectConfig for this project.
+        Returns Config for this project.
         """
-        return ProjectConfig.objects.get(project=self)
+        return Config.objects.get(project=self)
+    config = property(get_config)
 
-class ProjectConfig(self):
-    project = models.ForeignKey(Project, unique=True)
-    basic_realm = models.CharField(max_length=64, default="Basic Auth Realm")
-    always_mail_members = models.BooleanField(default=False)
-'''
+class Config(models.Model):
+    """
+    This model stores configuration on "per project" basis.
+    """
+    project = models.ForeignKey(Project, unique=True, verbose_name=_('Project'))
+    edited_at = models.DateTimeField(auto_now=True, verbose_name=('Edited at'))
+    editor = models.ForeignKey(User)
+    basic_realm = models.CharField(max_length=64, default='Basic Auth Realm',
+        verbose_name = _('Basic realm'))
+    always_mail_members = models.BooleanField(default = False,
+        verbose_name = _('Always send mail to members'))
+    changesets_paginate_by = models.PositiveIntegerField(
+        verbose_name = _('Changesets paginate by'), default = 10)
+    from_email_address = models.EmailField(max_length = 64,
+        default = get_config_value('FROM_EMAIL_ADDRESS'),
+        verbose_name = _('Email sender address'))
+    #Should be scaped with from django.utils.html.escape
+    task_email_summary_format = models.CharField(max_length = 128,
+        default = get_config_value('TASK_EMAIL_SUBJECT_SUMMARY_FORMAT'),
+        verbose_name = ('Task email summary format'),
+        help_text = _(
+            'You may use following placeholders: $project $summary $id'))
+    milestone_deadline_delta = models.PositiveIntegerField(
+        default = get_config_value('MILESTONE_DEADLINE_DELTA'),
+        verbose_name = _('Milestone deadline delta'),
+        help_text = _(''.join((
+            'Every milestone has its deadline and this number specifies ',
+            'how many days would be given by default. It may be set to ',
+            'any date during milestone creation process though.',
+        ))),
+        )
+
+    def __unicode__(self):
+        return u'<Config for %s>' % self.project
+
+    @staticmethod
+    def create_for_project(project):
+        """
+        Creates default configuration for given project.
+        """
+        if project.config_set.count() > 0:
+            raise ConfigAlreadyExist("Project %s with id %d has already "
+                "related configuration" % (project, project.id))
+        config = Config.objects.create(
+            project = project,
+            editor = project.author,
+        )
+        return config
 
 class Component(models.Model):
     project = models.ForeignKey(Project)

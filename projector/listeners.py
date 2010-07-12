@@ -14,7 +14,7 @@ from django.core.mail import mail_admins
 from signals_ahoy.asynchronous import AsynchronousListener
 
 from projector import settings as projector_settings
-from projector.models import Project, Task, WatchedItem
+from projector.models import Project, Config, Task, WatchedItem
 from projector.signals import messanger
 
 from richtemplates.utils import get_user_profile_model
@@ -56,6 +56,7 @@ def project_created_listener(sender, instance, **kwargs):
     instance.repository = repository
     instance.create_workflow()
     instance.save()
+    Config.create_for_project(instance)
 
 def async_project_created_listener(sender, instance, **kwargs):
     """
@@ -72,7 +73,8 @@ def async_project_created_listener(sender, instance, **kwargs):
             while True:
                 try:
                     if iter > 10:
-                        raise Exception("Couldn't run post-save project script")
+                        raise Exception("Couldn't run post-save project script "
+                                "(tried %s times)" % iter)
                     else:
                         iter += 1
                     instance = Project.objects.get(pk=instance.pk)
@@ -177,5 +179,4 @@ def start_listening():
         messanger.connect(async_send_mail_listener.listen, sender=None)
     else:
         messanger.connect(send_mail_listener, sender=None)
-
 

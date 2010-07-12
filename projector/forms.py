@@ -10,6 +10,7 @@ from guardian.shortcuts import assign, remove_perm, get_perms,\
 from projector.models import Membership
 from projector.models import Team
 from projector.models import Project
+from projector.models import Config
 from projector.models import Task
 from projector.models import Status
 from projector.models import Component
@@ -68,6 +69,15 @@ class ProjectForm(forms.ModelForm):
                 team.save()
         return instance
 
+class ConfigForm(forms.ModelForm):
+    changesets_paginate_by = forms.IntegerField(
+        label=_('Changesets paginate by'), min_value=5, max_value=50)
+
+
+    class Meta:
+        model = Config
+        exclude = ['project', 'editor']
+
 class TaskCommentForm(forms.Form):
     comment = forms.CharField(label=_("Comment"), widget=forms.Textarea,
         required=False)
@@ -77,7 +87,7 @@ class TaskForm(LimitingModelForm):
         attr='username', label=_('Owner'), required=False)
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
-    watch_changes = forms.BooleanField(False, label=_('Watch for changes'))
+    watch_changes = forms.BooleanField(True, label=_('Watch for changes'))
 
     class Meta:
         model = Task
