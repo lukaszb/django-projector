@@ -9,3 +9,11 @@
 {% block menu_top %}
     {% include "layout/menu_top.html" %}
 {% endblock %}
+
+{% block breadcrumbs %}
+    {% load breadcrumber %}
+    <div class="richtemplates-breadcrumbs">
+        {% path_breadcrumbs request.path %}
+    </div>
+{% endblock %}
+
