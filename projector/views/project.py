@@ -177,7 +177,8 @@ class ProjectCreateView(View):
         project = Project(
             author=request.user,
         )
-        form = ProjectForm(request.POST or None, instance=project)
+        form = ProjectForm(request.POST or None, instance=project,
+            initial={'public': u'private'})
         if request.method == 'POST' and form.is_valid() and \
                 self.can_create(request.user, request):
             project = form.save()

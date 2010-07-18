@@ -25,10 +25,13 @@ from richtemplates.forms import RichSkinChoiceField, RichCodeStyleChoiceField
 
 import logging
 
-PUBLIC_RADIO_CHOICES = (
+PUBLIC_RADIO_CHOICES = [
     (u'public', _("Public")),
     (u'private', _("Private"))
-)
+]
+if get_config_value('PRIVATE_ONLY'):
+     # Don't let public choic if PRIVATE_ONLY flag is set
+    PUBLIC_RADIO_CHOICES.pop(0)
 
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(min_length=2, max_length=64, label=_('Name'))
