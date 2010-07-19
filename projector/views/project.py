@@ -3,6 +3,7 @@ import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
@@ -32,6 +33,7 @@ class ProjectView(View):
     ``GET_perms`` and ``POST_perms``. ``perms`` are always checked,
     ``GET_perms`` are additional checks which would be made for ``GET`` method
     requests only and ``POST_perms`` would be made for ``POST`` method requests.
+    ``private_perms`` would be checked for private projects only.
     """
 
     perms = []
@@ -55,6 +57,7 @@ class ProjectView(View):
             perms += self.POST_perms
         if self.project.is_private():
             perms += self.private_perms
+        perms = set(perms)
         return perms
 
     def check_permissions(self):
@@ -64,6 +67,9 @@ class ProjectView(View):
             return
         for perm in self.get_required_perms():
             if not self.request.user.has_perm(perm, self.project):
+                if settings.DEBUG:
+                    logging.info("User %s has no permission %s for project %s"
+                        % (self.request.user, perm, self.project))
                 raise PermissionDenied()
 
 class ProjectDetailView(ProjectView):

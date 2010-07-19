@@ -104,7 +104,7 @@ USE_I18N = True
 USE_L10N = True
 
 CACHE_PREFIX = 'projector-example-project'
-CACHE_TIMEOUT = 1 # For dev server
+#CACHE_TIMEOUT = 1 # For dev server
 
 LOGIN_REDIRECT_URL = '/projector/'
 AUTH_PROFILE_MODULE = 'projector.UserProfile'
@@ -163,6 +163,12 @@ REQUEST_IGNORE_PATHS = (
 
 try:
     from conf.local_settings import *
+    try:
+        for app in INSTALLED_APPS_LOCAL:
+            if app not in INSTALLED_APPS:
+                INSTALLED_APPS += (app,)
+    except NameError:
+        pass
 except ImportError:
     pass
 

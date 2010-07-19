@@ -2,3 +2,5 @@ from settings import *
 
 PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY = False
 
+DJALOG_LEVEL = 20
+

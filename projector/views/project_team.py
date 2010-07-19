@@ -18,7 +18,7 @@ class TeamListView(ProjectView):
     Returns teams view.
     """
 
-    perms = ProjectView.perms + ['view_teams_project']
+    private_perms = ProjectView.private_perms + ['view_teams_project']
     template_name = 'projector/project/teams/home.html'
 
     def response(self, request, username, project_slug):
