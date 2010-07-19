@@ -18,8 +18,11 @@ class TeamListView(ProjectView):
     Returns teams view.
     """
 
-    private_perms = ProjectView.private_perms + ['view_teams_project']
     template_name = 'projector/project/teams/home.html'
+
+    def set_permissions(self):
+        super(TeamListView, self).set_permissions()
+        self.perms_private = ['view_project', 'view_teams_project']
 
     def response(self, request, username, project_slug):
         teams = Team.objects.filter(project=self.project)
@@ -34,8 +37,11 @@ class TeamAddView(ProjectView):
     Adds team for a project.
     """
 
-    perms = ProjectView.perms + ['add_team_project']
     template_name = 'projector/project/teams/add.html'
+
+    def set_permissions(self):
+        super(TeamAddView, self).set_permissions()
+        self.perms = ['view_project', 'add_team_project']
 
     def response(self, request, username, project_slug):
         team = Team(
@@ -62,8 +68,11 @@ class TeamEditView(ProjectView):
     Manages settings and permissions of project's team.
     """
 
-    perms = ProjectView.perms + ['change_team_project']
     template_name = 'projector/project/teams/edit.html'
+
+    def set_permissions(self):
+        super(TeamEditView, self).set_permissions()
+        self.perms = ['view_project', 'change_team_project']
 
     def response(self, request, username, project_slug, name):
         team = get_object_or_404(
@@ -99,8 +108,11 @@ class TeamDeleteView(ProjectView):
     Removes Group membership from the project.
     """
 
-    perms = ProjectView.perms + ['can_delete_team']
     template_name = 'projector/project/teams/delete.html'
+
+    def set_permissions(self):
+        super(TeamDeleteView, self).set_permissions()
+        self.perms = ['view_project', 'can_delete_team']
 
     def response(self, request, username, project_slug, name):
         team = get_object_or_404(

@@ -46,7 +46,10 @@ class ComponentCreateView(ProjectView):
     """
 
     template_name = 'projector/project/components/add.html'
-    perms = ProjectView.perms + ['change_project']
+
+    def set_permissions(self):
+        super(ComponentCreateView, self).set_permissions()
+        self.perms = ['change_project']
 
     def response(self, request, username, project_slug):
         component = Component(project=self.project)
@@ -68,7 +71,10 @@ class ComponentEditView(ProjectView):
     """
 
     template_name = 'projector/project/components/edit.html'
-    perms = ProjectView.perms + ['change_project']
+
+    def set_permissions(self):
+        super(ComponentEditView, self).set_permissions()
+        self.perms = ['change_project']
 
     def response(self, request, username, project_slug, component_slug):
         component = get_object_or_404(Component,
@@ -84,5 +90,4 @@ class ComponentEditView(ProjectView):
             'form': form,
         }
         return context
-
 

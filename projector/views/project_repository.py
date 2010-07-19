@@ -9,7 +9,10 @@ from projector.views.project import ProjectView
 from vcs.web.simplevcs.views import browse_repository, diff_file
 
 class RepositoryView(ProjectView):
-    private_perms = ProjectView.private_perms + ['can_read_repository']
+
+    def set_permissions(self):
+        super(RepositoryView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_read_repository']
 
 class RepositoryBrowseView(RepositoryView):
 

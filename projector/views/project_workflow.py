@@ -30,7 +30,10 @@ class WorkflowEditView(ProjectView):
     """
 
     template_name = 'projector/project/workflow/edit.html'
-    perms = ProjectView.perms + ['change_project']
+
+    def set_permissions(self):
+        super(WorkflowEditView, self).set_permissions()
+        self.perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         formset = StatusFormSet(request.POST or None,
@@ -66,7 +69,10 @@ class WorkflowAddStatusView(ProjectView):
     """
 
     template_name = 'projector/project/workflow/add_status.html'
-    perms = ProjectView.perms + ['change_project']
+
+    def set_permissions(self):
+        super(WorkflowAddStatusView, self).set_permissions()
+        self.perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         _max_order_status = get_first_or_None(

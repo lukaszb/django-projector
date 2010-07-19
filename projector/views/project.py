@@ -30,16 +30,14 @@ class ProjectView(View):
     Logic should be implemented at ``response`` method.
 
     Would check necessary permissions defined by class attributes: ``perms``,
-    ``GET_perms`` and ``POST_perms``. ``perms`` are always checked,
-    ``GET_perms`` are additional checks which would be made for ``GET`` method
-    requests only and ``POST_perms`` would be made for ``POST`` method requests.
-    ``private_perms`` would be checked for private projects only.
-    """
+    ``perms_POST`` and ``perms_POST``. ``perms`` are always checked,
+    ``perms_POST`` are additional checks which would be made for ``GET`` method
+    requests only and ``perms_POST`` would be made for ``POST`` method requests.
+    ``perms_private`` would be checked for private projects only.
 
-    perms = []
-    private_perms = ['view_project']
-    GET_perms = []
-    POST_perms = []
+    Permission attributes **must** be set at ``set_permissions`` method - for
+    thread-safety we cannot set them globally at class level.
+    """
 
     def __init__(self, request, username=None, project_slug=None, *args,
             **kwargs):
@@ -47,17 +45,26 @@ class ProjectView(View):
         self.project = get_object_or_404(Project, slug=project_slug,
             author__username=username)
         self.author = self.project.author
+        self.set_permissions()
         self.check_permissions()
+
+    def set_permissions(self):
+        self.perms = []
+        self.perms_private = ['view_project']
+        self.perms_GET = []
+        self.perms_POST = []
 
     def get_required_perms(self):
         perms = self.perms
         if self.request.method == 'GET':
-            perms += self.GET_perms
+            perms += self.perms_GET
         if self.request.method == 'POST':
-            perms += self.POST_perms
+            perms += self.perms_POST
         if self.project.is_private():
-            perms += self.private_perms
+            perms += self.perms_private
         perms = set(perms)
+        logging.info("self.request.META['PATH_INFO']: %s\nself.perms: %s"
+            % (self.request.META['PATH_INFO'], perms))
         return perms
 
     def check_permissions(self):
@@ -240,7 +247,7 @@ class ProjectEditView(ProjectView):
     """
 
     template_name = 'projector/project/edit.html'
-    perms = ProjectView.perms + ['change_project']
+    perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         project = self.project

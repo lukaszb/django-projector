@@ -145,7 +145,7 @@ urlpatterns += patterns('projector.views.project_repository',
 )
 
 # Tasks
-urlpatterns += patterns('projector.views.task',
+urlpatterns += patterns('projector.views.project_task',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/$',
         view='TaskListView',
         name='projector_task_list'),

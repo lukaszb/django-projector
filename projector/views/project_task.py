@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
-from projector.models import Task, Project
+from projector.models import Task
 from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.filters import TaskFilter
 from projector.views.project import ProjectView
@@ -27,7 +27,10 @@ class TaskListView(ProjectView):
     """
 
     template_name='projector/project/task_list.html'
-    private_perms = ProjectView.private_perms + ['can_view_tasks']
+
+    def set_permissions(self):
+        super(TaskListView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug):
         task_list = Task.objects.filter(project__id=self.project.id)\
@@ -52,7 +55,10 @@ class TaskDetailView(ProjectView):
     """
 
     template_name = 'projector/task/details.html'
-    private_perms = ProjectView.private_perms + ['can_view_tasks']
+
+    def set_permissions(self):
+        super(TaskDetailView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(
@@ -128,7 +134,10 @@ class TaskCreateView(ProjectView):
     New Task creation view.
     """
     template_name = 'projector/task/create.html'
-    private_perms = ProjectView.private_perms + ['can_add_task']
+
+    def set_permissions(self):
+        super(TaskCreateView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_add_task']
 
     @login_required_m
     def response(self, request, username, project_slug):
@@ -186,7 +195,10 @@ class TaskEditView(ProjectView):
     """
 
     template_name = 'projector/task/create.html'
-    private_perms = ProjectView.private_perms + ['can_change_task']
+
+    def set_permissions(self):
+        super(TaskEditView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_change_task']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
@@ -218,7 +230,9 @@ class TaskWatchView(ProjectView):
     Makes request's user watching this task.
     """
 
-    private_perms = ProjectView.private_perms + ['can_view_tasks']
+    def set_permissions(self):
+        super(TaskWatchView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
@@ -237,7 +251,9 @@ class TaskUnwatchView(ProjectView):
     Makes request's user watching this task.
     """
 
-    private_perms = ProjectView.private_perms + ['can_view_tasks']
+    def set_permissions(self):
+        super(TaskUnwatchView, self).set_permissions()
+        self.perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,

@@ -1,9 +1,13 @@
+import logging
+
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 #from django.core.urlresolvers import reverse
 from django.test.client import Client
 
 from projector.models import Project, Membership, Team
+
+from guardian.shortcuts import assign
 
 class ProjectorPermissionTests(TestCase):
 
@@ -168,5 +172,15 @@ class ProjectorPermissionTests(TestCase):
                 % (user, response.request['REQUEST_METHOD'],
                     response.request['PATH_INFO'], response.status_code))
 
-        client.logout()
+        # We add "view_project" permission for jack
+        assign('view_project', user, self.private_project)
+        self.client.logout()
+        self.client.login(username=user.username, password=user._plain_password)
+        url = self.private_project.get_absolute_url()
+        resp = self.client.get(url)
+        self.assertTrue(resp.status_code == 200,
+            "User %s tried access GET %s but returned code was %s"
+            % (user, url, resp.status_code))
+
+        self.client.logout()
 

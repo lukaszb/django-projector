@@ -7,8 +7,11 @@ from projector.forms import ConfigForm
 
 class ConfigEditView(ProjectView):
 
-    perms = ProjectView.perms + ['change_config_project']
     template_name = 'projector/project/config/home.html'
+
+    def set_permissions(self):
+        super(ConfigEditView, self).set_permissions()
+        self.perms = ['view_project', 'change_config_project']
 
     def response(self, request, username, project_slug):
         config = self.project.config

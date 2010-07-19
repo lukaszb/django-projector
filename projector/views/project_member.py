@@ -34,8 +34,11 @@ class MemberAddView(ProjectView):
     Adds member for a project.
     """
 
-    perms = ProjectView.perms + ['add_member_project']
     template_name = 'projector/project/members/add.html'
+
+    def set_permissions(self):
+        super(MemberAddView, self).set_permissions()
+        self.perms = ['view_project', 'add_member_project']
 
     def response(self, request, username, project_slug):
         membership = Membership(
@@ -62,8 +65,11 @@ class MemberEditView(ProjectView):
     Manages membership settings and permissions of project's member.
     """
 
-    perms = ProjectView.perms + ['can_change_member']
     template_name = 'projector/project/members/edit.html'
+
+    def set_permissions(self):
+        super(MemberEditView, self).set_permissions()
+        self.perms = ['view_project', 'can_change_member']
 
     def response(self, request, username, project_slug, member_username):
         membership = get_object_or_404(
@@ -106,8 +112,11 @@ class MemberDeleteView(ProjectView):
     Removes member from project.
     """
 
-    perms = ProjectView.perms + ['delete_member_project']
     template_name = 'projector/project/members/delete.html'
+
+    def set_permissions(self):
+        super(MemberDeleteView, self).set_permissions()
+        self.perms = ['view_project', 'delete_member_project']
 
     def response(self, request, username, project_slug, member_username):
         membership = get_object_or_404(
