@@ -11,6 +11,8 @@ _build
 dist
 .DS_Store
 *.orig
+.project
+.pydevproject
 
 example_project/media
 example_project/conf/local_settings.py
