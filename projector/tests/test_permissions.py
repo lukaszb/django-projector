@@ -11,48 +11,26 @@ from guardian.shortcuts import assign
 
 class ProjectorPermissionTests(TestCase):
 
+    fixtures = ['test_data.json']
+
     def setUp(self):
         self.client = Client()
 
-        self.admin = User.objects.create_superuser(
-            username = 'admin',
-            email = 'admin@example.com',
-            password = 'admin',
-        )
+        self.admin = User.objects.get(username='admin')
         self.admin._plain_password = 'admin'
 
-        self.jack = User.objects.create_user(
-            username = 'jack',
-            email = 'jack@example.com',
-            password = 'jack',
-        )
+        self.jack = User.objects.get(username='jack')
         self.jack._plain_password = 'jack'
 
-        self.joe = User.objects.create_user(
-            username = 'joe',
-            email = 'joe@example.com',
-            password = 'joe',
-        )
+        self.joe = User.objects.get(username='joe')
         self.joe._plain_password = 'joe'
 
-        self.noperms = User.objects.create_user(
-            username = 'noperms',
-            email = 'noperms@nodomain.net',
-            password = 'noperms',
-        )
+        self.noperms = User.objects.get(username='noperms')
         self.noperms._plain_password = 'noperms'
 
         # Create projects
-        self.public_project = Project.objects.create(
-            name = 'Public Project',
-            author = self.jack,
-            public = True,
-        )
-        self.private_project = Project.objects.create(
-            name = 'Private Project',
-            author = self.joe,
-            public = False,
-        )
+        self.public_project = Project.objects.get(name='public project')
+        self.private_project = Project.objects.get(name='private project')
 
     def _get_response(self, url, data={}, method='GET', code=200, follow=False):
         """
