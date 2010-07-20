@@ -161,10 +161,23 @@ REQUEST_IGNORE_PATHS = (
     r'^%s' % ADMIN_MEDIA_PREFIX.lstrip('/'),
 )
 
+# ============== #
+# EMAIL SETTINGS #
+# ============== #
+
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ''
+EMAIL_PORT = 25
+EMAIL_SUBJECT_PREFIX = '[Django] '
+EMAIL_USE_TLS = False
+
 try:
     from conf.local_settings import *
     try:
-        for app in INSTALLED_APPS_LOCAL:
+        for app in LOCAL_INSTALLED_APPS:
             if app not in INSTALLED_APPS:
                 INSTALLED_APPS += (app,)
     except NameError:

@@ -91,7 +91,7 @@ class ProjectView(View):
         for perm in perms:
             if not self.request.user.has_perm(perm, self.project):
                 if settings.DEBUG:
-                    logging.info("User %s has no permission %s for project %s"
+                    logging.debug("User %s has no permission %s for project %s"
                         % (self.request.user, perm, self.project))
                 raise PermissionDenied()
 

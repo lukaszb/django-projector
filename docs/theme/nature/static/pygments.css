@@ -1,3 +1,8 @@
+pre {
+    background-color: #FAF8CC;
+    border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+}
+
 .c { color: #999988; font-style: italic } /* Comment */
 .k { font-weight: bold } /* Keyword */
 .o { font-weight: bold } /* Operator */
