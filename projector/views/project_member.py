@@ -35,10 +35,7 @@ class MemberAddView(ProjectView):
     """
 
     template_name = 'projector/project/members/add.html'
-
-    def set_permissions(self):
-        super(MemberAddView, self).set_permissions()
-        self.perms = ['view_project', 'add_member_project']
+    perms = ['view_project', 'add_member_project']
 
     def response(self, request, username, project_slug):
         membership = Membership(
@@ -66,10 +63,7 @@ class MemberEditView(ProjectView):
     """
 
     template_name = 'projector/project/members/edit.html'
-
-    def set_permissions(self):
-        super(MemberEditView, self).set_permissions()
-        self.perms = ['view_project', 'can_change_member']
+    perms = ['view_project', 'can_change_member']
 
     def response(self, request, username, project_slug, member_username):
         membership = get_object_or_404(
@@ -113,10 +107,7 @@ class MemberDeleteView(ProjectView):
     """
 
     template_name = 'projector/project/members/delete.html'
-
-    def set_permissions(self):
-        super(MemberDeleteView, self).set_permissions()
-        self.perms = ['view_project', 'delete_member_project']
+    perms = ['view_project', 'delete_member_project']
 
     def response(self, request, username, project_slug, member_username):
         membership = get_object_or_404(

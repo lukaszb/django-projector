@@ -43,10 +43,7 @@ class MilestoneCreateView(ProjectView):
     """
 
     template_name = 'projector/project/milestones/add.html'
-
-    def set_permissions(self):
-        super(MilestoneCreateView, self).set_permissions()
-        self.perms = ['view_project', 'change_project']
+    perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         milestone = Milestone(project=self.project, author=request.user)
@@ -68,10 +65,7 @@ class MilestoneEditView(ProjectView):
     """
 
     template_name = 'projector/project/milestones/edit.html'
-
-    def set_permissions(self):
-        super(MilestoneEditView, self).set_permissions()
-        self.perms = ['view_project', 'change_project']
+    perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug, milestone_slug):
         milestone = get_object_or_404(Milestone, slug=milestone_slug)

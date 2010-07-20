@@ -1,5 +1,3 @@
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
@@ -10,30 +8,22 @@ from vcs.web.simplevcs.views import browse_repository, diff_file
 
 class RepositoryView(ProjectView):
 
-    def set_permissions(self):
-        super(RepositoryView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_read_repository']
+    perms_private = ['view_project', 'can_read_repository']
 
 class RepositoryBrowseView(RepositoryView):
 
     template_name = 'projector/project/repository/browse.html'
 
-    def __init__(self, request, username, project_slug, rel_repo_url='',
+    def response(self, request, username, project_slug, rel_repo_url='',
             revision='tip'):
-        super(RepositoryBrowseView, self).__init__(request, username,
-            project_slug)
-        self.rel_repo_url = rel_repo_url
-        self.revision = revision
-
-    def __call__(self):
         if not self.project._get_repo_path():
             msg = _("Repository's url is not set! Please configure project "
                     "preferences first.")
             messages.error(self.request, msg)
         repo_info = {
             'repository': self.project.repository,
-            'revision': self.revision,
-            'node_path': self.rel_repo_url,
+            'revision': revision,
+            'node_path': rel_repo_url,
             'template_name': self.template_name,
             'extra_context': {
                 'project': self.project,
@@ -45,20 +35,13 @@ class RepositoryFileDiffView(RepositoryView):
 
     template_name = 'projector/project/repository/diff.html'
 
-    def __init__(self, request, username, project_slug, revision_old,
+    def response(self, request, username, project_slug, revision_old,
             revision_new, rel_repo_url):
-        super(RepositoryFileDiffView, self).__init__(request, username,
-            project_slug)
-        self.revision_old = revision_old
-        self.revision_new = revision_new
-        self.rel_repo_url = rel_repo_url
-
-    def __call__(self):
         diff_info = {
             'repository': self.project.repository,
-            'revision_old': self.revision_old,
-            'revision_new': self.revision_new,
-            'file_path': self.rel_repo_url,
+            'revision_old': revision_old,
+            'revision_new': revision_new,
+            'file_path': rel_repo_url,
             'template_name': self.template_name,
             'extra_context': {
                 'project': self.project,
@@ -67,14 +50,12 @@ class RepositoryFileDiffView(RepositoryView):
         return diff_file(self.request, **diff_info)
 
 class RepositoryFileRaw(RepositoryView):
+    """
+    This view returns FileNode from repository as file attachment.
+    """
 
-    def __init__(self, request, username, project_slug, revision, rel_repo_url):
-        super(RepositoryFileRaw, self).__init__(request, username, project_slug)
-        self.revision = revision
-        self.rel_repo_url = rel_repo_url
-
-    def __call__(self):
-        node = self.project.repository.request(self.rel_repo_url, self.revision)
+    def response(self, request, username, project_slug, revision, rel_repo_url):
+        node = self.project.repository.request(rel_repo_url, revision)
         response = HttpResponse(node.content, mimetype=node.mimetype)
         response['Content-Disposition'] = 'attachment; filename=%s' % node.name
         return response
@@ -83,17 +64,11 @@ class RepositoryFileAnnotate(RepositoryView):
 
     template_name='projector/project/repository/annotate.html'
 
-    def __init__(self, request, username, project_slug, revision, rel_repo_url):
-        super(RepositoryFileAnnotate, self).__init__(request, username,
-            project_slug)
-        self.revision = revision
-        self.rel_repo_url = rel_repo_url
-
-    def __call__(self):
+    def response(self, request, username, project_slug, revision, rel_repo_url):
         repo_info = {
                 'repository': self.project.repository,
-                'revision': self.revision,
-                'node_path': self.rel_repo_url,
+                'revision': revision,
+                'node_path': rel_repo_url,
                 'template_name': self.template_name,
                 'extra_context': {
                     'project': self.project,
@@ -105,13 +80,12 @@ class RepositoryChangesets(RepositoryView):
 
     template_name = 'projector/project/repository/changeset_list.html'
 
-    def __call__(self):
+    def response(self, request, username, project_slug):
         context = {
             'project': self.project,
         }
         context['repository'] = self.project.repository
         context['CHANGESETS_PAGINATE_BY'] = \
             self.project.config.changesets_paginate_by
-        return render_to_response(self.template_name, context,
-            RequestContext(self.request))
+        return context
 

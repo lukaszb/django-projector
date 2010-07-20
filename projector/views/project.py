@@ -35,9 +35,12 @@ class ProjectView(View):
     requests only and ``perms_POST`` would be made for ``POST`` method requests.
     ``perms_private`` would be checked for private projects only.
 
-    Permission attributes **must** be set at ``set_permissions`` method - for
-    thread-safety we cannot set them globally at class level.
     """
+
+    perms = []
+    perms_private = ['view_project']
+    perms_GET = []
+    perms_POST = []
 
     def __init__(self, request, username=None, project_slug=None, *args,
             **kwargs):
@@ -45,23 +48,37 @@ class ProjectView(View):
         self.project = get_object_or_404(Project, slug=project_slug,
             author__username=username)
         self.author = self.project.author
-        self.set_permissions()
         self.check_permissions()
 
-    def set_permissions(self):
-        self.perms = []
-        self.perms_private = ['view_project']
-        self.perms_GET = []
-        self.perms_POST = []
-
     def get_required_perms(self):
-        perms = self.perms
+        """
+        We have to create new list basing on class attributes. New list
+        is required as previous code:::
+
+            perms = self.perms
+            if self.request.method == 'GET':
+                perms += self.perms_GET
+            elif self.request.method == 'POST':
+                perms += self.perms_POST
+
+            if self.project.is_private():
+                perms += self.perms_private
+
+            return perms
+
+        has been changing class (not instance) attribute due to first
+        line (object binding) which caused errors when multi-threaded.
+        Have on mind while subclassing and overriding this method.
+        """
+        perms = [p for p in self.perms]
+
         if self.request.method == 'GET':
-            perms += self.perms_GET
-        if self.request.method == 'POST':
-            perms += self.perms_POST
+            perms += [p for p in self.perms_GET]
+        elif self.request.method == 'POST':
+            perms += [p for p in self.perms_POST]
+
         if self.project.is_private():
-            perms += self.perms_private
+            perms += [p for p in self.perms_private]
         perms = set(perms)
         return perms
 
@@ -70,7 +87,8 @@ class ProjectView(View):
         # this would also make less database hits
         if self.project.author == self.request.user:
             return
-        for perm in self.get_required_perms():
+        perms = self.get_required_perms()
+        for perm in perms:
             if not self.request.user.has_perm(perm, self.project):
                 if settings.DEBUG:
                     logging.info("User %s has no permission %s for project %s"
@@ -164,6 +182,10 @@ def _project_detail_hg(request, project):
     return response
 
 class ProjectListView(View):
+    """
+    Project listing view.
+    """
+
     template_name = 'projector/project/list.html'
 
     def response(self, request):
@@ -245,10 +267,7 @@ class ProjectEditView(ProjectView):
     """
 
     template_name = 'projector/project/edit.html'
-
-    def set_permissions(self):
-        super(ProjectEditView, self).set_permissions()
-        self.perms = ['view_project', 'change_project']
+    perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         project = self.project

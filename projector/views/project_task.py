@@ -27,10 +27,7 @@ class TaskListView(ProjectView):
     """
 
     template_name='projector/project/task_list.html'
-
-    def set_permissions(self):
-        super(TaskListView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_view_tasks']
+    perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug):
         task_list = Task.objects.filter(project__id=self.project.id)\
@@ -55,10 +52,7 @@ class TaskDetailView(ProjectView):
     """
 
     template_name = 'projector/task/details.html'
-
-    def set_permissions(self):
-        super(TaskDetailView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_view_tasks']
+    perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(
@@ -78,7 +72,8 @@ class TaskDetailView(ProjectView):
         ]
         if request.user.has_perm('can_change_task', task.project):
             if destinations:
-                task_action_choices.append(DynamicActionChoice(1, _("Change status"),
+                task_action_choices.append(DynamicActionChoice(1,
+                    _("Change status"),
                     {'new_status': forms.ModelChoiceField(
                         queryset=destinations.exclude(id=task.status.id),
                         empty_label=None)
@@ -133,18 +128,17 @@ class TaskCreateView(ProjectView):
     """
     New Task creation view.
     """
-    template_name = 'projector/task/create.html'
 
-    def set_permissions(self):
-        super(TaskCreateView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_add_task']
+    template_name = 'projector/task/create.html'
+    perms_private = ['view_project', 'can_add_task']
 
     @login_required_m
     def response(self, request, username, project_slug):
         initial = {
             'owner': request.user.username, # form's owner is UserByNameField
         }
-        status = get_first_or_None(self.project.status_set.filter(is_initial=True))
+        status = get_first_or_None(
+            self.project.status_set.filter(is_initial=True))
         type = get_first_or_None(self.project.tasktype_set)
         priority = get_first_or_None(self.project.priority_set)
         component = get_first_or_None(self.project.component_set)
@@ -195,10 +189,7 @@ class TaskEditView(ProjectView):
     """
 
     template_name = 'projector/task/create.html'
-
-    def set_permissions(self):
-        super(TaskEditView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_change_task']
+    perms_private = ['view_project', 'can_change_task']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
@@ -230,9 +221,7 @@ class TaskWatchView(ProjectView):
     Makes request's user watching this task.
     """
 
-    def set_permissions(self):
-        super(TaskWatchView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_view_tasks']
+    perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
@@ -251,9 +240,7 @@ class TaskUnwatchView(ProjectView):
     Makes request's user watching this task.
     """
 
-    def set_permissions(self):
-        super(TaskUnwatchView, self).set_permissions()
-        self.perms_private = ['view_project', 'can_view_tasks']
+    perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
