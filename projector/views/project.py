@@ -63,8 +63,6 @@ class ProjectView(View):
         if self.project.is_private():
             perms += self.perms_private
         perms = set(perms)
-        logging.info("self.request.META['PATH_INFO']: %s\nself.perms: %s"
-            % (self.request.META['PATH_INFO'], perms))
         return perms
 
     def check_permissions(self):
@@ -247,7 +245,10 @@ class ProjectEditView(ProjectView):
     """
 
     template_name = 'projector/project/edit.html'
-    perms = ['view_project', 'change_project']
+
+    def set_permissions(self):
+        super(ProjectEditView, self).set_permissions()
+        self.perms = ['view_project', 'change_project']
 
     def response(self, request, username, project_slug):
         project = self.project

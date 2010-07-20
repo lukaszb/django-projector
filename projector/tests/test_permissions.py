@@ -1,8 +1,8 @@
-import logging
+import urlparse
 
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
-#from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 from django.test.client import Client
 
 from projector.models import Project, Membership, Team
@@ -54,6 +54,40 @@ class ProjectorPermissionTests(TestCase):
             public = False,
         )
 
+    def _get_response(self, url, data={}, method='GET', code=200, follow=False):
+        """
+        Test if response to given url/data/method returns with proper code.
+        Returns response.
+        """
+        method = method.upper()
+        if method == 'GET':
+            opener = self.client.get
+        elif method == 'POST':
+            opener = self.client.post
+        else:
+            self.fail("Unsupported method %s" % method)
+        response = opener(url, data, follow=follow)
+        self.assertEqual(response.status_code, code, "%s %s (data: %s) returned"
+            " code %s but %s was expected"
+            % (method, url, data, response.status_code, code))
+        return response
+
+    def test_anonymous(self):
+        # Test public project for anonymous user
+        self.client.logout()
+
+        url = self.public_project.get_absolute_url()
+        self._get_response(url)
+
+        url = reverse('projector_project_create')
+        response = self._get_response(url, follow=True)
+        # Redirects directly to login page with next parameter
+        self.assertTrue(len(response.redirect_chain) == 1)
+        passed_url, passed_code = response.redirect_chain[0]
+        parsed = urlparse.urlparse(passed_url)
+        self.assertEqual(parsed.path, reverse('auth_login'))
+        self.assertEqual(parsed.query, 'next=%s' % url)
+
     def test(self):
 
         # =================== #
@@ -69,12 +103,6 @@ class ProjectorPermissionTests(TestCase):
                 "User %s doesn't have permission to view public project!"
                 % user)
             client.logout()
-        # Test public project for anonymous user
-        self.client.logout()
-        response = self.client.get(self.public_project.get_absolute_url())
-        self.assertTrue(response.status_code == 200,
-            "User %s doesn't have permission to view public project!"
-            % user)
 
         # ==================== #
         # Test private project #
@@ -145,6 +173,16 @@ class ProjectorPermissionTests(TestCase):
                 % (user, response.request['REQUEST_METHOD'],
                     response.request['PATH_INFO'], response.status_code))
 
+        # Test project listing
+        url = reverse('projector_project_list')
+        resp = self._get_response(url)
+
+        project_list = resp.context['project_list']
+        for_user = Project.objects.for_user(user)
+        self.assertEqual(set(project_list), set(for_user),
+            "Project list retrieved from page (%s) is not equal with list for "
+            "user (%s)" % (project_list, for_user))
+
         # Now we make jack a member but without permissions he shouldn't be
         # able to see anything new
         Membership.objects.create(member=user, project=self.private_project)
@@ -174,13 +212,16 @@ class ProjectorPermissionTests(TestCase):
 
         # We add "view_project" permission for jack
         assign('view_project', user, self.private_project)
-        self.client.logout()
-        self.client.login(username=user.username, password=user._plain_password)
         url = self.private_project.get_absolute_url()
-        resp = self.client.get(url)
-        self.assertTrue(resp.status_code == 200,
-            "User %s tried access GET %s but returned code was %s"
-            % (user, url, resp.status_code))
+        self._get_response(url)
+
+        urls = (
+            self.private_project.get_components_url(),
+            self.private_project.get_milestones_url(),
+            self.private_project.get_workflow_url(),
+        )
+        for ulr in urls:
+            self._get_response(url, code=200)
 
         self.client.logout()
 
