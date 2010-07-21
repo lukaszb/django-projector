@@ -4,6 +4,7 @@
 {% load pagination_tags %}
 {% load sorting_tags %}
 
+{% comment %}
 {% block col_left %}{{ block.super }}
 
 <div class="richtemplates-panel">
@@ -22,8 +23,9 @@
     </div>
 </div>
 {% endblock %}
+{% endcomment %}
 
-{% block col_main_extra %}
+{% block col_single_extra %}
 
 {% autosort filters.qs as task_list %}
 {% autopaginate task_list %}
@@ -77,8 +79,13 @@
                 <td><a href="{% url projector_users_profile_detail task.author.username %}" 
                        class="block-link">{{ task.author }}</a>
                 </td>
-                <td><a href="{% url projector_users_profile_detail task.owner.username %}" 
+                <td>
+                    {% if task.owner %}
+                    <a href="{% url projector_users_profile_detail task.owner.username %}" 
                        class="block-link">{{ task.owner }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load guardian_tags %}
+
+<div class="menu-top-submenu">
+    <ul class="menu-top-left">
+        <li><a href="{% url projector_home %}">{% trans "Projector homepage" %}</a></li>
+        <li><a href="{% url projector_project_list %}">{% trans "Projects" %}</a></li>
+    </ul>
+    <ul class="menu-top-right">
+        {% if project %}
+            {% get_obj_perms request.user for project as "project_perms" %}
+            {% if "change_config_project" in project_perms %}
+            <li><a href="{% url projector_project_config project.author.username project.slug %}">{% trans "Settings" %}</a></li>
+            {% endif %}
+        {% endif %}
+    </ul>
+</div>

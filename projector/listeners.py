@@ -5,7 +5,7 @@ import datetime
 import traceback
 
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.contenttypes.models import ContentType
@@ -168,7 +168,7 @@ def start_listening():
     post_save.connect(request_new_profile, sender=User)
     post_save.connect(task_save_listener, sender=Task)
     post_save.connect(watcheditem_save_listener, sender=WatchedItem)
-    post_save.connect(watcheditem_delete_listener, sender=WatchedItem)
+    post_delete.connect(watcheditem_delete_listener, sender=WatchedItem)
 
     if projector_settings.CREATE_PROJECT_ASYNCHRONOUSLY:
         post_save.connect(async_project_created_listener.listen, sender=Project)

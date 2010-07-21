@@ -1,4 +1,4 @@
-{% extends "projector/home.html" %}
+{% extends "base_1col.html" %}
 
 {% load markup %}
 {% load i18n %}
@@ -6,6 +6,8 @@
 {% load native %}
 
 {% block extra_head %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/browser.css" />
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/projector.css" />
 <script type="text/javascript">
     $(document).ready(function(){
         $('#id_project_repository_url').click(function(){
@@ -21,6 +23,12 @@
 </script>
 {% endblock %}
 
+{% block menu_top %}
+    {{ block.super }}
+    {% include "projector/menu.html" %}
+{% endblock %}
+
+{% comment %}
 {% block col_left %}{{ block.super }}
 
 {% get_obj_perms request.user for project as "project_perms" %}
@@ -93,10 +101,11 @@
 </div>
 
 {% endblock %}
+{% endcomment %}
 
-{% block col_main_title %}{{ project.name }}{% endblock %}
+{% block col_single_title %}{{ project.name }}{% endblock %}
 
-{% block col_main %}
+{% block col_single %}
 {% get_obj_perms request.user for project as "project_perms" %}
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
@@ -144,7 +153,7 @@
     
     </div>
 </div>
-    {% block col_main_extra %}
+    {% block col_single_extra %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Project details" %}</h5>
     <div class="richtemplates-panel-content">
@@ -207,7 +216,7 @@
         
     </div>
 </div>
-    {% endblock col_main_extra %}
+    {% endblock col_single_extra %}
 
-{% endblock col_main %}
+{% endblock col_single %}
 

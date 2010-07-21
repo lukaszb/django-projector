@@ -4,6 +4,7 @@
 {% load richtemplates_tags %}
 {% load native %}
 
+{% comment %}
 {% block col_left %}{{ block.super }}
 {% block info_block %}
 <div class="richtemplates-panel">
@@ -64,10 +65,6 @@
                 (<a href="{% url projector_project_file_diff project.author.username project.slug changeset.id root.changeset.id root.path %}"
                    class="show-tipsy"
                    title="{% trans "Show diff" %}">{% trans "diff" %}</a>)
-           {% comment %}
-                    <span class="show-tipsy" title="{{ changeset.date }}">{{ changeset.date|timesince }}</span>
-                    {% trans "ago" %}
-            {% endcomment %}
                 </li>
                 {% endfor %}
             </ul>
@@ -77,8 +74,9 @@
 </div>
 {% endblock info_block %}
 {% endblock %}
+{% endcomment %}
 
-{% block col_main_extra %}
+{% block col_single_extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's repository browser" %}</h5>

@@ -79,6 +79,12 @@ class Watchable(object):
         except WatchedItem.DoesNotExist:
             return False
 
+    def get_watchers(self):
+        users = User.objects.filter(
+            watcheditem__content_type = ContentType.objects.get_for_model(self),
+            watcheditem__object_id = self.pk,
+        )
+        return users
 
 class DictModel(models.Model):
     name = models.CharField(_('name'), max_length=32)
@@ -504,6 +510,13 @@ class Project(models.Model, Watchable):
         """
         return Config.objects.get(project=self)
     config = property(get_config)
+
+    def get_watchers(self):
+        watchers = super(Project, self).get_watchers()
+        watchers = watchers.filter(models.Q(
+            membership__project=self) |
+            models.Q(groups__team__project=self))
+        return watchers
 
 class Config(models.Model):
     """

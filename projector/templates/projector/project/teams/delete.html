@@ -5,7 +5,7 @@
 {% load sorting_tags %}
 {% load native %}
 
-{% block col_main_extra %}
+{% block col_single_extra %}
 <div class="richtemplates-panel">
     <h5>{% trans "Remove team" %}</h5>
     <div class="richtemplates-panel-content">
@@ -21,7 +21,7 @@
             <h2>{% trans "Permissions currently given to team" %} {{ team.group }}</h2>
             <ul>
                 {% for perm in team_perms %}
-                <li>{{ perm }}</li>
+                <li>{{ perm.permission.name }}</li>
                 {% endfor %}
             </ul>
         </div>

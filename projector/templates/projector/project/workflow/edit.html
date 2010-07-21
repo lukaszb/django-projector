@@ -3,9 +3,9 @@
 {% load markup %}
 {% load i18n %}
 
-{% block col_main_title %}{{ project.name }}{% endblock %}
+{% block col_single_title %}{{ project.name }}{% endblock %}
 
-{% block col_main_extra %}
+{% block col_single_extra %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Workflow schema" %}</h5>
     <div class="richtemplates-panel-content">
@@ -29,5 +29,5 @@
         </form>
     </div>
 </div>
-{% endblock col_main_extra %}
+{% endblock col_single_extra %}
 
