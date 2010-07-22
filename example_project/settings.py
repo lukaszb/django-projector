@@ -180,6 +180,9 @@ try:
         for app in LOCAL_INSTALLED_APPS:
             if app not in INSTALLED_APPS:
                 INSTALLED_APPS += (app,)
+        for middleware in LOCAL_MIDDLEWARE_CLASSES:
+            if middleware not in MIDDLEWARE_CLASSES:
+                MIDDLEWARE_CLASSES += (middleware,)
     except NameError:
         pass
 except ImportError:

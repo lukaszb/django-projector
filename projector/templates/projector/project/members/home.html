@@ -18,9 +18,9 @@
 
     <ul class="nav-inline">
         <li class="richbuttonset">
-            <a  class="button-link"href="{{ project.get_members_url }}">{% trans "Members" %}</a>
+            <a  class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a>
             {% if "can_add_member" in project_perms %}
-            <a  class="button-link"href="{{ project.get_members_add_url }}">{% trans "Add member" %}</a>
+            <a  class="button-link" href="{{ project.get_members_add_url }}">{% trans "Add member" %}</a>
             {% endif %}
         </li>
     </ul>
