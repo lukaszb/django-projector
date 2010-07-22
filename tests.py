@@ -9,7 +9,7 @@ import os
 import sys
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "example_project.settings_test"
-from example_project import settings
+from example_project import settings_test as settings
 
 # Hide logging messages
 settings.DJALOG_LEVEL = 30

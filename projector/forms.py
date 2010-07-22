@@ -165,7 +165,7 @@ class MembershipForm(LimitingModelForm):
         return member
 
 def get_editable_perms():
-    editable_perms = get_config_value('PROJECT_EDITABLE_PERMISSIONS')
+    editable_perms = get_config_value('EDITABLE_PERMISSIONS')
     perms = [(p.codename, p.name) for p in get_perms_for_model(Project)
         if p.codename in editable_perms]
     perms.sort(key=lambda pair: pair[0])

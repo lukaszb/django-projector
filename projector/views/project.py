@@ -147,8 +147,7 @@ def _project_detail_hg(request, project):
         raise NotMercurialRequest("Only GET/POST methods are allowed, got %s"
             % request.method)
     # Allow to read from public projects
-    if project.is_public() and request.method == 'GET' and \
-        get_config_value('ALWAYS_ALLOW_READ_PUBLIC_PROJECTS'):
+    if project.is_public() and request.method == 'GET':
         mercurial_info = {
             'repo_path': project._get_repo_path(),
             'push_ssl': simplevcs_settings.PUSH_SSL,

@@ -22,15 +22,19 @@ class EmailTest(TestCase):
     def test_send_mail_to_task_author(self):
         # needs project to be created first
         jack = User.objects.create(username='jack')
-        project = Project.objects.create(author=jack, name='Black Jack')
+        #project = Project.objects.create(author=jack, name='Black Jack')
 
-        self.client.login(username='jack', password='jack')
-        self.client.post(reverse('projector_task_create', kwargs={
-            'username': 'jack',
-            'project_slug': project.slug}),
-            data={
-                'summary': 'Jack\'s task',
-                'description': 'No description',
-            })
-        self.assertEquals(len(mail.outbox), 1)
+        #self.client.login(username='jack', password='jack')
+        #task =
+        #response = self.client.post(reverse('projector_task_create', kwargs={
+            #'username': 'jack',
+            #'project_slug': project.slug}),
+            #data={
+                #'summary': 'Jack\'s task',
+                #'description': 'No description',
+            #})
+        #self.assertEqual(response.status_code, 200)
+
+        ##Author of the project should be notified after task is created
+        #self.assertEquals(len(mail.outbox), 1)
 
