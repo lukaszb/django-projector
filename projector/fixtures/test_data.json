@@ -13,7 +13,7 @@
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$e19ab$42713cb1cfca1c948405f67fc9a67316810dbc0f", 
-            "email": "admin@example.com", 
+            "email": "admin@non-exist-31415926535.com", 
             "date_joined": "2010-07-20 11:00:00"
         }
     }, 
@@ -31,7 +31,7 @@
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$c69c2$28c52e7333ba3f688ceae0bac3a53dab39f9b54c", 
-            "email": "jack@example.com", 
+            "email": "jack@non-exist-31415926535.com", 
             "date_joined": "2010-07-20 12:00:00"
         }
     }, 
@@ -49,7 +49,7 @@
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$85e52$7b460ab1bbc7f558fe8a1d81904cabbd390a09e9", 
-            "email": "joe@example.com", 
+            "email": "joe@non-exist-31415926535.com", 
             "date_joined": "2010-07-20 13:00:00"
         }
     },
@@ -67,7 +67,7 @@
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$8fe1f$60d6b1fb0cbaf84aa86eaedc2a49572760b90980", 
-            "email": "noperms@example.com", 
+            "email": "noperms@non-exist-31415926535.com", 
             "date_joined": "2010-07-20 14:00:00"
         }
     }, 
