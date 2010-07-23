@@ -27,7 +27,6 @@ Features
 - Documents based on `restructuredText`_
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
-- Full project schema scripts (provided by `Capo`_)
 - More to come
 
 Incoming
@@ -89,4 +88,3 @@ Other topics
 .. _subversion: http://subversion.tigris.org/
 .. _git: http://git-scm.com/
 .. _trac: http://trac.edgewall.org/
-.. _capo: http://bitbucket.org/lukaszb/capo/

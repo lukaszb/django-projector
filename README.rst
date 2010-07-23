@@ -20,7 +20,6 @@ Features
 - Documents based on `restructuredText`_
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
-- Full project schema scripts (provided by `Capo`_)
 - More to come
 
 Incoming
@@ -79,7 +78,6 @@ of the license with source distribution, at the root location, within
 .. _mercurial: http://mercurial.selenic.com/
 .. _subversion: http://subversion.tigris.org/
 .. _git: http://git-scm.com/
-.. _capo: http://bitbucket.org/lukaszb/capo/
 
 .. [1] Don't get us wrong, Trac_ is great tool but we believe that
    django's pluggable applications are far easier to configure and
