@@ -29,9 +29,6 @@ PUBLIC_RADIO_CHOICES = [
     (u'public', _("Public")),
     (u'private', _("Private"))
 ]
-if get_config_value('PRIVATE_ONLY'):
-     # Don't let public choic if PRIVATE_ONLY flag is set
-    PUBLIC_RADIO_CHOICES.pop(0)
 
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(min_length=2, max_length=64, label=_('Name'))
@@ -44,6 +41,13 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         exclude = ('members', 'author', 'editor', 'repository', 'teams')
+
+    def __init__(self, *args, **kwargs):
+        res = super(ProjectForm, self).__init__(*args, **kwargs)
+        # Update ``status`` field while creating new task
+        if get_config_value('PRIVATE_ONLY'):
+            self.fields['public'].choices.pop(0)
+        return res
 
     def clean_public(self):
         data = self.cleaned_data['public']

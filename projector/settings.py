@@ -70,6 +70,8 @@ EDITABLE_PERMISSIONS = getattr(settings,
     )
 )
 
+FROM_EMAIL_ADDRESS = settings.DEFAULT_FROM_EMAIL
+
 MAX_PROJECTS_PER_USER = getattr(settings,
     'PROJECTOR_MAX_PROJECTS_PER_USER', 50)
 
@@ -101,7 +103,7 @@ TASK_EMAIL_SUBJECT_SUMMARY_FORMAT = getattr(settings,
     "[$project] #$id: $summary")
 
 PROJECTOR = {
-    'ALWAYS_SEND_MAILS_TO_MEMBERS': ALWAYS_SEND_MAILS_TO_MEMBERS,
+    'ALWAYS_SEND_MAILS_TO_MEMBERS': globals()['ALWAYS_SEND_MAILS_TO_MEMBERS'],
     'BANNED_PROJECT_NAMES': BANNED_PROJECT_NAMES,
     'BASIC_AUTH_REALM': BASIC_AUTH_REALM,
     'CHANGESETS_PAGINATE_BY': CHANGESETS_PAGINATE_BY,
@@ -120,5 +122,6 @@ PROJECTOR = {
 def get_config_value(key):
     if key.startswith('PROJECTOR_'):
         key = key[key.find('PROJECTOR_'):]
-    return PROJECTOR[key]
+    return globals()[key]
+    #return PROJECTOR[key]
 
