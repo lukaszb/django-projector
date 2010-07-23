@@ -117,7 +117,6 @@ def task_save_listener(sender, instance, **kwargs):
     """
     Action made after task is saved (created or updated).
     """
-    logging.info("task_save_listener called!")
     if kwargs['created'] is True:
         # Task was created
         mail_info = {
@@ -125,9 +124,6 @@ def task_save_listener(sender, instance, **kwargs):
             'body': instance.get_long_content(),
             'recipient_list': [instance.author.email],
         }
-        msg = "Sending a signal to messanger"
-        logging.info(msg)
-        print msg
         messanger.send(None, **mail_info)
     else:
         # Task was updated
@@ -136,9 +132,6 @@ def task_save_listener(sender, instance, **kwargs):
         for watched_item in WatchedItem.objects.filter(
             content_type=ContentType.objects.get_for_model(Task),
             object_id = instance.pk):
-            msg = "Sending a signal to messanger"
-            logging.info(msg)
-            print msg
             messanger.send(None,
                 subject = subject,
                 body = body,

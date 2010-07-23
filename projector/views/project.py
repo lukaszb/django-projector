@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 
 from projector.core.controllers import View
 from projector.models import Project
-from projector.forms import ProjectForm
+from projector.forms import ProjectForm, ConfigForm
 from projector.settings import get_config_value
 
 from vcs.web.simplevcs import settings as simplevcs_settings
@@ -266,24 +266,46 @@ class ProjectEditView(ProjectView):
     """
 
     template_name = 'projector/project/edit.html'
-    perms = ['view_project', 'change_project']
+    perms = ['view_project', 'change_project', 'admin_project']
 
     def response(self, request, username, project_slug):
-        project = self.project
-        if project.public:
-            project.public = u'public'
-        else:
-            project.public = u'private'
-        form = ProjectForm(request.POST or None, instance=project)
-        if request.method == 'POST' and form.is_valid():
-            project = form.save()
-            message = _("Project edited successfully")
-            messages.success(request, message)
-            return HttpResponseRedirect(project.get_absolute_url())
+        self.context['project'] = self.project
+        self.validate_project_form(request)
+        self.validate_config_form(request)
+        return self.context
 
-        context = {
-            'form' : form,
-            'project': form.instance,
-        }
-        return context
+    def validate_project_form(self, request):
+        public_val = self.project.is_public() and u'public' or u'private'
+        if request.method == 'POST' and \
+                request.POST.get('submit_project', False):
+            form = ProjectForm(request.POST, instance=self.project,
+                initial={'public': public_val})
+            if form.is_valid():
+                msg = _("Project edited successfully")
+                self.project = form.save()
+                messages.success(request, msg)
+            else:
+                msg = _("Form has not validated")
+                messages.error(request, msg)
+        else:
+            form = ProjectForm(instance=self.project,
+                initial={'public': public_val})
+        self.context['form'] = form
+
+    def validate_config_form(self, request):
+        if request.method == 'POST' and \
+                request.POST.get('submit_config', False):
+            form = ConfigForm(request.POST, instance=self.project.config)
+            if form.is_valid():
+                form.instance.editor = request.user
+                form.save()
+                msg = _("Project's configuration updated successfully")
+                messages.success(request, msg)
+            else:
+                msg = _("Errors occured while trying to update "
+                            "project's configuration")
+                messages.error(request, msg)
+        else:
+            form = ConfigForm(instance=self.project.config)
+        self.context['form_config'] = form
 

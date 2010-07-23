@@ -104,11 +104,12 @@ class TaskForm(LimitingModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
-        # Update ``status`` field while creating new task
-        self.fields['status'].queryset = Status.objects.filter(
-            project=self.instance.project, is_initial=True)
-        self.fields['status'].empty_label=None
-        self.fields['owner'].queryset = self.instance.project.members.all()
+        if 'status' in self.fields:
+            # Update ``status`` field while creating new task
+            self.fields['status'].queryset = Status.objects.filter(
+                project=self.instance.project, is_initial=True)
+            self.fields['status'].empty_label=None
+        #self.fields['owner'].queryset = self.instance.project.members.all()
 
     def save(self, editor, editor_ip, project=None, commit=True):
         assert project or self.instance.project,\
@@ -137,11 +138,12 @@ class TaskEditForm(TaskForm):
         label=_('Comment'), widget=forms.Textarea, required=False)
 
     def __init__(self, *args, **kwargs):
-        print args, kwargs
         super(TaskEditForm, self).__init__(*args, **kwargs)
         if 'status' in self.fields:
             status_field = self['status'].field
             status_field.queryset = self.instance.status.destinations.all()
+        if 'watch_changes' in self.fields:
+            self.fields.pop('watch_changes')
 
     def clean(self):
         comment = self.cleaned_data.get('comment', None)

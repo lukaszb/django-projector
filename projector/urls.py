@@ -33,13 +33,6 @@ urlpatterns += patterns('projector.views.project',
 
 )
 
-# Config
-urlpatterns += patterns('projector.views.project_config',
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/settings/$',
-        view='ConfigEditView',
-        name='projector_project_config'),
-)
-
 # Milestones
 urlpatterns += patterns('projector.views.project_milestone',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/milestones/$',

@@ -21,6 +21,7 @@ class BaseView(object):
         obj.__init__(request, *args, **kwargs)
         obj.args = args
         obj.kwargs = kwargs
+        obj.context = {}
         return obj
 
     def __init__(self, request, *args, **kwargs):

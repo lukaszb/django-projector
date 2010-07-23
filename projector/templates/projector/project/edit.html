@@ -11,7 +11,7 @@
 
 {% load i18n %}
 
-{% block col_main_extra %}
+{% block col_single_extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's edit panel" %}</h5>
@@ -22,18 +22,30 @@
                 {% include "richtemplates/forms/form.html" %}
             </table>
             <div>
-                <input id="id_submit" type="submit" name="submit"
-                value="{% trans "Update" %} {% trans "project" %}"/>
-                <input type="button" onclick="window.location='{% spaceless %}
-                    {% if form.instance.id %}
-                        {{ form.instance.get_absolute_url }}
-                    {% else %}
-                        {% url projector_project_list %}
-                    {% endif %}
-                    {% endspaceless %}'" value="{% trans "Cancel" %}"/>
+                <input id="id_submit_project" type="submit" name="submit_project"
+                value="{% trans "Save" %} {% trans "project" %}"/>
             </div>
         </form>
     </div>
 </div>
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Project's configuration panel" %}</h5>
+    <div class="richtemplates-panel-content">
+        <form action="." method="post">
+            {% csrf_token %}
+            {% with form_config as form %}
+            <table class="form-table">
+                {% include "richtemplates/forms/form.html" %}
+            </table>
+            {% endwith %}
+            <div>
+                <input id="id_submit_config" type="submit" name="submit_config"
+                value="{% trans "Save" %} {% trans "project" %}"/>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 

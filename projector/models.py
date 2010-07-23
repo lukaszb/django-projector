@@ -27,7 +27,9 @@ from projector.utils import abspath, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
 from projector.settings import get_config_value
-from projector.managers import ProjectManager, TeamManager, WatchedItemManager
+from projector.managers import ProjectManager
+from projector.managers import TeamManager
+from projector.managers import WatchedItemManager
 
 from vcs.web.simplevcs.models import Repository
 
@@ -136,7 +138,7 @@ def validate_project_name(name):
     """
     Checks if this project name may be used.
     """
-    if name.lower() in projector_settings.BANNED_PROJECT_NAMES:
+    if name.strip().lower() in projector_settings.BANNED_PROJECT_NAMES:
         raise ValidationError(_("This name is restricted"))
 
 class Project(models.Model, Watchable):
@@ -161,8 +163,7 @@ class Project(models.Model, Watchable):
     outdated = models.BooleanField(_('outdated'), default=False)
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
-    fork = models.ForeignKey('self', null=True, blank=True,
-        editable=False)
+    fork = models.ForeignKey('self', null=True, blank=True, editable=False)
 
     objects = ProjectManager()
 
@@ -173,7 +174,7 @@ class Project(models.Model, Watchable):
         get_latest_by = 'created_at'
         permissions = (
             ('view_project', 'Can view project'),
-            ('change_config_project', 'Can change config'),
+            ('admin_project', 'Can administer project'),
             ('can_read_repository', 'Can read repository'),
             ('can_write_to_repository', 'Can write to repository'),
             ('can_change_description', 'Can change description'),
@@ -883,7 +884,6 @@ class AbstractTask(models.Model):
         null=True, blank=True)
     component = models.ForeignKey(Component, verbose_name=_('component'))
 
-
     def get_status(self):
         return self.status
 
@@ -919,7 +919,6 @@ class Task(AbstractTask, Watchable):
         """
         Sets and returns new id for taks within it's project.
         """
-        logging.debug("Task's _calculate_id method called")
         try:
             self.project # Just check
         except Project.DoesNotExist:
