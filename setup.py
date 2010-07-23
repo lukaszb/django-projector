@@ -30,7 +30,6 @@ setup(
         'djalog',
         'django-richtemplates',
         'django-pagination>=1.0.7',
-        'django-attachments',
         'django-tagging',
         'django-autoslug',
         'django-guardian',

@@ -8,7 +8,6 @@ urlpatterns = patterns('',
     (r'^$', 'projector.views.users.UserHomepageView'),
 
     (r'^accounts/', include('registration.urls')),
-    (r'^attachments/', include('attachments.urls')),
     (r'^projector/', include('projector.urls')),
 
     (r'^admin_tools/', include('admin_tools.urls')),

@@ -9,7 +9,6 @@
 {% endblock %}
 
 {% load i18n %}
-{% load attachments_tags %}
 
 {% block col_left %}{{ block.super }}
 <div class="richtemplates-panel">
@@ -187,23 +186,6 @@
             {% endfor %}
     
 
-        {% get_attachments_for task as "task_attachments" %}
-        <fieldset id="task-attachments">
-            <legend>{% trans "Attachments" %}</legend>
-            {% if task_attachments %}
-            <ul>
-            {% for attachment in task_attachments %}
-                <li>
-                    <a href="{{ attachment.attachment_file.url }}">{{ attachment.filename }}</a>
-                    {% attachment_delete_link attachment %}
-                </li>
-            {% endfor %}
-            </ul>
-            {% endif %}
-                        
-            {% attachment_form task %}
-        </fieldset>
-            
         {# Form begin #}
         {% if user.is_authenticated %}
         <form action="." method="post" class="action-form">

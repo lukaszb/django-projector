@@ -44,7 +44,6 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
 
     # External
-    'attachments',
     'djalog',
     'django_extensions',
     'django_sorting',

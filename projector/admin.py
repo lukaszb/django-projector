@@ -9,7 +9,6 @@ from projector.models import Status, Task, Priority,\
 from projector.models import Membership
 
 from richtemplates.forms import LimitingModelForm
-from attachments.admin import AttachmentInlines
 
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 
@@ -57,7 +56,6 @@ class TaskAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     save_on_top = True
     search_fields = ['id', 'summary', 'description']
-    inlines = [TaskRevisionInline, AttachmentInlines]
     form = TaskAdminForm
 
     fieldsets = (

@@ -14,7 +14,6 @@ Following packages are needed to get ``django-projector`` working:
 
 - `Django`_ >= 1.2
 - `django-autoslug`_
-- `django-attachments`_
 - `django-extensions`_
 - `django-guardian`_
 - `django-keyedcache`_
@@ -36,7 +35,6 @@ Following packages are needed to get ``django-projector`` working:
 
 .. _django: http://www.djangoproject.com
 .. _django-autoslug: http://bitbucket.org/neithere/django-autoslug/
-.. _django-attachments: http://github.com/bartTC/django-attachments 
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
 .. _django-guardian: http://packages.python.org/django-guardian/
 .. _django-keyedcache: http://bitbucket.org/bkroeze/django-keyedcache/
