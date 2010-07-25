@@ -19,9 +19,6 @@ class ProjectorStatusTransition(TestCase):
             slug=slugify(name),
             author=self.admin,
         )
-        #commenting out as now workflow creation is handled by signals/listeners
-        #if craeted:
-        #    self.project.create_workflow()
 
         Transition.objects.filter(
             Q(source__project=self.project) |

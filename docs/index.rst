@@ -88,3 +88,8 @@ Other topics
 .. _subversion: http://subversion.tigris.org/
 .. _git: http://git-scm.com/
 .. _trac: http://trac.edgewall.org/
+
+.. [1] Don't get us wrong, Trac_ is great tool but we believe that
+   django's pluggable applications are far easier to configure and
+   deploy.
+

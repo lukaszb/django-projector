@@ -122,7 +122,7 @@ class ProjectorPermissionTests(TestCase):
         # they cannot be edited
         new_member = User.objects.create_user(
             username='new_member',
-            email='new_member@example.com',
+            email='new_member@non-existence-1231231.com',
             password='new_member')
         new_member._plain_password = 'new_member'
 
