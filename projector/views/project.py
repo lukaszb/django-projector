@@ -49,6 +49,9 @@ class ProjectView(View):
             author__username=username)
         self.author = self.project.author
         self.check_permissions()
+        super(ProjectView, self).__init__(request=request, username=username,
+            project_slug=project_slug, *args, **kwargs)
+        self.context['project'] = self.project
 
     def get_required_perms(self):
         """
@@ -103,7 +106,7 @@ class ProjectDetailView(ProjectView):
     permission requirements.
     """
 
-    template_name = 'projector/project/details.html'
+    template_name = 'projector/project/detail.html'
     csrf_exempt = True
 
     def get_required_perms(self):

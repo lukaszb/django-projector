@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.contenttypes.models import ContentType
 from django.core.mail import mail_admins
 
 from signals_ahoy.asynchronous import AsynchronousListener
@@ -119,29 +118,14 @@ def task_save_listener(sender, instance, **kwargs):
     """
     if kwargs['created'] is True:
         # Task was created
-        mail_info = {
-            'subject': instance.get_long_summary(),
-            'body': instance.get_long_content(),
-            'recipient_list': [instance.author.email],
-        }
-        messanger.send(None, **mail_info)
+        pass
     else:
         # Task was updated
-        subject = instance.get_long_summary()
-        body = instance.get_long_content()
-        for watched_item in WatchedItem.objects.filter(
-            content_type=ContentType.objects.get_for_model(Task),
-            object_id = instance.pk):
-            messanger.send(None,
-                subject = subject,
-                body = body,
-                recipient_list = [watched_item.user.email])
+        pass
 
 def send_mail_listener(sender, subject, body, recipient_list,
         from_address=projector_settings.get_config_value('FROM_EMAIL_ADDRESS'),
         **kwargs):
-    print "mail is going to be send..."
-    print sender, subject
     if 'mailer' in settings.INSTALLED_APPS and \
         projector_settings.get_config_value('SEND_MAILS_USING_MAILER'):
         from mailer import send_mail
@@ -154,12 +138,15 @@ async_send_mail_listener = AsynchronousListener(send_mail_listener)
 
 def watcheditem_save_listener(sender, instance, **kwargs):
     if kwargs['created'] is True:
-        logging.info("%s started watching %s" % (instance.user, instance))
+        logging.info("%s started watching %s" % (instance.user,
+            instance.content_object))
     else:
-        logging.info("%s already watching %s" % (instance.user, instance))
+        logging.info("%s already watching %s" % (instance.user,
+            instance.content_object))
 
 def watcheditem_delete_listener(sender, instance, **kwargs):
-    logging.info("%s stopped watching %s" % (instance.user, instance))
+    logging.info("%s stopped watching %s" % (instance.user,
+        instance.content_object))
 
 def start_listening():
     """

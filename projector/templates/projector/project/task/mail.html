@@ -18,3 +18,17 @@
 
 {{ task.description }}
 
+{# Comment if necessary #}
+{% if task.current_revision and task.current_revision.comment %}
+
+{% with _("Comment by") as comment_by %}
+
+{% for x in comment_by %}={% endfor %}={% for x in task.current_revision.author.username %}={% endfor %}
+{{ comment_by }} {{ task.current_revision.author }}
+{% for x in comment_by %}={% endfor %}={% for x in task.current_revision.author.username %}={% endfor %}
+
+{{ task.current_revision.comment }}
+
+{% endwith %}
+
+{% endif %}

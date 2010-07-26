@@ -16,12 +16,11 @@ class BaseView(object):
         if not isinstance(request, HttpRequest):
             raise TypeError("Class based views requires HttpRequest "
                 "to be passed as first argument (got %s)" % request)
-        else:
-            obj.request = request
+        obj.request = request
+        obj.context = {}
         obj.__init__(request, *args, **kwargs)
         obj.args = args
         obj.kwargs = kwargs
-        obj.context = {}
         return obj
 
     def __init__(self, request, *args, **kwargs):

@@ -125,7 +125,7 @@ class TaskForm(LimitingModelForm):
         id = self.instance._calculate_id()
         logging.debug("Calculated id: %s" % id)
         task = super(TaskForm, self).save(commit)
-        if commit and self.cleaned_data['watch_changes']:
+        if commit and self.cleaned_data.get('watch_changes', False):
             task.watch(editor)
         return task
 

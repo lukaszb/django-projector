@@ -13,6 +13,8 @@ from django.contrib.auth.models import User, Group, AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
+from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.contrib.sites.models import Site
@@ -28,8 +30,10 @@ from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
 from projector.settings import get_config_value
 from projector.managers import ProjectManager
+from projector.managers import TaskManager
 from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
+from projector.signals import messanger
 
 from vcs.web.simplevcs.models import Repository
 
@@ -519,6 +523,7 @@ class Project(models.Model, Watchable):
             models.Q(groups__team__project=self))
         return watchers
 
+
 class Config(models.Model):
     """
     This model stores configuration on "per project" basis.
@@ -903,6 +908,8 @@ class Task(AbstractTask, Watchable):
         null=True)
     editor_ip = models.IPAddressField(blank=True)
 
+    objects = TaskManager()
+
     class Meta:
         ordering = ('-id',)
         verbose_name = _('task')
@@ -1084,15 +1091,15 @@ class Task(AbstractTask, Watchable):
         """
         Returns content of the task, suitable as email message's body.
         """
-        task_url = 'http://%s/%s' % (Site.objects.get_current().domain,
+        task_url = 'http://%s%s' % (Site.objects.get_current().domain,
             self.get_absolute_url())
-        result = render_to_string('projector/task/mail.html', {
+        result = render_to_string('projector/project/task/mail.html', {
             'task': self,
             'task_url': task_url,
         })
         return result
 
-    def get_last_revision(self):
+    def current_revision(self):
         """
         Returns last TaskRevision (not self) attached to this task. If there
         were no changes made yet, None is returned.
@@ -1100,7 +1107,37 @@ class Task(AbstractTask, Watchable):
         if self.revision == 0:
             return None
         else:
-            return self.taskrevision_set.get(revision=self.revision-1)
+            return self.taskrevision_set.get(revision=self.revision)
+
+    def notify(self, recipient_list=None):
+        """
+        Notifies about task's status. If ``recipient_list`` is None, would
+        send a note to everyone who watch this task.
+        """
+        if recipient_list is None:
+            recipient_list = self.get_watchers()
+        if self.project.is_private():
+            if isinstance(recipient_list, QuerySet):
+                recipient_list = recipient_list.filter(
+                    Q(membership__project=self.project) |
+                    Q(project=self.project) |
+                    #Q(is_superuser=True) |
+                    Q(groups__team__project=self.project))
+            else:
+                raise TypeError("Currently only QuerySet instances are "
+                    "allowed as recipient_list parameter for private "
+                    "projects")
+        if isinstance(recipient_list, QuerySet):
+            recipient_list = recipient_list.values_list('email', flat=True)
+        # Be sure not to double recipient
+        recipient_list=set(recipient_list)
+        mail_info = {
+            'subject': self.get_long_summary(),
+            'body': self.get_long_content(),
+            'recipient_list': [addr for addr in recipient_list],
+        }
+        messanger.send(None, **mail_info)
+
 
 class TaskRevision(AbstractTask):
     task = models.ForeignKey(Task)

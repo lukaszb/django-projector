@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 
+from richtemplates.shortcuts import get_first_or_None
+
 class ProjectManager(models.Manager):
 
     def for_user(self, user=None):
@@ -32,6 +34,30 @@ class ProjectManager(models.Manager):
             .distinct()
 
         return qs
+
+class TaskManager(models.Manager):
+
+    def get_for_project(self, project):
+        """
+        Returns Task instance with default values set related to given
+        project.
+        """
+        from projector.models import Task
+        status = get_first_or_None(
+            project.status_set.filter(is_initial=True))
+        type = get_first_or_None(project.tasktype_set)
+        priority = get_first_or_None(project.priority_set)
+        component = get_first_or_None(project.component_set)
+
+        task = Task(
+            project = project,
+            status = status,
+            type = type,
+            priority = priority,
+            component = component,
+        )
+        return task
+
 
 class TeamManager(models.Manager):
 

@@ -4,7 +4,6 @@ import logging
 from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -16,7 +15,7 @@ from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
 from projector.filters import TaskFilter
 from projector.views.project import ProjectView
 
-from richtemplates.shortcuts import get_first_or_None, get_json_response
+from richtemplates.shortcuts import get_json_response
 from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
 login_required_m = method_decorator(login_required)
@@ -26,7 +25,7 @@ class TaskListView(ProjectView):
     Task for project listing view.
     """
 
-    template_name='projector/project/task_list.html'
+    template_name='projector/project/task/list.html'
     perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug):
@@ -39,11 +38,8 @@ class TaskListView(ProjectView):
             task = filters.qs[0]
             messages.info(self.request, _("One task matched - redirecting..."))
             return redirect(task.get_absolute_url())
-        context = {
-            'project': self.project,
-            'filters': filters,
-        }
-        return context
+        self.context['filters'] = filters
+        return self.context
 
 class TaskDetailView(ProjectView):
     """
@@ -51,7 +47,7 @@ class TaskDetailView(ProjectView):
     Users may update task here.
     """
 
-    template_name = 'projector/task/details.html'
+    template_name = 'projector/project/task/detail.html'
     perms_private = ['view_project', 'can_view_tasks']
 
     def response(self, request, username, project_slug, task_id):
@@ -97,7 +93,7 @@ class TaskDetailView(ProjectView):
                 # Task handler
                 data = action_form.cleaned_data
                 task.editor = request.user
-                task.editor_ip = request.META['REMOTE_ADDR']
+                task.editor_ip = request.META.get('REMOTE_ADDR', '')
                 # action_type number as defined before at DynamicActionChoices
                 action_type = data['action_type']
                 if request.user.has_perm('can_change_task', task.project):
@@ -108,28 +104,27 @@ class TaskDetailView(ProjectView):
                     task.save()
                     task.comment = comment
                     task.create_revision()
+                    task.notify()
                 else:
                     messages.warning(request, _("There were no changes"))
-                return HttpResponseRedirect(task.get_absolute_url())
+                return redirect(task.get_absolute_url())
             else:
                 logging.error(action_form.errors)
 
-        context = {
-            'task' : task,
-            'is_watched': task.is_watched(request.user),
-            'now' : datetime.datetime.now(),
-            'action_form' : action_form,
-            'comment_formset' : comment_formset,
-        }
+        self.context['task'] = task
+        self.context['is_watched'] = task.is_watched(request.user)
+        self.context['now'] = datetime.datetime.now()
+        self.context['action_form'] = action_form
+        self.context['comment_formset'] = comment_formset
 
-        return context
+        return self.context
 
 class TaskCreateView(ProjectView):
     """
     New Task creation view.
     """
 
-    template_name = 'projector/task/create.html'
+    template_name = 'projector/project/task/create.html'
     perms_private = ['view_project', 'can_add_task']
 
     @login_required_m
@@ -137,58 +132,35 @@ class TaskCreateView(ProjectView):
         initial = {
             'owner': request.user.username, # form's owner is UserByNameField
         }
-        status = get_first_or_None(
-            self.project.status_set.filter(is_initial=True))
-        type = get_first_or_None(self.project.tasktype_set)
-        priority = get_first_or_None(self.project.priority_set)
-        component = get_first_or_None(self.project.component_set)
+        instance = Task.objects.get_for_project(self.project)
+        instance.author = request.user
+        instance.author_ip = request.META.get('REMOTE_ADDR', '')
+        instance.editor = instance.author
+        instance.editor_ip = instance.author_ip
 
-        for attr in (status, type, priority, component):
-            if attr is None:
-                messages.error(request, _("Statuses, task types, priorities or "
-                    "components of this project are missing or no initial status "
-                    "is defined and we cannot create new tasks. Ask site "
-                    "administrator for help."))
-                return {}
-
-        instance = Task(
-            project = self.project,
-            author = request.user,
-            author_ip = request.META['REMOTE_ADDR'],
-            editor = request.user,
-            editor_ip = request.META['REMOTE_ADDR'],
-            status = status,
-            type = type,
-            priority = priority,
-            component = component,
-        )
         form = TaskForm(request.POST or None, initial=initial, instance=instance)
+
         if request.method == 'POST':
-            if form.errors:
-                #logging.error("Form has following errors:\n%s"
-                #    % pprint.pformat(form.errors))
-                pass
             if form.is_valid():
                 task = form.save(
                     editor = request.user,
-                    editor_ip = request.META['REMOTE_ADDR'],
+                    editor_ip = request.META.get('REMOTE_ADDR', ''),
                 )
                 task.create_revision()
                 messages.success(request, _("Task created succesfully."))
-                return HttpResponseRedirect(task.get_absolute_url())
+                task.notify()
+                return redirect(task.get_absolute_url())
 
-        context = {
-            'form' : form,
-        }
+        self.context['form'] = form
 
-        return context
+        return self.context
 
 class TaskEditView(ProjectView):
     """
     Edit Task meta information. task_details edits the rest.
     """
 
-    template_name = 'projector/task/create.html'
+    template_name = 'projector/project/task/create.html'
     perms_private = ['view_project', 'can_change_task']
 
     def response(self, request, username, project_slug, task_id):
@@ -200,21 +172,20 @@ class TaskEditView(ProjectView):
             if form.is_valid():
                 task = form.save(
                     editor=request.user,
-                    editor_ip=request.META['REMOTE_ADDR'],
+                    editor_ip=request.META.get('REMOTE_ADDR', ''),
                 )
                 task.create_revision()
                 messages.success(request, _("Task updated successfully."))
+                task.notify()
                 return redirect(task.get_absolute_url())
         else:
             form = TaskEditForm(instance=task, initial={
                 'owner': task.owner and task.owner.username or None,
             })
 
-        context = {
-            'form' : form,
-        }
+        self.context['form'] = form
 
-        return context
+        return self.context
 
 class TaskWatchView(ProjectView):
     """

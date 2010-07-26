@@ -26,9 +26,9 @@ def author_editor_save_model(self, request, obj, form, change):
         # Its a new instance so we need to
         # set author and author_ip fields
         obj.author = request.user
-        obj.author_ip = request.META['REMOTE_ADDR']
+        obj.author_ip = request.META.get('REMOTE_ADDR', '')
     obj.editor = request.user
-    obj.editor_ip = request.META['REMOTE_ADDR']
+    obj.editor_ip = request.META.get('REMOTE_ADDR', '')
 
     return super(self.__class__, self).save_model(request, obj, form, change)
 

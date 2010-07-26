@@ -1,0 +1,35 @@
+{% extends "projector/project/task/base.html" %}
+
+{% load i18n %}
+{% load native %}
+
+{% block extra_head %}{{ block.super }}
+    {{ form.media }}
+    {% autocomplete_field form.owner %}
+{% endblock %}
+
+{% block col_single_extra %}
+<div class="richtemplates-panel">
+    {% if form.instance.id %}
+    <h5>{% trans "Update task" %}</h5>
+    {% else %}
+    <h5>{% trans "Create new task" %}</h5>
+    {% endif %}
+    <div class="richtemplates-panel-content">
+
+        <form action="." method="post">
+            {% csrf_token %}
+            <table class="form-table">
+                {% include "richtemplates/forms/form.html" %}
+            </table>
+            <div>
+                <input id="id_submit" type="submit" name="submit"
+                value="{% if form.instance.id %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %} {% trans "task" %}"/>
+                <input type="button" onclick="window.location='{% if form.instance.project %}{{ form.instance.project.get_absolute_url }}{% endif %}'"
+                value="{% trans "Cancel" %}"/>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
