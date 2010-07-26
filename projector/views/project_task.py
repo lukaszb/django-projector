@@ -43,7 +43,7 @@ class TaskListView(ProjectView):
 
 class TaskDetailView(ProjectView):
     """
-    Task details view.
+    Task detail view.
     Users may update task here.
     """
 
@@ -157,7 +157,7 @@ class TaskCreateView(ProjectView):
 
 class TaskEditView(ProjectView):
     """
-    Edit Task meta information. task_details edits the rest.
+    Edit Task meta information. task_detail edits the rest.
     """
 
     template_name = 'projector/project/task/create.html'

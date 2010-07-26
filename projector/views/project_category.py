@@ -11,9 +11,9 @@ from projector.models import Project, ProjectCategory, Membership
 from projector.forms import ProjectForm
 
 @login_required
-def project_category_details(request, project_category_slug,
-        template_name='projector/project_category/details.html'):
-    logging.debug("project_category_details called")
+def project_category_detail(request, project_category_slug,
+        template_name='projector/project_category/detail.html'):
+    logging.debug("project_category_detail called")
     kwargs = {
         'queryset' : ProjectCategory.objects.all(),
         'slug' : project_category_slug,

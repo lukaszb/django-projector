@@ -14,7 +14,7 @@ urlpatterns += patterns('projector.views.project_category',
         view='project_category_create',
         name='projector_project_category_create'),
     url(r'^categories/(?P<project_category_slug>[-\w]+)/$',
-        'project_category_details', name='projector_project_category_details'),
+        'project_category_detail', name='projector_project_category_detail'),
 )
 
 urlpatterns += patterns('projector.views.project',
@@ -29,7 +29,7 @@ urlpatterns += patterns('projector.views.project',
         view='ProjectEditView',
         name='projector_project_edit'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
-        view='ProjectDetailView', name='projector_project_details'),
+        view='ProjectDetailView', name='projector_project_detail'),
 
 )
 
@@ -147,7 +147,7 @@ urlpatterns += patterns('projector.views.project_task',
         name='projector_task_create'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/$',
         view='TaskDetailView',
-        name='projector_task_details'),
+        name='projector_task_detail'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/tasks/(?P<task_id>\d+)/edit/$',
         view='TaskEditView',
         name='projector_task_edit'),

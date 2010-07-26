@@ -133,7 +133,7 @@ class ProjectCategory(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_category_details', (), {
+        return ('projector_project_category_detail', (), {
             'username': self.project.author.username,
             'project_category_slug' : self.slug,
         })
@@ -225,7 +225,7 @@ class Project(models.Model, Watchable):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_project_details', (), {
+        return ('projector_project_detail', (), {
             'username': self.author.username,
             'project_slug' : self.slug,
         })
@@ -943,7 +943,7 @@ class Task(AbstractTask, Watchable):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('projector_task_details', (), {
+        return ('projector_task_detail', (), {
             'username': self.project.author.username,
             'project_slug': self.project.slug,
             'task_id': self.id,

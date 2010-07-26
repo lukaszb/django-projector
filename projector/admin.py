@@ -59,7 +59,7 @@ class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
 
     fieldsets = (
-        (_("Task details"), {
+        (_("Task detail"), {
             'fields': (
                 'summary',
                 ('project', 'component'),
