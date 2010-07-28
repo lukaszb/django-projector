@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.forms.formsets import formset_factory
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
@@ -49,6 +50,7 @@ class TaskDetailView(ProjectView):
 
     template_name = 'projector/project/task/detail.html'
     perms_private = ['view_project', 'can_view_tasks']
+    perms_POST = ['can_change_task']
 
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(
@@ -80,8 +82,6 @@ class TaskDetailView(ProjectView):
 
         comment_formset = CommentFormset(request.POST or None)
         if request.method == 'POST':
-            if not request.user.has_perm('can_change_task', task.project):
-                raise PermissionDenied()
 
             if action_form.is_valid() and comment_formset.is_valid():
                 # Comment handler
@@ -125,7 +125,7 @@ class TaskCreateView(ProjectView):
     """
 
     template_name = 'projector/project/task/create.html'
-    perms_private = ['view_project', 'can_add_task']
+    perms = ProjectView.perms + ['can_add_task']
 
     @login_required_m
     def response(self, request, username, project_slug):
@@ -161,8 +161,9 @@ class TaskEditView(ProjectView):
     """
 
     template_name = 'projector/project/task/create.html'
-    perms_private = ['view_project', 'can_change_task']
+    perms = ['can_change_task']
 
+    @login_required_m
     def response(self, request, username, project_slug, task_id):
         task = get_object_or_404(Task, id=task_id,
             project__author__username=username, project__slug=project_slug)
@@ -170,8 +171,12 @@ class TaskEditView(ProjectView):
         if request.method == 'POST':
             form = TaskEditForm(request.POST, instance=task)
             if form.is_valid():
+                if request.user.is_authenticated():
+                    editor = request.user
+                else:
+                    editor = User.get_anonymous() # available from guardian
                 task = form.save(
-                    editor=request.user,
+                    editor=editor,
                     editor_ip=request.META.get('REMOTE_ADDR', ''),
                 )
                 task.create_revision()
