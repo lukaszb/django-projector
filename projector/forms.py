@@ -1,5 +1,6 @@
 from django import forms
 from django.forms.models import modelformset_factory
+from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
@@ -29,6 +30,22 @@ PUBLIC_RADIO_CHOICES = [
     (u'public', _("Public")),
     (u'private', _("Private"))
 ]
+
+class PerProjectUniqueNameMixin(object):
+    """
+    Can be used for forms with model which is related with Project and has
+    ``name`` field which should be unique per project.
+    """
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if self._meta.model.objects\
+            .filter(project=self.instance.project)\
+            .filter(name__iexact=name)\
+            .exists():
+            raise forms.ValidationError(_("%(class)s with same name already "
+                "defined for this project" % {
+                    'class': self._meta.model.__name__}))
+        return name
 
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(min_length=2, max_length=64, label=_('Name'))
@@ -296,47 +313,25 @@ class TeamForm(LimitingModelForm):
 class TeamDeleteForm(forms.Form):
     post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
 
-class MilestoneForm(forms.ModelForm):
+class MilestoneForm(forms.ModelForm, PerProjectUniqueNameMixin):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
-
 
     class Meta:
         model = Milestone
         exclude = ['project', 'author']
 
-class ComponentForm(forms.ModelForm):
+class ComponentForm(forms.ModelForm, PerProjectUniqueNameMixin):
 
     class Meta:
         model = Component
         exclude = ['project']
 
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if not self.instance.pk and self.instance.project.component_set\
-            .filter(name__iexact=name)\
-            .exists():
-            raise forms.ValidationError(_("Component with same name already "
-                "defined for this project"))
-        return name
-
-class StatusEditForm(forms.ModelForm):
+class StatusEditForm(forms.ModelForm, PerProjectUniqueNameMixin):
 
     class Meta:
         model = Status
         exclude = ['project']
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        try:
-            Status.objects.get(name__iexact=name,
-                project=self.instance.project)
-        except Status.DoesNotExist:
-            pass
-        else:
-            raise forms.ValidationError(_("Status with this name already "
-                "exists for this project"))
-        return name
 
 class StatusForm(StatusEditForm):
 
@@ -344,19 +339,38 @@ class StatusForm(StatusEditForm):
         model = Status
         exclude = ['project', 'destinations']
 
-StatusFormSetBase = modelformset_factory(Status,
-    exclude = ['description', 'project'],
-    extra = 0,
-)
+class BaseStatusFormSet(BaseModelFormSet):
 
-class StatusFormSet(StatusFormSetBase):
+    def clean(self):
+        """
+        Checks that no two statuses have the same name.
+        """
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on
+            # its own
+            return
+        # TODO: Notify user which forms were posted with same names (use
+        # form._errors['name'] = ... )
+        names = []
+        for form in self.forms:
+            name = form.cleaned_data['name']
+            if name in names:
+                raise forms.ValidationError(_("Statuses in a set must have "
+                    "distinct name"))
+            names.append(name)
 
     def add_fields(self, form, index):
-        super(StatusFormSet, self).add_fields(form, index)
+        super(BaseStatusFormSet, self).add_fields(form, index)
         qs = form['destinations'].field.queryset
         if form.instance.project:
             qs = qs.filter(project = form.instance.project)
             form['destinations'].field.queryset = qs
+
+StatusFormSet = modelformset_factory(Status,
+    exclude = ['description', 'project'],
+    extra = 0,
+    formset = BaseStatusFormSet,
+)
 
 class UserProfileForm(forms.ModelForm):
     skin = RichSkinChoiceField()

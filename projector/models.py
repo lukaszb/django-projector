@@ -303,8 +303,8 @@ class Project(models.Model, Watchable):
         })
 
     @models.permalink
-    def get_milestones_add_url(self):
-        return ('projector_project_milestones_add', (), {
+    def get_milestone_add_url(self):
+        return ('projector_project_milestone_add', (), {
             'username': self.author.username,
             'project_slug': self.slug,
         })
@@ -719,7 +719,7 @@ class Milestone(models.Model):
         ordering = ('created_at',)
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
-        #unique_together = ('project', 'slug')
+        unique_together = ('project', 'name')
 
     def __unicode__(self):
         return self.name

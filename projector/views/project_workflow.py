@@ -54,6 +54,8 @@ class WorkflowEditView(ProjectView):
             else:
                 msg = _("Errors occured while processing formset")
                 messages.error(request, msg)
+                for error in formset.non_form_errors():
+                    messages.error(request, error)
         context = {
             'project': self.project,
             'formset': formset,

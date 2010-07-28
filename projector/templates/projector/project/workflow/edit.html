@@ -14,11 +14,13 @@
         <form method="post" action=".">
             {% csrf_token %}
             {{ formset.management_form }}
-            <table class="form-table">
             {% for form in formset.forms %}
-                {% include "richtemplates/forms/form.html" %}
+            <div class="richblock">
+                <table class="form-table">
+                    {% include "richtemplates/forms/form.html" %}
+                </table>
+            </div>
             {% endfor %}
-            </table>
             <div>
                 <input id="id_submit" type="submit" name="submit"
                     value="{% trans "Update" %}"/>

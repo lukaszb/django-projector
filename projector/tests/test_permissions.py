@@ -1,15 +1,15 @@
 import urlparse
 
-from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
+from projector.tests.base import ProjectorTestCase
 from projector.models import Project, Membership, Team
 
 from guardian.shortcuts import assign
 
-class ProjectorPermissionTests(TestCase):
+class ProjectorPermissionTests(ProjectorTestCase):
 
     fixtures = ['test_data.json']
 
@@ -31,24 +31,6 @@ class ProjectorPermissionTests(TestCase):
         # Create projects
         self.public_project = Project.objects.get(name='public project')
         self.private_project = Project.objects.get(name='private project')
-
-    def _get_response(self, url, data={}, method='GET', code=200, follow=False):
-        """
-        Test if response to given url/data/method returns with proper code.
-        Returns response.
-        """
-        method = method.upper()
-        if method == 'GET':
-            opener = self.client.get
-        elif method == 'POST':
-            opener = self.client.post
-        else:
-            self.fail("Unsupported method %s" % method)
-        response = opener(url, data, follow=follow)
-        self.assertEqual(response.status_code, code, "%s %s (data: %s) returned"
-            " code %s but %s was expected"
-            % (method, url, data, response.status_code, code))
-        return response
 
     def test_anonymous(self):
         # Test public project for anonymous user
@@ -103,7 +85,7 @@ class ProjectorPermissionTests(TestCase):
             self.private_project.get_task_list_url(),
             self.private_project.get_create_task_url(),
             self.private_project.get_milestones_url(),
-            self.private_project.get_milestones_add_url(),
+            self.private_project.get_milestone_add_url(),
             self.private_project.get_components_url(),
             self.private_project.get_component_add_url(),
             self.private_project.get_workflow_url(),

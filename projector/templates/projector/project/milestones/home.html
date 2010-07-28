@@ -16,7 +16,7 @@
         <li class="richbuttonset">
             <a class="button-link" href="{{ project.get_milestones_url }}">{% trans "Milestones" %}</a>
             {% if "change_project" in project_perms %}
-            <a class="button-link" href="{{ project.get_milestones_add_url }}">{% trans "Add milestone" %}</a>
+            <a class="button-link" href="{{ project.get_milestone_add_url }}">{% trans "Add milestone" %}</a>
             {% endif %}
         </li>
         <li>
