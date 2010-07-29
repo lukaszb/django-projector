@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'djalog',
     'django_extensions',
     'django_sorting',
+    'debug_toolbar',
     'guardian',
     'keyedcache',
     'pagination',
@@ -55,7 +56,6 @@ INSTALLED_APPS = (
     'signals_ahoy',
     'tagging',
     'projector',
-    #'request',
     'vcs.web.simplevcs',
     'mailer',
 
@@ -70,12 +70,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
 
-    #'request.middleware.RequestMiddleware',
+    'djalog.middleware.SQLLoggingMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'richtemplates.middleware.Http403Middleware',
     'django_sorting.middleware.SortingMiddleware',
-    'djalog.middleware.SQLLoggingMiddleware',
     'vcs.web.simplevcs.middleware.PaginationMiddleware',
 )
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 MEDIA_ROOT = abspath(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
@@ -150,6 +152,14 @@ NATIVE_TAGS = (
     'richtemplates.templatetags.native',
     'projector.templatetags.native',
 )
+
+# ====================== #
+# DEBUG TOOLBAR SETTINGS #
+# ====================== #
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': True,
+}
 
 # ================ #
 # REQUEST SETTINGS #

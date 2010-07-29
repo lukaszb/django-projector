@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
-from projector.models import Project, Transition
+from projector.models import Project, Transition, Status
 
 class ProjectorStatusTransition(TestCase):
 
@@ -19,14 +19,13 @@ class ProjectorStatusTransition(TestCase):
             slug=slugify(name),
             author=self.admin,
         )
+        Status.objects.create(name='s1', project=self.project, order=2)
+        Status.objects.create(name='s2', project=self.project, order=3)
 
         Transition.objects.filter(
             Q(source__project=self.project) |
             Q(destination__project=self.project))\
             .delete()
-
-    def tearDown(self):
-        self.project.delete()
 
     def test_notransitions(self):
         statuses = self.project.status_set.all()

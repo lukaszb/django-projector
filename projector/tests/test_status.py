@@ -2,8 +2,10 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 
 from projector.tests.base import ProjectorTestCase
-from projector.models import Project, Status
-from projector.conf.default_workflow import statuses
+from projector.models import Project
+from projector.settings import get_workflow
+
+statuses = get_workflow().statuses
 
 class StatusTest(ProjectorTestCase):
 
@@ -30,16 +32,15 @@ class StatusTest(ProjectorTestCase):
 
         order = len(statuses) + 1
         new_status_name = u'status-1'
-        response = self._get_response(
+        self._get_response(
             url = self.project.get_workflow_add_status_url(),
             data = {'name': new_status_name, 'order': unicode(order)},
             method = 'POST', follow = True)
         order += 1
-        # By default when each project is created, statuses from
-        # projector.conf.default_workflow.statuses
+
         self.assertEqual(self.project.status_set.count(), len(statuses) + 1)
 
-        response = self._get_response(
+        self._get_response(
             url = self.project.get_workflow_add_status_url(),
             data = {'name': new_status_name, 'order': unicode(order)},
             method = 'POST', follow = True)

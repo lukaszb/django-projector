@@ -84,6 +84,24 @@ When new project is created some actions are made using `Djangos' signals <http:
 By default those actions are made asynchronousely by new thread in order not to
 block client.
 
+PROJECTOR_DEFAULT_PROJECT_WORKFLOW
+----------------------------------
+
+Default: ``projector.conf.default_workflow``
+
+Path to object defining default workflow for new projects.
+
+Object must define following tuples: *components*, *task_types*, *priorities*
+and *statuses*. Each tuple should contain dictionaries with following key/value
+pairs:
+
+- **components**: *name*
+- **task_types**: *name*, *order*
+- **priorities**: *name*, *order*
+- **statuses**: *name*, *oder*, *is_resolved*, *is_initial*
+
+See source code pointed by default value for more detail.
+
 PROJECTOR_EDITABLE_PERMISSIONS
 ------------------------------
 

@@ -23,12 +23,11 @@ from guardian.shortcuts import assign, get_perms, get_perms_for_model
 
 from autoslug import AutoSlugField
 
-from projector.conf import default_workflow
 from projector.exceptions import ConfigAlreadyExist
 from projector.utils import abspath, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
-from projector.settings import get_config_value
+from projector.settings import get_config_value, get_workflow
 from projector.managers import ProjectManager
 from projector.managers import TaskManager
 from projector.managers import TeamManager
@@ -443,17 +442,19 @@ class Project(models.Model, Watchable):
                     "'%s'" % (self, perm, self.author))
                 assign(perm, self.author, self)
 
-    def create_workflow(self, workflow=default_workflow):
+    def create_workflow(self, workflow=None):
         """
         Creates default workflow for the project. We need to create initial
         member (author) and objects required to work on issues (components,
         types, statuses with their transitions).
 
         :param workflow: python object defining tuples of dicts with
-          information on project *metadata*; by default module
-          ``projector.conf.default_workflow`` is used - take a look at it if
-          you want to use your own object
+          information on project *metadata*; by default, object defined by
+          ``DEFAULT_PROJECT_WORKFLOW`` setting would be used.
         """
+
+        if workflow is None:
+            workflow = get_workflow()
 
         Membership.objects.create(project=self, member=self.author)
         self.set_author_permissions()

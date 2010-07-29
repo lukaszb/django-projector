@@ -2,6 +2,7 @@ import os
 import logging
 
 from django.conf import settings
+from django.utils.importlib import import_module
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
@@ -46,6 +47,10 @@ CHANGESETS_PAGINATE_BY = getattr(settings,
 
 CREATE_PROJECT_ASYNCHRONOUSLY = getattr(settings,
     'PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY', True)
+
+DEFAULT_PROJECT_WORKFLOW = getattr(settings,
+    'PROJECTOR_DEFAULT_PROJECT_WORKFLOW',
+    'projector.conf.workflow.DefaultWorkflow')
 
 EDITABLE_PERMISSIONS = getattr(settings,
     'PROJECTOR_EDITABLE_PERMISSIONS',
@@ -126,4 +131,11 @@ def get_config_value(key):
         key = key[key.find('PROJECTOR_'):]
     return globals()[key]
     #return PROJECTOR[key]
+
+def get_workflow():
+    obj_path = get_config_value('DEFAULT_PROJECT_WORKFLOW')
+    modpath, clsname = obj_path.rsplit('.', 1)
+    mod = import_module(modpath)
+    workflow = getattr(mod, clsname)
+    return workflow
 
