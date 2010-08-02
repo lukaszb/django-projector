@@ -5,7 +5,7 @@
 {% block col_left %}
     
     <div class="richtemplates-panel">
-        <h5>{% trans "User" %}: {{ profile.user }}</h5>
+        <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ request.user }}</h5>
 	    <div class="richtemplates-panel-content">
             {% if user == profile.user %}
 			<ul class="nav-vertical">
@@ -20,15 +20,22 @@
 
 {% block col_main %}
 <div class="richtemplates-panel">
-    <h5>{% trans "User profile" %}</h5>
+    <h5>
+    {% if profile.is_team %}
+        {% trans "Team profile" %}
+    {% else %}
+        {% trans "User profile" %}
+    {% endif %}
+    </h5>
     <div class="richtemplates-panel-content">
         <div class="richblock">
             <table class="richblock-properties">
                 <tbody>
                     <tr>
-                        <th>{% trans "User" %}</th>
+                        <th>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}</th>
                         <td>{{ profile.user.username }}</td>
                     </tr>
+                    {% if not profile.is_team %}
                     <tr>
                         <th>{% trans "Full name" %}</th>
                         <td>{{ profile.user.get_full_name }}</td>
@@ -37,6 +44,7 @@
                         <th>E-mail</th>
                         <td>{{ profile.user.email }}</td>
                     </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>

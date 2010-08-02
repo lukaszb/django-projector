@@ -66,6 +66,7 @@ Documentation
    :maxdepth: 1
 
    example_project
+   teamwork
 
 **Development**
 
@@ -74,6 +75,13 @@ Documentation
 
    dev/testing
 
+**API**
+
+.. toctree::
+   :maxdepth: 2
+
+   api/index
+ 
 Other topics
 ============
 

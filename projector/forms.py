@@ -378,5 +378,26 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        exclude = ('user', 'activation_token')
+        exclude = ('user', 'activation_token', 'is_team', 'group')
+
+
+class UserConvertToTeamForm(forms.Form):
+    confirm = forms.BooleanField(label=_('confirm'))
+
+    def _get_user(self):
+        return getattr(self, '_user', None)
+
+    def _set_user(self, user):
+        self._user = user
+
+    user = property(_get_user, _set_user)
+
+    def clean(self):
+        if any(self.errors):
+            return
+        if not self.user:
+            self._errors['confirm'] = [_("No user has been set")]
+            raise forms.ValidationError()
+        Team.objects.convert_from_user(self.user)
+        return super(UserConvertToTeamForm, self).clean()
 

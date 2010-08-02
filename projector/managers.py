@@ -1,6 +1,8 @@
 from django.db import models
+from django.db import IntegrityError
 from django.db.models import Q
-from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.contenttypes.models import ContentType
 
 from richtemplates.shortcuts import get_first_or_None
@@ -70,6 +72,32 @@ class TeamManager(models.Manager):
         queryset = self.get_query_set()
         queryset = queryset.filter(group__user=user)
         return queryset
+
+    def convert_from_user(self, user):
+        """
+        Converts ``User`` instance into ``Team`` instance. It won't delete user,
+        his or her profile would simply get ``team`` attribute set to newly
+        created ``Team`` and ``is_team`` attribute would be set to ``True``.
+        """
+        from projector.models import Project
+        if not user.is_active or user.is_anonymous():
+            raise ValidationError("Cannot conver anonymous or inactive user")
+        elif user.is_superuser or user.is_staff:
+            raise ValidationError("Cannot convert staff member or superuser")
+        try:
+            group = Group.objects.create(name=user.username)
+            profile = user.get_profile()
+            profile.is_team = True
+            profile.group = group
+            profile.save()
+            user.groups.add(group)
+            for project in Project.objects.filter(author=user):
+                self.create(project = project, group = group)
+            return group
+        except IntegrityError:
+            raise ValidationError("Cannot convert user if a group with same "
+                "name already exist")
+
 
 class WatchedItemManager(models.Manager):
 

@@ -1,0 +1,22 @@
+{% extends "projector/accounts/dashboard.html" %}
+
+{% load i18n %}
+
+{% block col_main_title %}{% trans "Convert to team" %}{% endblock %}
+{% block col_main_extra %}
+<div class="richtemplates-panel">
+    <h5>{% trans "Convert to team" %}</h5>
+    <div class="richtemplates-panel-content">
+        <ul class="messages">
+            <li class="message message-info">
+                {% blocktrans %}
+                Converts your account into Team. This account would remain untouched - you'd be able to authorize 
+                and manage it as usual. However, new Group with same name as your username would be created and
+                Team connecting this group would be created for each project you're author of.
+                {% endblocktrans %}
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

@@ -145,6 +145,11 @@ def validate_project_name(name):
         raise ValidationError(_("This name is restricted"))
 
 class Project(models.Model, Watchable):
+    """
+    Most important models within whole application. It provides connection with
+    all other models.
+    """
+
     name = models.CharField(_('name'), max_length=64, unique=True,
         validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
@@ -1161,6 +1166,9 @@ class UserProfile(RichUserProfile):
     """
     activation_token = models.CharField(_('activation_token'), max_length=32,
         editable=False)
+    group = models.OneToOneField(Group, verbose_name=_('group'), null=True,
+        blank=True)
+    is_team = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'projector'

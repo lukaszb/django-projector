@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 
 from projector.core.controllers import View
-from projector.forms import UserProfileForm
+from projector.forms import UserProfileForm, UserConvertToTeamForm
 from projector.models import Team, Project
 
 class UserListView(View):
@@ -72,8 +72,37 @@ class UserDashboardView(View):
             messages.success(request, message)
             return redirect(reverse('projector_users_profile_detail',
                 kwargs={'username': request.user.username}))
-        context = {
-            'form': form,
-        }
-        return context
+        self.context['form'] = form
+        self.context['profile'] = form.instance
+        return self.context
+
+class UserDashboardConvert2TeamView(View):
+    """
+    Convert to team view.
+    """
+
+    template_name = 'projector/accounts/dashboard-convert-confirm.html'
+
+    def response(self, request):
+        if request.user.is_anonymous() or not request.user.is_active:
+            raise PermissionDenied
+        if request.user.get_profile().is_team:
+            messages.warning(request,
+                "This account is already converted to team!")
+            return redirect(reverse('projector_users_profile_detail',
+                kwargs={'username': request.user.username}))
+        form = UserConvertToTeamForm(request.POST or None)
+        form.user = request.user
+        if request.method == 'POST':
+            if form.is_valid():
+                msg = _("You have successfully converted account into Team")
+                messages.success(request, msg)
+                return redirect(reverse('projector_users_profile_detail',
+                    kwargs={'username': request.user.username}))
+            else:
+                msg = _("Errors occured during account to team conversion")
+                messages.error(request, msg)
+        self.context['form'] = form
+        self.context['profile'] = request.user.get_profile()
+        return self.context
 

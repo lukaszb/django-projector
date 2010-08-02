@@ -5,11 +5,11 @@
 {% block col_left %}
     
     <div class="richtemplates-panel">
-        <h5>{% trans "User" %}: {{ profile.user }}</h5>
+        <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ request.user }}</h5>
 	    <div class="richtemplates-panel-content">
-            {% if user == profile.user %}
+            {% if request.user == profile.user %}
 			<ul class="nav-vertical">
-                <li><a href="{{ profile.user.get_absolute_url }}">{% trans "Show your public profile" %}</a></li>
+                <li><a href="{% url projector_users_profile_detail request.user.username %}">{% trans "Show your public profile" %}</a></li>
                 <li><a href="{% url projector_dashboard %}">{% trans "Dashboard" %}</a></li>
             </ul>
             {% endif %}
@@ -18,7 +18,14 @@
 
 {% endblock %}
 
-{% block col_main_title %}{% trans "User profile" %}{% endblock %}
+{% block col_main_title %}
+{% if profile.is_team %}
+    {% trans "Team profile" %}
+{% else %}
+    {% trans "User profile" %}
+{% endif %}
+{% endblock %}
+
 {% block col_main_content %}
     <form action="." method="post">
         {% csrf_token %}
@@ -29,5 +36,27 @@
             <input id="id_submit" type="submit" name="submit" value="Submit" />
         </div>
     </form>
+{% endblock %}
+
+{% block col_main_extra %}
+<div class="richtemplates-panel">
+    <h5>{% trans "Actions" %}</h5>
+    <div class="richtemplates-panel-content">
+        <ul class="nav-vertical">
+            {% if not profile.is_team %}
+            <li class="richbuttonset">
+                <a class="button-link" href="{% url projector_dashboard_convert_to_team %}">{% trans "Convert to team" %}</a>
+                <p>
+                {% blocktrans %}
+                Converts your account into Team. This account would remain untouched - you'd be able to authorize 
+                and manage it as usual. However, new Group with same name as your username would be created and
+                Team connecting this group would be created for each project you're author of.
+                {% endblocktrans %}
+                </p>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
 {% endblock %}
 

@@ -17,6 +17,22 @@ urlpatterns += patterns('projector.views.project_category',
         'project_category_detail', name='projector_project_category_detail'),
 )
 
+# Users
+urlpatterns += patterns('projector.views.users',
+    url(r'^users/$',
+        view = 'UserListView',
+        name = 'projector_user_list'),
+
+    url(r'^dashboard/convert-to-team/$',
+        view = 'UserDashboardConvert2TeamView',
+        name = 'projector_dashboard_convert_to_team'),
+
+    url(r'^dashboard/$',
+        view = 'UserDashboardView',
+        name = 'projector_dashboard'),
+
+)
+
 urlpatterns += patterns('projector.views.project',
     # Basic
     url(r'^projects/$',
@@ -159,21 +175,11 @@ urlpatterns += patterns('projector.views.project_task',
         name='projector_task_unwatch'),
 )
 
-# Users
 urlpatterns += patterns('projector.views.users',
-    url(r'^users/$',
-        view = 'UserListView',
-        name = 'projector_user_list'),
-
-    url(r'^dashboard/$',
-        view = 'UserDashboardView',
-        name = 'projector_dashboard'),
-
     url(r'^(?P<username>\w+)/$',
         view = 'UserProfileDetailView',
         name = 'projector_users_profile_detail'),
 )
-
 # ========== #
 # Feeds dict #
 # ========== #
