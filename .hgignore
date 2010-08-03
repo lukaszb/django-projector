@@ -17,3 +17,7 @@ dist
 example_project/media
 example_project/conf/local_settings.py
 projector/plugins
+
+bin
+buildout.cfg
+bootstrap.py
