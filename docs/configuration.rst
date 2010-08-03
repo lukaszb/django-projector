@@ -1,9 +1,10 @@
 .. _configuration:
 
+=============
 Configuration
 =============
 
-After you hook ``django-projector`` into your project [1]_
+After you hook ``django-projector`` into your project (see :ref:`installation`)
 you should probably change some of configuration variables.
 
 Available settings
@@ -195,4 +196,3 @@ name placeholders (``$project``, ``$id``, ``$summary``). All placeholders are
 optional - but adviced, obviousely.
 
 
-.. [1] See :ref:`installation`
