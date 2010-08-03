@@ -3,16 +3,16 @@
 {% load i18n %}
 {% load native %}
 
-{% block extra_head %}{{ block.super }}
+{% block extra-head %}{{ block.super }}
     {{ form.media }}
 {% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's member" %}: {{ membership.member }}</h5>
     <div class="richtemplates-panel-content">
-    {% block members_menu %}{{ block.super }}{% endblock %}
+    {% block members-menu %}{{ block.super }}{% endblock %}
     {% if project.is_public %}
         <ul class="messages">
             <li class="message message-info">

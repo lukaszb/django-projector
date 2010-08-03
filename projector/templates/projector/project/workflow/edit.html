@@ -3,13 +3,13 @@
 {% load markup %}
 {% load i18n %}
 
-{% block col_single_title %}{{ project.name }}{% endblock %}
+{% block col-single-title %}{{ project.name }}{% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Workflow schema" %}</h5>
     <div class="richtemplates-panel-content">
-        {% block workflow_menu %}{{ block.super }}{% endblock %}
+        {% block workflow-menu %}{{ block.super }}{% endblock %}
 
         <form method="post" action=".">
             {% csrf_token %}
@@ -31,5 +31,5 @@
         </form>
     </div>
 </div>
-{% endblock col_single_extra %}
+{% endblock col-single-extra %}
 

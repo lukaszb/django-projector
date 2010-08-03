@@ -3,17 +3,17 @@
 {% load i18n %}
 {% load native %}
 
-{% block extra_head %}{{ block.super }}
+{% block extra-head %}{{ block.super }}
     {{ form.media }}
 {% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's team" %}: {{ team }}</h5>
     <div class="richtemplates-panel-content">
     
-    {% block teams_menu %}{{ block.super }}{% endblock %}
+    {% block teams-menu %}{{ block.super }}{% endblock %}
 
     {% if project.is_public %}
         <ul class="messages">

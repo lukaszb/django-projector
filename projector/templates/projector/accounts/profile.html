@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block col_left %}
+{% block col-left %}
     
     <div class="richtemplates-panel">
         <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ request.user }}</h5>
@@ -18,7 +18,7 @@
 
 {% endblock %}
 
-{% block col_main %}
+{% block col-main %}
 <div class="richtemplates-panel">
     <h5>
     {% if profile.is_team %}

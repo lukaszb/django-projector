@@ -5,7 +5,7 @@
 {% load sorting_tags %}
 
 {% comment %}
-{% block col_left %}{{ block.super }}
+{% block col-left %}{{ block.super }}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Task search" %}</h5>
@@ -25,7 +25,7 @@
 {% endblock %}
 {% endcomment %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 {% autosort filters.qs as task_list %}
 {% autopaginate task_list %}

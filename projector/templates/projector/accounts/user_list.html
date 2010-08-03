@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block col_left %}
+{% block col-left %}
     {{ block.super }}
     <div class="richtemplates-panel">
         <h5>{% trans "Projects statistics" %}</h5>
@@ -17,9 +17,9 @@
     </div>
 {% endblock %}
 
-{% block col_main_title %}{% trans "Projects List" %}{% endblock %}
+{% block col-main-title %}{% trans "Projects List" %}{% endblock %}
 
-{% block col_main_content %}
+{% block col-main-content %}
 
     {% load pagination_tags %}
     {% load sorting_tags %}

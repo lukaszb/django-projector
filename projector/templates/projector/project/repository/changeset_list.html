@@ -6,11 +6,11 @@
 {% load projector_tags %}
 
 {% if root.is_file %}
-    {% block head_css %}{{ block.super }}
+    {% block head-css %}{{ block.super }}
     {% endblock %}
 {% endif %}
 
-{% block info_block %}
+{% block info-block %}
 <div class="richtemplates-panel">
     <h5>{% trans "Node's information" %}</h5>
     <div class="richtemplates-panel-content">
@@ -28,12 +28,12 @@
 </div>
 {% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's repository browser" %}</h5>
     <div class="richtemplates-panel-content">
-    {% block repository_menu %}{{ block.super }}{% endblock %}
+    {% block repository-menu %}{{ block.super }}{% endblock %}
     
     {% autopaginate repository CHANGESETS_PAGINATE_BY %}
 

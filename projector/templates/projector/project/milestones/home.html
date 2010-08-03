@@ -4,12 +4,12 @@
 {% load guardian_tags %}
 {% load richtemplates_tags %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 <div class="richtemplates-panel">
     <h5>{% trans "Project's milestones" %}</h5>
     <div class="richtemplates-panel-content">
-    {% block milestones_menu %}
+    {% block milestones-menu %}
     {% get_obj_perms request.user for project as "project_perms" %}
 
     <ul class="nav-inline">

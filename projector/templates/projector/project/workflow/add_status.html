@@ -4,11 +4,11 @@
 {% load pagination_tags %}
 {% load sorting_tags %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">
     <h5>{% trans "Add status" %}</h5>
     <div class="richtemplates-panel-content">
-        {% block workflow_menu %}{{ block.super }}{% endblock %}
+        {% block workflow-menu %}{{ block.super }}{% endblock %}
 
         <form action="." method="post">
             {% csrf_token %}

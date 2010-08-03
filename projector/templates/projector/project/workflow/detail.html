@@ -4,14 +4,14 @@
 {% load i18n %}
 {% load guardian_tags %}
 
-{% block col_single_title %}{{ project.name }}{% endblock %}
+{% block col-single-title %}{{ project.name }}{% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 {% get_obj_perms request.user for project as "project_perms" %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Workflow schema" %}</h5>
     <div class="richtemplates-panel-content">
-        {% block workflow_menu %}
+        {% block workflow-menu %}
         <ul class="nav-inline">
             <li class="richbuttonset">
                 <a class="button-link"href="{{ project.get_workflow_url }}">{% trans "Workflow" %}</a>
@@ -43,5 +43,5 @@
 
     </div>
 </div>
-{% endblock col_single_extra %}
+{% endblock col-single-extra %}
 

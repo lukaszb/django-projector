@@ -3,12 +3,12 @@
 {% load i18n %}
 {% load native %}
 
-{% block extra_head %}{{ block.super }}
+{% block extra-head %}{{ block.super }}
     {{ form.media }}
     {% autocomplete_field form.owner %}
 {% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">
     {% if form.instance.id %}
     <h5>{% trans "Update task" %}</h5>

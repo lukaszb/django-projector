@@ -3,13 +3,13 @@
 {% load markup %}
 {% load i18n %}
 
-{% block col_single_title %}{{ project.name }}{% endblock %}
+{% block col-single-title %}{{ project.name }}{% endblock %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Milestone detail" %}</h5>
     <div class="richtemplates-panel-content">
-        {% block milestones_menu %}{{ block.super }}{% endblock %}
+        {% block milestones-menu %}{{ block.super }}{% endblock %}
 
         <div class="richblock">
             <table class="richblock-properties">
@@ -35,5 +35,5 @@
 
     </div>
 </div>
-{% endblock col_single_extra %}
+{% endblock col-single-extra %}
 

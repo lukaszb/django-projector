@@ -158,7 +158,7 @@ NATIVE_TAGS = (
 # ====================== #
 
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': True,
+    'INTERCEPT_REDIRECTS': False,
 }
 
 # ================ #

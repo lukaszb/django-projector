@@ -3,7 +3,7 @@
 {% load markup %}
 {% load native %}
 
-{% block extra_head %}
+{% block extra-head %}
     {{ block.super }}
     <script type="text/javascript" src="{{ RICHTEMPLATES_MEDIA_URL }}js/action_form.js"></script>
 {% endblock %}
@@ -11,7 +11,7 @@
 {% load i18n %}
 
 {% comment %}
-{% block col_left %}{{ block.super }}
+{% block col-left %}{{ block.super }}
 <div class="richtemplates-panel">
     <h5>{% trans "Task changes" %}</h5>
     <div class="richtemplates-panel-content">
@@ -33,7 +33,7 @@
 {% endblock %}
 {% endcomment %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">    
     <h5>{% trans "Task detail" %}</h5>
     <div class="richtemplates-panel-content">

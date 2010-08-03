@@ -2,14 +2,14 @@
 
 {% load i18n %}
 
-{% block extra_head %}{{ block.super }}
+{% block extra-head %}{{ block.super }}
     {{ form.media }}
 {% endblock %}
 
-{% block col_left %}{% endblock %}
+{% block col-left %}{% endblock %}
 
-{% block col_main_title %}{% trans "Projector global settings" %}{% endblock %}
-{% block col_main_content %}
+{% block col-main-title %}{% trans "Projector global settings" %}{% endblock %}
+{% block col-main-content %}
 
 <form method="post">
     {% csrf_token %}

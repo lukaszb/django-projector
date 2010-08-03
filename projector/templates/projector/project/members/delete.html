@@ -5,11 +5,11 @@
 {% load sorting_tags %}
 {% load native %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 <div class="richtemplates-panel">
     <h5>{% trans "Remove member" %}</h5>
     <div class="richtemplates-panel-content">
-        {% block members_menu %}{{ block.super }}{% endblock %}
+        {% block members-menu %}{{ block.super }}{% endblock %}
         <ul class="messages">
             <li class="message message-warning">{% trans "Are you sure you want to remove member" %} {{ membership.member }}?</li>
         </ul>

@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block col_left %}
+{% block col-left %}
     
     <div class="richtemplates-panel">
         <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ request.user }}</h5>
@@ -18,7 +18,7 @@
 
 {% endblock %}
 
-{% block col_main_title %}
+{% block col-main-title %}
 {% if profile.is_team %}
     {% trans "Team profile" %}
 {% else %}
@@ -26,7 +26,7 @@
 {% endif %}
 {% endblock %}
 
-{% block col_main_content %}
+{% block col-main-content %}
     <form action="." method="post">
         {% csrf_token %}
         <table class="form-table">
@@ -38,7 +38,7 @@
     </form>
 {% endblock %}
 
-{% block col_main_extra %}
+{% block col-main-extra %}
 <div class="richtemplates-panel">
     <h5>{% trans "Actions" %}</h5>
     <div class="richtemplates-panel-content">

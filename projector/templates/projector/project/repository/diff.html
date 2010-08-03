@@ -4,11 +4,11 @@
 {% load native %}
 {% load breadcrumber %}
 
-{% block col_left %}
+{% block col-left %}
 {% with file_old as root %}{{ block.super }}{% endwith %}
 {% endblock %}
 
-{% block browse_content %}
+{% block browse-content %}
 {% if diff_content %}
     <div class="diffblock">
         {{ differ.as_html|safe }}

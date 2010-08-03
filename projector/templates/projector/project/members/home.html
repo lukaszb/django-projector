@@ -5,7 +5,7 @@
 {% load sorting_tags %}
 {% load guardian_tags %}
 
-{% block col_single_extra %}
+{% block col-single-extra %}
 
 {% autosort memberships %}
 {% autopaginate memberships %}
@@ -13,7 +13,7 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Project's members" %}</h5>
     <div class="richtemplates-panel-content">
-    {% block members_menu %}
+    {% block members-menu %}
     {% get_obj_perms request.user for project as "project_perms" %}
 
     <ul class="nav-inline">

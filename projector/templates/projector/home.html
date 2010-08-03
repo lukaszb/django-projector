@@ -2,18 +2,18 @@
 
 {% load i18n %}
 
-{% block extra_head %}
+{% block extra-head %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/browser.css" />
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/projector.css" />
 {% endblock %}
 
-{% block menu_top %}
+{% block menu-top %}
     {{ block.super }}
     {% include "projector/menu.html" %}
 {% endblock %}
 
-{% block col_left %}
+{% block col-left %}
     
     <div class="richtemplates-panel">
 	    <h5>{% trans "Quicklinks" %}</h5>

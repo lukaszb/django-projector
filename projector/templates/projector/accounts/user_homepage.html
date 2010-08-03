@@ -3,7 +3,7 @@
 
 {% load i18n %}
 
-{% block col_left %}
+{% block col-left %}
     {% if user.get_profile %}
     <div class="richtemplates-panel">
         <h5>{% trans "User" %}: {{ profile.user }}</h5>
@@ -18,7 +18,7 @@
     {% endif %}
 {% endblock %}
 
-{% block col_main %}
+{% block col-main %}
 {% if user.get_profile %}
 <div class="richtemplates-panel">
     <h5>{% trans "Your homepage" %}</h5>
