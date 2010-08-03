@@ -172,6 +172,7 @@ class Project(models.Model, Watchable):
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
     fork = models.ForeignKey('self', null=True, blank=True, editable=False)
+    fork_url = models.URLField(verify_exists=False, null=True, blank=True)
 
     objects = ProjectManager()
 
