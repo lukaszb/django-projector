@@ -271,6 +271,7 @@ class ProjectEditView(ProjectView):
     template_name = 'projector/project/edit.html'
     perms = ['view_project', 'change_project', 'admin_project']
 
+    @login_required_m
     def response(self, request, username, project_slug):
         self.context['project'] = self.project
         self.validate_project_form(request)

@@ -1,5 +1,6 @@
 .. _teamwork:
 
+========
 Teamwork
 ========
 
@@ -10,7 +11,7 @@ are always welcome!
 .. _teamwork-mappings:
 
 Mappings
---------
+========
 
 Most of the times within Django_ project we use ``django.contrib.auth``
 application to store and manage users (:py:class:`auth.User`) and
@@ -34,12 +35,12 @@ models.
 .. _teamwork-membership:
 
 Membership
-----------
+==========
 
 Each user is related with project by :py:class:`projector.Membership` instance.
 
 Administration
-~~~~~~~~~~~~~~
+--------------
 
 Membership for the author of the project is created automatically, and is given
 all available permissions and thus it's member is referenced as project's
@@ -51,17 +52,35 @@ or remove members if necessary. Project owner's permissions cannot be changed.
 Admin can also manage :ref:`teams <teamwork-team>`.
 
 Other members
-~~~~~~~~~~~~~
+-------------
 
 User may be project's *member* without associated
 :py:class:`projector.Membership` instance if he or she is member of a
 :py:class:`auth.Group` (by the instance of :py:class:`projector.Team` - see
 :ref:`below <teamwork-team>` for more detail).
 
+.. _teamwork-membership-anon:
+
+AnonymousUser member
+--------------------
+
+Since Django_ 1.2 authentication backends may support anonymous user and 
+django-guardian_ implements this functionality (see more at it's `documentation
+<http://packages.python.org/django-guardian/configuration.html>`_). As so,
+it is possible to add :py:class:`auth.AnonymousUser` as a project's member
+and manage it's permissions as with any other user.
+
+.. warning::
+   It is possible to give out administration privileges to
+   anonymous user this way. Some views (like task creation or project edition)
+   requires user to be logged in but project's owner should be careful about
+   anonymous user's permission management.
+
+
 .. _teamwork-membership-convert:
 
 Convert to ``Team``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Any user may be converted into :py:class:`projector.Team` instance. Well, this
 is not totally true - in fact, by conversion to ``Team`` we mean *set a team
@@ -92,7 +111,7 @@ Conversion's api is provided by :py:class:`projector.Team` manager's method
 .. _teamwork-team:
 
 Team
-----
+====
 
 Any :py:class:`auth.Group` may be used to create :py:class:`projector.Team`
 instance which bounds :py:class:`auth.Group` and :py:class:`projector.Project`.
@@ -104,4 +123,4 @@ users *and* many teams. It may be confusing but it's really simple.
 
 
 .. _django: http://www.djangoproject.com/
-
+.. _django-guardian: http://github.com/lukaszb/django-guardian/
