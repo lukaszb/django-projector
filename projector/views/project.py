@@ -7,13 +7,14 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
 from projector.core.controllers import View
+from projector.core.exceptions import ProjectorError
 from projector.models import Project
-from projector.forms import ProjectForm, ConfigForm
+from projector.forms import ProjectForm, ConfigForm, ProjectForkForm
 from projector.settings import get_config_value
 
 from vcs.web.simplevcs import settings as simplevcs_settings
@@ -52,6 +53,32 @@ class ProjectView(View):
         super(ProjectView, self).__init__(request=request, username=username,
             project_slug=project_slug, *args, **kwargs)
         self.context['project'] = self.project
+
+        # Set forks without additional queries if is a root (not forked project)
+        if self.project.is_root():
+            self.context['forks'] = [self.project]
+            self.context['project_root'] = self.project
+            if request.user.is_anonymous():
+                self.context['user_fork'] = None
+            elif request.user == self.project.author:
+                self.context['user_fork'] = self.project
+            else:
+                self.context['user_fork'] = self.project.get_fork_for_user(
+                    request.user)
+        else:
+            forks = self.project.get_all_forks()
+            self.context['forks'] = forks
+            self.context['project_root'] = self.project.get_root()
+            user_fork = None
+            if request.user.is_anonymous():
+                self.context['user_fork'] = None
+            else:
+                for fork in forks:
+                    if fork.author_id == request.user.id:
+                        user_fork = fork
+                        break
+            self.context['user_fork'] = user_fork
+
 
     def get_required_perms(self):
         """
@@ -118,6 +145,7 @@ class ProjectDetailView(ProjectView):
 
     def response(self, request, username, project_slug):
         try:
+
             if is_mercurial(request):
                 return _project_detail_hg(request, self.project)
             last_part = request.path.split('/')[-1]
@@ -125,10 +153,9 @@ class ProjectDetailView(ProjectView):
                 raise Http404("Not a mercurial request and path longer than "
                     " should be: %s" % request.path)
 
-            context = {
-                'project': self.project,
-            }
-            return context
+            # project is injected into the contest at ProjectView constructor
+            return self.context
+
         except Exception, err:
             dont_log_exceptions = (PermissionDenied,)
             if not isinstance(err, dont_log_exceptions):
@@ -262,6 +289,36 @@ class ProjectCreateView(View):
             send_error(request, _("You cannot create more projects"))
             return False
         return True
+
+
+class ProjectForkView(ProjectView):
+    """
+    Project fork (internal fork) view.
+    """
+
+    template_name = 'projector/project/fork.html'
+
+    @login_required_m
+    def response(self, request, username, project_slug):
+        user_fork = self.project.get_fork_for_user(request.user)
+        if user_fork:
+            messages.warning(request, _("User has already forked this project"))
+            return redirect(user_fork.get_absolute_url())
+
+        form = ProjectForkForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                # TODO: Move can_create from ProjectCreateView class
+                ProjectCreateView.can_create(request.user, request)
+                try:
+                    fork = self.project.fork(user=request.user)
+                    return redirect(fork.get_absolute_url())
+                except ProjectorError, err:
+                    messages.error(request, str(err))
+                return redirect(self.project.get_absolute_url())
+        self.context['form'] = form
+        return self.context
+
 
 class ProjectEditView(ProjectView):
     """

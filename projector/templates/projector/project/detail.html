@@ -3,6 +3,7 @@
 {% load markup %}
 {% load i18n %}
 {% load guardian_tags %}
+{% load richtemplates_tags %}
 {% load native %}
 
 {% block extra-head %}{{ block.super }}
@@ -17,6 +18,9 @@
         {% if "change_project" in project_perms %}        
         $('#admin-link').button({
             icons: { primary: "ui-icon-wrench" }
+        })
+        $('#fork-link').button({
+            icons: { primary: "ui-icon-shuffle" }
         })
         {% endif %}
     });
@@ -110,7 +114,17 @@
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
     <div class="richtemplates-panel-content">
-        <h1>{{ project.name }}</h1>
+        <h1>{{ project.name }}{% if not project.is_root %} {% richicon "arrow_switch.png" %}{% endif %}</h1>
+        {% if not project.is_root %}
+            <div class="message message-info">
+                <p>
+                    {% blocktrans %}
+                    This is a fork. Original project can be found
+                    {% endblocktrans %}
+                    <a href="{{ project.get_root.get_absolute_url }}">here</a>
+                </p>
+            </div>
+        {% endif %}
         <ul class="nav-inline">
             <li class="richbuttonset"><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project detail" %}</a></li>
             {% if project.get_repo_url %}
@@ -126,6 +140,16 @@
                 <a class="button-link" href="{{ project.get_members_url }}">{% trans "Members" %}</a>
                 <a class="button-link" href="{{ project.get_teams_url }}">{% trans "Teams" %}</a>
             </li>
+
+            {# Right side #}
+            <li class="richbuttonset" style="float: right">
+                {% if user_fork %}
+                <a id="fork-link" class="button-link" href="{{ user_fork.get_absolute_url }}">{% trans "Your fork" %}</a>
+                {% else %}
+                <a id="fork-link" class="button-link" href="{{ project.get_fork_url }}">{% trans "Fork" %}</a>
+                {% endif %}
+            </li>
+
         </ul>
 
         {% if "change_project" in project_perms %}

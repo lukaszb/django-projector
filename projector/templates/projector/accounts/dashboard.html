@@ -2,6 +2,23 @@
 
 {% load i18n %}
 
+{% block extra-head %}{{ block.super }}
+<style>
+    table.action-table thead tr th {
+        vertical-align: inherit;
+        text-align: center;
+        width: 150px;
+    }
+    table.action-table tbody tr th {
+        vertical-align: inherit;
+        text-align: center;
+    }
+    table.action-table a.richbutton {
+        width: 120px;
+    }
+</style>
+{% endblock %}
+
 {% block col-left %}
     
     <div class="richtemplates-panel">
@@ -42,20 +59,64 @@
 <div class="richtemplates-panel">
     <h5>{% trans "Actions" %}</h5>
     <div class="richtemplates-panel-content">
-        <ul class="nav-vertical">
+
+        <table class="action-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Action" %}</th>
+                    <th>{% trans "Description" %}</th>
+                </tr>
+            <tbody>
+            <tr>
+                <th>
+                    <a href="{% url projector_project_create %}"
+                       class="richbutton">{% trans "Create project" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>{% trans "Create new project" %}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <a href="{% url projector_project_create %}"
+                       class="richbutton">{% trans "Fork project" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>
+                            {% blocktrans %}
+                            Fork project from external location (i.e. from <a href="http://bitbucket.org">Bitbucket</a>).
+                            This is <strong>not</strong> same as forking project within {{ site }} - to fork project
+                            already present here simply navigate to the project homepage and run fork process from there.
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+                </td>
+            </tr>
             {% if not profile.is_team %}
-            <li class="richbuttonset">
-                <a class="button-link" href="{% url projector_dashboard_convert_to_team %}">{% trans "Convert to team" %}</a>
-                <p>
-                {% blocktrans %}
-                Converts your account into Team. This account would remain untouched - you'd be able to authorize 
-                and manage it as usual. However, new Group with same name as your username would be created and
-                Team connecting this group would be created for each project you're author of.
-                {% endblocktrans %}
-                </p>
-            </li>
+            <tr>
+                <th>
+                    <a href="{% url projector_dashboard_convert_to_team %}"
+                       class="richbutton">{% trans "Convert to team" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>
+                        {% blocktrans %}
+                    Converts your account into Team. This account would remain untouched - you'd be able to authorize 
+                    with it and manage it as usual. However, new Group with same name as your username would be created and
+                    Team connecting this group would be created for each project you're author of.
+                        {% endblocktrans %}
+                        </p>
+                    </div>
+                </td>
+            </tr>
             {% endif %}
-        </ul>
+            </tbody>
+        </table>
+
     </div>
 </div>
 {% endblock %}

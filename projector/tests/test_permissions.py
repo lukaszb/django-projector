@@ -81,6 +81,7 @@ class ProjectorPermissionTests(ProjectorTestCase):
             self.private_project.get_teams_url(),
             self.private_project.get_teams_add_url(),
             #self.private_project.get_teams_edit_url(),
+            self.private_project.get_fork_url(),
 
             self.private_project.get_task_list_url(),
             self.private_project.get_create_task_url(),

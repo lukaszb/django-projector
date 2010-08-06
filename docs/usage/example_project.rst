@@ -1,7 +1,7 @@
 .. _example-project:
 
-Example project
-===============
+Example projector-based project
+===============================
 
 .. versionadded:: 0.1.7
 

@@ -18,3 +18,6 @@ class NotRequestError(ProjectorError):
 class ConfigAlreadyExist(ProjectorError):
     pass
 
+class ForkError(ProjectorError):
+    pass
+

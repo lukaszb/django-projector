@@ -65,8 +65,9 @@ Documentation
 .. toctree::
    :maxdepth: 1
 
-   example_project
-   teamwork
+   usage/example_project
+   usage/teamwork
+   usage/projects/index.rst
 
 **Development**
 

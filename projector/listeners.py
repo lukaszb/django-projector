@@ -14,7 +14,7 @@ from signals_ahoy.asynchronous import AsynchronousListener
 
 from projector import settings as projector_settings
 from projector.models import Project, Config, Task, WatchedItem
-from projector.signals import messanger
+from projector.signals import messanger, post_fork
 
 from richtemplates.utils import get_user_profile_model
 from vcs.web.simplevcs.models import Repository
@@ -52,6 +52,17 @@ def project_created_listener(sender, instance, **kwargs):
     alias = 'hg'
     repository = Repository.objects.create(path=repo_path,
         alias=alias)
+    if instance.is_fork():
+        # Pull sources from parent
+        from mercurial.ui import ui
+        from mercurial.commands import pull
+        from mercurial.error import Abort
+        try:
+            ui = ui()
+            pull(ui, instance.parent.repository._repo.repo,
+                str(repository.path))
+        except Abort, err:
+            logging.error("Couldn't pull [%s]" % err)
     instance.repository = repository
     instance.create_workflow()
     instance.save()
@@ -112,6 +123,15 @@ def async_project_created_listener(sender, instance, **kwargs):
 async_project_created_listener = AsynchronousListener(
     async_project_created_listener)
 
+def fork_done(sender, fork, **kwargs):
+    """
+    Action made after project is forked.
+    """
+    from mercurial.ui import ui
+    from mercurial.commands import pull
+    ui = ui()
+    pull(ui, fork.repository._repo.repo, str(sender.repository.path))
+
 def task_save_listener(sender, instance, **kwargs):
     """
     Action made after task is saved (created or updated).
@@ -158,6 +178,8 @@ def start_listening():
     post_save.connect(task_save_listener, sender=Task)
     post_save.connect(watcheditem_save_listener, sender=WatchedItem)
     post_delete.connect(watcheditem_delete_listener, sender=WatchedItem)
+
+    post_fork.connect(fork_done)
 
     if projector_settings.CREATE_PROJECT_ASYNCHRONOUSLY:
         post_save.connect(async_project_created_listener.listen, sender=Project)

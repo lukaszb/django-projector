@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
@@ -74,6 +75,7 @@ class UserDashboardView(View):
                 kwargs={'username': request.user.username}))
         self.context['form'] = form
         self.context['profile'] = form.instance
+        self.context['site'] = Site.objects.get_current()
         return self.context
 
 class UserDashboardConvert2TeamView(View):

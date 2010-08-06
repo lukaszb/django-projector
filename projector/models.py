@@ -6,37 +6,39 @@ import logging
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.template.defaultfilters import slugify
-from django.template.loader import render_to_string
 from django.contrib.auth.models import User, Group, AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
-from django.contrib.sites.models import Site
 
 from guardian.shortcuts import assign, get_perms, get_perms_for_model
 
 from autoslug import AutoSlugField
 
-from projector.exceptions import ConfigAlreadyExist
-from projector.utils import abspath, using_projector_profile
-from projector.utils.lazy import LazyProperty
 from projector import settings as projector_settings
-from projector.settings import get_config_value, get_workflow
+from projector.core.exceptions import ConfigAlreadyExist, ForkError
 from projector.managers import ProjectManager
 from projector.managers import TaskManager
 from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
-from projector.signals import messanger
+from projector.settings import get_config_value, get_workflow
+from projector.signals import messanger, post_fork
+from projector.utils import abspath, using_projector_profile
+from projector.utils.lazy import LazyProperty
 
 from vcs.web.simplevcs.models import Repository
 
 from richtemplates.models import UserProfile as RichUserProfile
+
+from treebeard.al_tree import AL_Node
 
 
 class WatchedItem(models.Model):
@@ -144,18 +146,18 @@ def validate_project_name(name):
     if name.strip().lower() in projector_settings.BANNED_PROJECT_NAMES:
         raise ValidationError(_("This name is restricted"))
 
-class Project(models.Model, Watchable):
+class Project(AL_Node, Watchable):
     """
     Most important models within whole application. It provides connection with
     all other models.
     """
 
-    name = models.CharField(_('name'), max_length=64, unique=True,
+    name = models.CharField(_('name'), max_length=64,
         validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
         null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
-    slug = models.SlugField(unique=True, validators=[validate_project_name])
+    slug = models.SlugField(validators=[validate_project_name])
     home_page_url = models.URLField(_("home page url "), null=True, blank=True,
         verify_exists=False)
     active = models.BooleanField(_('active'), default=True)
@@ -171,8 +173,15 @@ class Project(models.Model, Watchable):
     outdated = models.BooleanField(_('outdated'), default=False)
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
-    fork = models.ForeignKey('self', null=True, blank=True, editable=False)
+
+    parent = models.ForeignKey('self',
+                           related_name='children_set',
+                           null=True,
+                           blank=True,
+                           db_index=True)
     fork_url = models.URLField(verify_exists=False, null=True, blank=True)
+
+    node_order_by = ['author', 'name']
 
     objects = ProjectManager()
 
@@ -181,6 +190,7 @@ class Project(models.Model, Watchable):
         verbose_name_plural = _('projects')
         ordering = ['name']
         get_latest_by = 'created_at'
+        unique_together = ['author', 'name']
         permissions = (
             ('view_project', 'Can view project'),
             ('admin_project', 'Can administer project'),
@@ -238,6 +248,13 @@ class Project(models.Model, Watchable):
     @models.permalink
     def get_edit_url(self):
         return ('projector_project_edit', (), {
+            'username': self.author.username,
+            'project_slug' : self.slug,
+        })
+
+    @models.permalink
+    def get_fork_url(self):
+        return ('projector_project_fork', (), {
             'username': self.author.username,
             'project_slug' : self.slug,
         })
@@ -405,6 +422,7 @@ class Project(models.Model, Watchable):
         django sites framework).
         """
         current_site = Site.objects.get_current()
+        # FIXME: What should we do with hardcoded schemas?
         if settings.DEBUG:
             prefix = 'http://'
         else:
@@ -530,6 +548,72 @@ class Project(models.Model, Watchable):
             models.Q(groups__team__project=self))
         return watchers
 
+    def fork(self, user, force_private=False):
+        """
+        Creates fork from internal context. As we use django-treebeard,
+        we need to use it's api to create a child.
+
+        :param user: new author for forked project
+        :param force_private: if set to True, project would be created
+          as private
+
+        :returns: :py:class:`projector.models.Project`
+
+        :raise ``django.core.exceptions.PermissionDenied``: when
+          user is anonymous, not active or cannot access this project
+        :raise ``projector.core.exceptions.ForkError``: when
+          user has already forked this project
+        """
+        if user.is_anonymous() or not user.is_active:
+            raise PermissionDenied("Fork is allowed for active users only")
+        if not self in Project.objects.for_user(user):
+            raise PermissionDenied("User is not allowed to fork this project")
+        if user == self.author:
+            raise ForkError("Author cannot fork own project")
+        user_fork = self.get_fork_for_user(user)
+        if user_fork:
+            raise ForkError("User already forked this project")
+
+        if force_private:
+            is_public = False
+        else:
+            is_public = self.public
+
+        project_info = {
+            'name': self.name,
+            'author': user,
+            'public': is_public,
+            'fork_url': self.get_repo_url(),
+        }
+        forked = self.add_child(**project_info)
+        post_fork.send(sender=self, fork=forked)
+        return forked
+
+    def get_fork_for_user(self, user):
+        """
+        Returns fork of this project's root for the given user. If user haven't
+        forked project from this instance's tree, ``None`` is returned.
+        """
+        for fork in self.get_all_forks():
+            if fork.author_id == user.id:
+                return fork
+        return None
+
+    def get_all_forks(self):
+        """
+        Returns all forks for this project, starting from root. Returned object
+        is a list (not ``Queryset``) and contains this instance.
+        """
+        root = self.get_root()
+        forks = Project.get_tree(parent=root)
+        return forks
+
+    def is_fork(self):
+        """
+        Returns ``True`` if this instance is a fork (has parent), ``False``
+        otherwise.
+        """
+        return self.parent is not None
 
 class Config(models.Model):
     """

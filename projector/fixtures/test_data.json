@@ -76,7 +76,6 @@
         "model": "projector.project", 
         "fields": {
             "category": null, 
-            "fork": null, 
             "name": "public project", 
             "repository": 1, 
             "author": 2, 
@@ -95,7 +94,6 @@
         "model": "projector.project", 
         "fields": {
             "category": null, 
-            "fork": null, 
             "name": "private project", 
             "repository": 2, 
             "author": 3, 

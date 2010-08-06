@@ -57,7 +57,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        exclude = ('members', 'author', 'editor', 'repository', 'teams')
+        exclude = ('members', 'author', 'editor', 'repository', 'teams', 'parent')
 
     def __init__(self, *args, **kwargs):
         res = super(ProjectForm, self).__init__(*args, **kwargs)
@@ -92,6 +92,9 @@ class ProjectForm(forms.ModelForm):
                 team.project = instance
                 team.save()
         return instance
+
+class ProjectForkForm(forms.Form):
+    pass
 
 class ConfigForm(forms.ModelForm):
     changesets_paginate_by = forms.IntegerField(
