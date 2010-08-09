@@ -5,6 +5,8 @@ from projector.models import Project
 from projector.forms import ProjectForm
 from projector.forms import ProjectMembershipPermissionsForm
 from projector.forms import ProjectTeamPermissionsForm
+from projector.forks import BaseForkForm
+from projector.utils.basic import str2obj
 
 from guardian.shortcuts import get_perms_for_model
 
@@ -36,4 +38,9 @@ class SettingsTest(TestCase):
         form_perms = set((c[0] for c in form.fields['permissions'].choices))
         self.assertTrue(form_perms == editable_perms)
 
+    def test_FORK_FORMS(self):
+        map = settings.FORK_EXTERNAL_MAP.items()
+        for key, val in map:
+            ForkForm = str2obj(val)
+            self.assertTrue(issubclass(ForkForm, BaseForkForm))
 

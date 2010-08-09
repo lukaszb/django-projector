@@ -1,3 +1,5 @@
+from django.utils.importlib import import_module
+
 def codename_to_label(codename):
     rremove = '_project'
     if codename.endswith(rremove):
@@ -7,4 +9,20 @@ def codename_to_label(codename):
         .replace('_', ' ')\
         .capitalize()
     return codename
+
+def str2obj(text):
+    """
+    Returns object pointed by the string. In example::
+
+        >>> from projector.models import Project
+        >>> point = 'projector.models.Project'
+        >>> obj = str2obj(point)
+        >>> obj is Project
+        True
+
+    """
+    modpath, objname = text.rsplit('.', 1)
+    mod = import_module(modpath)
+    obj = getattr(mod, objname)
+    return obj
 

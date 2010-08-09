@@ -22,6 +22,7 @@ Following packages are needed to get ``django-projector`` working:
 - `django-signals-ahoy`_
 - `django-sorting`_
 - `django-tagging`_
+- `django-treebeard`_
 - `vcs`_
 - `docutils`_
 - `Pygments`_
@@ -43,6 +44,7 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/
 .. _django-sorting: http://github.com/directeur/django-sorting
 .. _django-tagging: http://code.google.com/p/django-tagging/
+.. _django-treebeard: http://bitbucket.org/tabo/django-treebeard/
 .. _docutils: http://docutils.sourceforge.net/
 .. _pygments: http://pygments.org/
 .. _mercurial: http://mercurial.selenic.com/

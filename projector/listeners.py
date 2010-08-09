@@ -18,6 +18,7 @@ from projector.signals import messanger, post_fork
 
 from richtemplates.utils import get_user_profile_model
 from vcs.web.simplevcs.models import Repository
+from vcs.exceptions import VCSError
 
 def request_new_profile(sender, instance, **kwargs):
     """
@@ -44,26 +45,31 @@ def project_created_listener(sender, instance, **kwargs):
 
     repo_path = instance._get_repo_path()
 
-    logging.info("Trying to initialize new mercurial repository"
-        " at %s" % repo_path)
+    logging.info("Trying to initialize repository at %s" % repo_path)
 
     # Hardcoding repository creation process until more backends
     # are available from ``vcs``
     alias = 'hg'
-    repository = Repository.objects.create(path=repo_path,
-        alias=alias)
-    if instance.is_fork():
-        # Pull sources from parent
-        from mercurial.ui import ui
-        from mercurial.commands import pull
-        from mercurial.error import Abort
-        try:
-            ui = ui()
-            pull(ui, instance.parent.repository._repo.repo,
-                str(repository.path))
-        except Abort, err:
-            logging.error("Couldn't pull [%s]" % err)
-    instance.repository = repository
+    try:
+        clone_url = None
+        if instance.parent:
+            # Attempt to fork internally
+            clone_url = instance.parent._get_repo_path()
+        elif instance.fork_url:
+            # Attempt to fork from external location
+            clone_url = instance.fork_url
+        repository = Repository.objects.create(path=repo_path,
+            alias=alias, clone_url=clone_url)
+        instance.repository = repository
+    except VCSError, err:
+        traceback_msg = '\n'.join(traceback.format_exception(*(sys.exc_info())))
+        if clone_url is not None:
+            msg = "Couldn't clone repository. Original error was: %s" % err
+        else:
+            msg = "Couldn't create repository. Original error was: %s" % err
+        msg = '\n\n'.join((msg, traceback_msg))
+        logging.error(msg)
+
     instance.create_workflow()
     instance.save()
     Config.create_for_project(instance)
@@ -127,10 +133,7 @@ def fork_done(sender, fork, **kwargs):
     """
     Action made after project is forked.
     """
-    from mercurial.ui import ui
-    from mercurial.commands import pull
-    ui = ui()
-    pull(ui, fork.repository._repo.repo, str(sender.repository.path))
+    pass
 
 def task_save_listener(sender, instance, **kwargs):
     """

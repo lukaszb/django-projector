@@ -1,13 +1,19 @@
+import logging
+
 from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User, Group
 from django.contrib import messages
+from django.contrib.auth.models import User, Group
+from django.contrib.formtools.wizard import FormWizard
+from django.shortcuts import redirect
 
 from guardian.shortcuts import assign, remove_perm, get_perms,\
     get_perms_for_model
 
+from projector.core.exceptions import ProjectorError
+from projector.forks.base import BaseForkForm
 from projector.models import Membership
 from projector.models import Team
 from projector.models import Project
@@ -18,13 +24,12 @@ from projector.models import Component
 from projector.models import Milestone
 from projector.models import UserProfile
 from projector.settings import get_config_value
+from projector.utils.basic import str2obj
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     ModelByNameField
 from richtemplates.widgets import RichCheckboxSelectMultiple
 from richtemplates.forms import RichSkinChoiceField, RichCodeStyleChoiceField
-
-import logging
 
 PUBLIC_RADIO_CHOICES = [
     (u'public', _("Public")),
@@ -403,4 +408,37 @@ class UserConvertToTeamForm(forms.Form):
             raise forms.ValidationError()
         Team.objects.convert_from_user(self.user)
         return super(UserConvertToTeamForm, self).clean()
+
+map = get_config_value('FORK_EXTERNAL_MAP')
+fork_map = dict((key, str2obj(val)) for key, val in map.items())
+choices = tuple((key, key) for key in fork_map)
+
+class ExternalForkSourcesForm(forms.Form):
+    source = forms.ChoiceField(choices=choices)
+
+class ExternalForkWizard(FormWizard):
+
+    def done(self, request, form_list):
+        form = form_list[1]
+        if not isinstance(form, BaseForkForm):
+            raise ProjectorError("Final fork wizard form must be subclass of "
+                    "projector.forks.base.BaseForkForm class")
+        try:
+            fork = form.fork(request)
+        except ProjectorError, err:
+            msg = _("Error occured while trying to fork %s" % form.get_url())
+            messages.error(request, msg)
+            logging.debug(str(err))
+            return redirect('projector_dashboard')
+        else:
+            return redirect(fork.get_absolute_url())
+
+    def process_step(self, request, form, step):
+        if step == 0 and form.is_valid():
+            source = form.cleaned_data['source']
+            self.form_list[1] = fork_map[source]
+        return super(ExternalForkWizard, self).process_step(request, form, step)
+
+    def get_template(self, step):
+        return 'projector/accounts/dashboard-external-fork.html'
 

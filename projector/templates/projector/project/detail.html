@@ -114,14 +114,14 @@
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
     <div class="richtemplates-panel-content">
-        <h1>{{ project.name }}{% if not project.is_root %} {% richicon "arrow_switch.png" %}{% endif %}</h1>
-        {% if not project.is_root %}
+        <h1>{{ project.name }}{% if project.is_fork %} {% richicon "arrow_switch.png" %}{% endif %}</h1>
+        {% if project.is_fork %}
             <div class="message message-info">
                 <p>
                     {% blocktrans %}
                     This is a fork. Original project can be found
                     {% endblocktrans %}
-                    <a href="{{ project.get_root.get_absolute_url }}">here</a>
+                    <a href="{% if project.fork_url %}{{ project.fork_url }}{% else %}{{ project.get_root.get_absolute_url }}{% endif %}">here</a>
                 </p>
             </div>
         {% endif %}
@@ -142,6 +142,7 @@
             </li>
 
             {# Right side #}
+            {% if project.author != request.user %}
             <li class="richbuttonset" style="float: right">
                 {% if user_fork %}
                 <a id="fork-link" class="button-link" href="{{ user_fork.get_absolute_url }}">{% trans "Your fork" %}</a>
@@ -149,6 +150,7 @@
                 <a id="fork-link" class="button-link" href="{{ project.get_fork_url }}">{% trans "Fork" %}</a>
                 {% endif %}
             </li>
+            {% endif %}
 
         </ul>
 

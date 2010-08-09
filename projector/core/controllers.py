@@ -1,12 +1,21 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpRequest
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
+login_required_m = method_decorator(login_required)
 
 class BaseView(object):
     """
     Base class for django views.
     """
+    login_required = False
+    template_name = ''
+
     def __new__(cls, request, *args, **kwargs):
+        if cls.login_required:
+            cls.response = login_required_m(cls.response)
         view = cls.new(request, *args, **kwargs)
         return view.__call__()
 

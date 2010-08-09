@@ -2,10 +2,12 @@ from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest
 
 from projector.core.exceptions import ForkError
 from projector.models import Project
 from projector.tests.base import ProjectorTestCase
+from projector.forks.bitbucket import BitbucketForkForm
 
 class ForkTest(TestCase):
 
@@ -107,7 +109,30 @@ class ForkViewTest(ProjectorTestCase):
         self.assertTrue(fork.is_fork())
         self.assertEqual(fork.get_root().id, self.project.id)
 
-        self.assertEqual(fork.repository.alias, self.project.repository.alias)
-        self.assertEqual(fork.repository.revisions,
-            self.project.repository.revisions)
+        if self.project.repository is not None:
+            self.assertEqual(fork.repository.alias,
+                self.project.repository.alias,
+                "Alias of fork (%s) should be same as alias of original "
+                "project (%s)" % (fork, self.project))
+            self.assertEqual(fork.repository.revisions,
+                self.project.repository.revisions)
+
+
+class BitbucketForkTest(TestCase):
+
+    def test_fork(self):
+        joe = User.objects.create(username='joe')
+        data = {
+            'username': u'lukaszb',
+            'projectname': u'django-projector',
+            'as_private': u'checked',
+        }
+        form = BitbucketForkForm(data)
+        self.assertTrue(form.is_valid())
+        request = HttpRequest()
+        request.user = joe
+        fork = form.fork(request)
+        fork = Project.objects.get(pk=fork.pk)
+        self.assertTrue(len(fork.repository.revisions) > 100)
+        self.assertTrue(fork.is_private())
 

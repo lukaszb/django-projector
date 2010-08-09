@@ -11,6 +11,7 @@ _build
 dist
 .DS_Store
 *.orig
+*.origin
 .project
 .pydevproject
 

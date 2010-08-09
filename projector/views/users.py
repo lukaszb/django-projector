@@ -8,7 +8,9 @@ from django.core.urlresolvers import reverse
 
 from projector.core.controllers import View
 from projector.forms import UserProfileForm, UserConvertToTeamForm
+from projector.forms import ExternalForkWizard, ExternalForkSourcesForm
 from projector.models import Team, Project
+
 
 class UserListView(View):
     template_name = 'projector/accounts/user_list.html'
@@ -77,6 +79,21 @@ class UserDashboardView(View):
         self.context['profile'] = form.instance
         self.context['site'] = Site.objects.get_current()
         return self.context
+
+class UserDashboardForkView(View):
+    """
+    Fork external project.
+    """
+
+    template_name = 'projector/accounts/dashboard_fork.html'
+    login_required = True
+
+    def response(self, request):
+        # Zero below is only a placeholder - we change form_list dynamically
+        # at wizard's ``process_step`` method
+        wizard = ExternalForkWizard([ExternalForkSourcesForm, 0])
+        wizard.extra_context['profile'] = request.user.get_profile()
+        return wizard(request)
 
 class UserDashboardConvert2TeamView(View):
     """

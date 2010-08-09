@@ -27,10 +27,13 @@ urlpatterns += patterns('projector.views.users',
         view = 'UserDashboardConvert2TeamView',
         name = 'projector_dashboard_convert_to_team'),
 
+    url(r'^dashboard/external-fork/$',
+        view = 'UserDashboardForkView',
+        name = 'projector_dashboard_fork'),
+
     url(r'^dashboard/$',
         view = 'UserDashboardView',
         name = 'projector_dashboard'),
-
 )
 
 urlpatterns += patterns('projector.views.project',

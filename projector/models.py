@@ -174,11 +174,8 @@ class Project(AL_Node, Watchable):
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
 
-    parent = models.ForeignKey('self',
-                           related_name='children_set',
-                           null=True,
-                           blank=True,
-                           db_index=True)
+    parent = models.ForeignKey('self', related_name='children_set',
+       null=True, blank=True, db_index=True)
     fork_url = models.URLField(verify_exists=False, null=True, blank=True)
 
     node_order_by = ['author', 'name']
@@ -613,7 +610,7 @@ class Project(AL_Node, Watchable):
         Returns ``True`` if this instance is a fork (has parent), ``False``
         otherwise.
         """
-        return self.parent is not None
+        return self.parent is not None or self.fork_url
 
 class Config(models.Model):
     """

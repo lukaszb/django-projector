@@ -136,6 +136,24 @@ List of permission codenames allowed to be edited by projects' owners.
    projector to show forms for permission editing with specified
    codenames.
 
+PROJECTOR_FORK_EXTERNAL_MAP
+---------------------------
+
+Default::
+
+    {
+        'bitbucket': 'projector.forks.bitbucket.BitbucketForkForm',
+    }
+
+Dictionary of forms to be used for external forking. Read more at
+:ref:`projects-forking-external`.
+
+PROJECTOR_FROM_EMAIL_ADDRESS
+----------------------------
+
+Default: would try to get value from ``settings.DEFAULT_FROM_EMAIL``.
+
+Email address used as sender for all mails send by projector.
 
 PROJECTOR_MAX_PROJECTS_PER_USER
 -------------------------------
