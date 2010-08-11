@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.test.client import Client
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.models import AnonymousUser
 
