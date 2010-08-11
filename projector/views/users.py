@@ -10,6 +10,18 @@ from projector.core.controllers import View
 from projector.forms import UserProfileForm, UserConvertToTeamForm
 from projector.forms import ExternalForkWizard, ExternalForkSourcesForm
 from projector.models import Team, Project
+from projector.settings import get_config_value
+
+
+def can_fork_external():
+    """
+    External fork is available if ``FORK_EXTERNAL_MAP`` is set to ``True``
+    **AND** ``FORK_EXTERNAL_MAP`` is not empty dict.
+    """
+    if get_config_value('FORK_EXTERNAL_ENABLED') is True and \
+        get_config_value('FORK_EXTERNAL_MAP'):
+        return True
+    return False
 
 
 class UserListView(View):
@@ -21,6 +33,7 @@ class UserListView(View):
             'user_list': user_list,
         }
         return context
+
 
 class UserHomepageView(View):
     template_name = 'projector/accounts/user_homepage.html'
@@ -42,6 +55,7 @@ class UserHomepageView(View):
         }
         return context
 
+
 class UserProfileDetailView(View):
     """
     Public profile of the given user.
@@ -56,6 +70,7 @@ class UserProfileDetailView(View):
             'teams': Team.objects.for_user(user)
         }
         return context
+
 
 class UserDashboardView(View):
     """
@@ -78,22 +93,32 @@ class UserDashboardView(View):
         self.context['form'] = form
         self.context['profile'] = form.instance
         self.context['site'] = Site.objects.get_current()
+        self.context['can_fork_external'] = can_fork_external()
         return self.context
+
 
 class UserDashboardForkView(View):
     """
-    Fork external project.
+    Fork external project view.
     """
 
     template_name = 'projector/accounts/dashboard_fork.html'
     login_required = True
 
     def response(self, request):
-        # Zero below is only a placeholder - we change form_list dynamically
-        # at wizard's ``process_step`` method
+        if get_config_value('FORK_EXTERNAL_ENABLED') is not True:
+            messages.warning(request, _("External forks are disabled"))
+            return redirect(reverse('projector_dashboard'))
+        elif not get_config_value('FORK_EXTERNAL_MAP'):
+            messages.warning(request, _("No external fork forms available"))
+            return redirect(reverse('projector_dashboard'))
+
+        # Zero at forms list parameter of wizard is only a placeholder - we
+        # change form_list dynamically at wizard's ``process_step`` method
         wizard = ExternalForkWizard([ExternalForkSourcesForm, 0])
         wizard.extra_context['profile'] = request.user.get_profile()
         return wizard(request)
+
 
 class UserDashboardConvert2TeamView(View):
     """

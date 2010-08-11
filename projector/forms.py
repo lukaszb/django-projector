@@ -13,7 +13,7 @@ from guardian.shortcuts import assign, remove_perm, get_perms,\
     get_perms_for_model
 
 from projector.core.exceptions import ProjectorError
-from projector.forks.base import BaseForkForm
+from projector.forks.base import BaseExternalForkForm
 from projector.models import Membership
 from projector.models import Team
 from projector.models import Project
@@ -420,23 +420,26 @@ class ExternalForkWizard(FormWizard):
 
     def done(self, request, form_list):
         form = form_list[1]
-        if not isinstance(form, BaseForkForm):
-            raise ProjectorError("Final fork wizard form must be subclass of "
-                    "projector.forks.base.BaseForkForm class")
         try:
             fork = form.fork(request)
         except ProjectorError, err:
             msg = _("Error occured while trying to fork %s" % form.get_url())
             messages.error(request, msg)
-            logging.debug(str(err))
+            logging.error(str(err))
             return redirect('projector_dashboard')
         else:
             return redirect(fork.get_absolute_url())
 
     def process_step(self, request, form, step):
-        if step == 0 and form.is_valid():
+        form.is_valid()
+        if step == 0:
             source = form.cleaned_data['source']
             self.form_list[1] = fork_map[source]
+        elif step == 1:
+            if not isinstance(form, BaseExternalForkForm):
+                raise ProjectorError(
+                        "Final fork wizard form must be subclass of "
+                        "projector.forks.base.BaseForkForm class")
         return super(ExternalForkWizard, self).process_step(request, form, step)
 
     def get_template(self, step):

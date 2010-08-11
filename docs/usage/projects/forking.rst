@@ -37,7 +37,51 @@ External fork
 =============
 
 At his or her dasboard, user can find a *Fork project* button. This does **not**
-refer to :ref:`internal fork <projects-forking-internal>`.
+refer to :ref:`internal fork <projects-forking-internal>`. External forking
+only allows to fork from external location.
 
+To enable this functionality, it's necessary to set
+``PROJECTOR_FORK_EXTERNAL_ENABLED = True`` at settings file. Moreover,
+``PROJECTOR_FORK_EXTERNAL_MAP`` dict setting should be set properly (see
+:ref:`configuration`).
+
+.. warning::
+   We **DO NOT** take any responsibility caused by using external forking.
+   Reason is simple - some users could use this functionality to attack
+   external hosts by sending crafted values to the fork form. Values should be
+   validated by the form first, though.
+
+How to write external fork form
+-------------------------------
+
+External fork form should subclass
+:py:class:`projector.forks.base.BaseExternalForkForm` and implement ``fork``
+method:
+
+* ``fork(request)``: this method should implement action required to create
+  :py:class:`projector.models.Project` instance. Note that real fork procedure
+  is fired by project creation handler. We may create a project in whatever way
+  we want here but most basic scenario is to pass ``author``, ``name`` and
+  ``public`` attributes to the constructor of
+  :py:class:`projector.models.Project` class.
+
+  .. note::
+     All exceptions at ``fork`` method should be caught and eventually
+     propagated but with type ``projector.core.exceptions.ProjectError`` (or a
+     subclass of it). It is necessary for
+     :py:class:`projector.forms.ExternalForkWizard` to properly notify user
+     if any error has occured during forking process. Those are not validation
+     errors as ``fork`` method should be called only after form is cleaned.
+
+Moreover, :py:class:`projector.forks.base.BaseExternalForkForm` comes with
+one field ``as_private``. After form validation it is possible to check
+if project should be forked as *public* or *private* by calling ``is_public``
+form's method. This method would return ``True`` or ``False``.
+
+After form is implemented we can hook it at the ``PROJECTOR_FORK_EXTERNAL_MAP``
+setting.
+
+We advice to review code of :py:mod:`projector.forks.bitbucket` module to see
+full example.
 
 .. _Bitbucket: http://bitbucket.org

@@ -69,6 +69,7 @@ def project_created_listener(sender, instance, **kwargs):
             msg = "Couldn't create repository. Original error was: %s" % err
         msg = '\n\n'.join((msg, traceback_msg))
         logging.error(msg)
+        raise err
 
     instance.create_workflow()
     instance.save()

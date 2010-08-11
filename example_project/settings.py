@@ -183,6 +183,14 @@ EMAIL_PORT = 25
 EMAIL_SUBJECT_PREFIX = '[Django] '
 EMAIL_USE_TLS = False
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
+ANONYMOUS_USER_ID = -1
+
+ACCOUNT_ACTIVATION_DAYS = 7
+
 try:
     from conf.local_settings import *
     try:
@@ -196,12 +204,4 @@ try:
         pass
 except ImportError:
     pass
-
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # this is default
-    'guardian.backends.ObjectPermissionBackend',
-)
-ANONYMOUS_USER_ID = -1
-
-ACCOUNT_ACTIVATION_DAYS = 7
 

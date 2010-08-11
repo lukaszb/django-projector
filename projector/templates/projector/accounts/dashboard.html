@@ -78,6 +78,7 @@
                     </div>
                 </td>
             </tr>
+            {% if can_fork_external %}
             <tr>
                 <th>
                     <a href="{% url projector_dashboard_fork %}"
@@ -95,6 +96,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
             {% if not profile.is_team %}
             <tr>
                 <th>

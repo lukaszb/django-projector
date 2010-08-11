@@ -4,9 +4,10 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 
-from projector.core.exceptions import ForkError
+from projector.core.exceptions import ProjectorError, ForkError
 from projector.models import Project
 from projector.tests.base import ProjectorTestCase
+from projector.forks.base import BaseExternalForkForm
 from projector.forks.bitbucket import BitbucketForkForm
 
 class ForkTest(TestCase):
@@ -118,6 +119,33 @@ class ForkViewTest(ProjectorTestCase):
                 self.project.repository.revisions)
 
 
+class BaseExternalForkFormTest(TestCase):
+
+    def test_not_cleaned_no_data(self):
+        form = BaseExternalForkForm()
+        self.assertRaises(ProjectorError, form.is_public)
+        self.assertRaises(ProjectorError, form.is_private)
+
+    def test_not_cleaned_with_data(self):
+        form = BaseExternalForkForm({'as_private': u'checked'})
+        self.assertRaises(ProjectorError, form.is_public)
+        self.assertRaises(ProjectorError, form.is_private)
+
+    def test_valid_public(self):
+        form = BaseExternalForkForm({})
+        self.assertTrue(form.is_valid())
+        # as_private not checked
+        self.assertTrue(form.is_public())
+        self.assertFalse(form.is_private())
+
+    def test_valid_private(self):
+        form = BaseExternalForkForm({'as_private': u'checked'})
+        self.assertTrue(form.is_valid())
+        # as_public checked
+        self.assertFalse(form.is_public())
+        self.assertTrue(form.is_private())
+
+
 class BitbucketForkTest(TestCase):
 
     def test_fork(self):
@@ -135,4 +163,38 @@ class BitbucketForkTest(TestCase):
         fork = Project.objects.get(pk=fork.pk)
         self.assertTrue(len(fork.repository.revisions) > 100)
         self.assertTrue(fork.is_private())
+
+    def test_wrong_values(self):
+        joe = User.objects.create(username='joe')
+        data = {
+            'username': u'x',
+            'projectname': u'x',
+        }
+        form = BitbucketForkForm(data)
+        self.assertTrue(form.is_valid())
+        request = HttpRequest()
+        request.user = joe
+        try:
+            form.fork(request)
+        except ProjectorError:
+            pass
+        else:
+            self.fail("Form should raise subclass of ProjectorError")
+
+    def test_valid(self):
+        """
+        This test checks if sane values have been passed to the form.
+        Allowing external forking may be very dangerous as we may expose
+        own project to be used as *proxy* for attacks on external locations.
+        """
+        data_list = [dict((key, val) for key, val in (
+            ('foobar', '<script...'),
+            ('<script', 'foobar'),
+            ('foobar', '../../'),
+            ('../../', 'foobar'),
+        ))]
+        for data in data_list:
+            form = BitbucketForkForm(data)
+            self.assertFalse(form.is_valid())
+
 

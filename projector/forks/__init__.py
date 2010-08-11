@@ -1,4 +1,4 @@
-from projector.forks.base import BaseForkForm
+from projector.forks.base import BaseExternalForkForm
 
-__all__ = ['BaseForkForm',]
+__all__ = ['BaseExternalForkForm',]
 

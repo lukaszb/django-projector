@@ -1,18 +1,23 @@
 from django import forms
 from django.utils.translation import ugettext as _
 
-from projector.forks.base import BaseForkForm
+from projector.core.exceptions import ForkError
+from projector.forks.base import BaseExternalForkForm
 from projector.models import Project
 
-class BitbucketForkForm(BaseForkForm):
+from vcs.exceptions import VCSError
+
+class BitbucketForkForm(BaseExternalForkForm):
 
     site = 'bitbucket.org'
     help_text = _('Only public projects are allowed to be forked from '
                   'bitbucket')
 
-    username = forms.CharField(max_length=128, label=_('Username'),
+    username = forms.RegexField(regex=r'^[-\w]+$', max_length=128,
+        label=_('Username'),
         help_text=_('Name of user you want to fork project from'))
-    projectname = forms.CharField(max_length=128, label=_('Project name'),
+    projectname = forms.RegexField(regex=r'^[-\w]+$',max_length=128,
+        label=_('Project name'),
         help_text=_('Name of project you want to fork belonging to specified '
                     'user'))
     use_https = forms.BooleanField(initial=False, label=_('Use https'),
@@ -20,14 +25,20 @@ class BitbucketForkForm(BaseForkForm):
                     'connection'), required=False)
 
     def fork(self, request):
+        """
+        This method only creates ``Project`` instance with proper attributes
+        as real fork is done by ``Project``'s ``post_save`` handler.
+        """
         data = self.cleaned_data
         url = self.get_url()
-        is_public = not bool(data['as_private'])
-        project = Project.objects.create(
-            author = request.user,
-            name = data['projectname'],
-            public = is_public,
-            fork_url = url)
+        try:
+            project = Project.objects.create(
+                author = request.user,
+                name = data['projectname'],
+                public = self.is_public(),
+                fork_url = url)
+        except VCSError:
+            raise ForkError(_("Error during fork procedure"))
         return project
 
     def get_url(self):

@@ -136,17 +136,32 @@ List of permission codenames allowed to be edited by projects' owners.
    projector to show forms for permission editing with specified
    codenames.
 
+PROJECTOR_FORK_EXTERNAL_ENABLED
+-------------------------------
+
+Default: ``False``
+
+If set to ``True`` users would be allowed to fork projects from external
+locations (read more at :ref:`projects-forking-external`).
+
+.. warning::
+   We **DO NOT** take any responsibility caused by using external forking.
+   Reason is simple - some users could use this functionality to attack
+   external hosts by sending crafted values to the fork form. This should be
+   validated by the form first, though.
+
 PROJECTOR_FORK_EXTERNAL_MAP
 ---------------------------
 
 Default::
 
     {
-        'bitbucket': 'projector.forks.bitbucket.BitbucketForkForm',
+        'bitbucket.org': 'projector.forks.bitbucket.BitbucketForkForm',
     }
 
-Dictionary of forms to be used for external forking. Read more at
-:ref:`projects-forking-external`.
+Dictionary of forms to be used for external forking. Keys would be used as
+choices at the first step of external forking process. Values should be paths
+to the fork form. Read more at :ref:`projects-forking-external`.
 
 PROJECTOR_FROM_EMAIL_ADDRESS
 ----------------------------
