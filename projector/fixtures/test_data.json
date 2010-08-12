@@ -83,7 +83,7 @@
             "modified_at": "2010-07-20 20:00:00", 
             "public": true, 
             "home_page_url": "", 
-            "active": true, 
+            "is_active": true, 
             "outdated": false, 
             "slug": "public-project", 
             "description": ""
@@ -101,7 +101,7 @@
             "modified_at": "2010-07-21 21:00:00", 
             "public": false, 
             "home_page_url": "", 
-            "active": true, 
+            "is_active": true, 
             "outdated": false, 
             "slug": "private-project", 
             "description": ""

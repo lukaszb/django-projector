@@ -161,7 +161,7 @@ class Project(AL_Node, Watchable):
     slug = models.SlugField(validators=[validate_project_name])
     home_page_url = models.URLField(_("home page url "), null=True, blank=True,
         verify_exists=False)
-    active = models.BooleanField(_('active'), default=True)
+    is_active = models.BooleanField(_('is active'), default=True)
     public = models.BooleanField(_('public'), default=True)
     members = models.ManyToManyField(User, verbose_name=_('members'),
         through="Membership")

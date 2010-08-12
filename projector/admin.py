@@ -124,10 +124,10 @@ class PriorityInline(admin.TabularInline):
     extra = 1
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'category', 'home_page_url', 'active',
+    list_display = ('id', 'name', 'category', 'home_page_url', 'is_active',
         'public', 'author', 'created_at', 'outdated')
     list_display_links = ('name',)
-    list_filter = ('category', 'active', 'public', 'outdated')
+    list_filter = ('category', 'is_active', 'public', 'outdated')
     save_on_top = True
     search_fields = ['name', 'description']
     prepopulated_fields = {"slug": ("name",)}
