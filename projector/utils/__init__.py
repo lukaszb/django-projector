@@ -1,6 +1,17 @@
+"""
+Utilities and helpers for ``django-projector``.
+"""
 import os
 
 from django.conf import settings
+from projector.utils.basic import str2obj, codename_to_label
+
+__all__ = [
+    'abspath',
+    'codename_to_label',
+    'str2obj',
+    'using_projector_profile',
+]
 
 abspath = lambda *paths: os.path.abspath(os.path.join(*paths))
 

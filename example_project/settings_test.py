@@ -3,6 +3,7 @@ from settings import *
 PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY = False
 PROJECTOR_SEND_MAIL_ASYNCHRONOUSELY = False
 PROJECTOR_DEFAULT_PROJECT_WORKFLOW = 'projector.tests.workflow.TestWorkflow'
+PROJECTOR_PROJECTS_HOMEDIR_GETTER = 'projector.tests.base.get_homedir'
 
 DJALOG_LEVEL = 5
 

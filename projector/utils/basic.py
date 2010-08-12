@@ -23,6 +23,9 @@ def str2obj(text):
     """
     modpath, objname = text.rsplit('.', 1)
     mod = import_module(modpath)
-    obj = getattr(mod, objname)
+    try:
+        obj = getattr(mod, objname)
+    except AttributeError:
+        raise ImportError("Cannot retrieve object from location %s" % text)
     return obj
 

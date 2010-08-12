@@ -36,3 +36,13 @@ class ProjectorTestCase(TestCase):
 
         return response
 
+def get_homedir(project):
+    """
+    Returns homedir for single project.
+    """
+    import hashlib
+    date = project.created_at.strftime('%Y%m%d%H%M%s')
+    hex = hashlib.sha224(date).hexdigest()
+    homedir = '-'.join(('test', date, str(project.id), hex))
+    return homedir
+

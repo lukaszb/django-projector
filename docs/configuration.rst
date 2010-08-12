@@ -7,11 +7,15 @@ Configuration
 After you hook ``django-projector`` into your project (see :ref:`installation`)
 you should probably change some of configuration variables.
 
+.. setting:: ALL
+
 Available settings
 ==================
 
 Those configurable variables should be defined at the project's settings module,
 just like standard `Django's variables <http://docs.djangoproject.com/en/dev/ref/settings/#ref-settings>`_.
+
+.. setting:: PROJECTOR_ALWAYS_SEND_MAILS_TO_MEMBERS
 
 PROJECTOR_ALWAYS_SEND_MAILS_TO_MEMBERS
 --------------------------------------
@@ -20,6 +24,8 @@ Default: ``False``
 
 If set to ``True``, any change to project would send an email to each projects'
 members regardless of their individual preferences.
+
+.. setting:: PROJECTOR_BANNED_PROJECT_NAMES
 
 PROJECTOR_BANNED_PROJECT_NAMES
 ------------------------------
@@ -61,6 +67,8 @@ List of names which are restricted during project creation.
    By specifying own list, we in fact extend default list. We mention this as
    most of the settings are overridable - this one is not.
 
+.. setting:: PROJECTOR_BASIC_AUTH_REALM
+
 PROJECTOR_BASIC_AUTH_REALM
 --------------------------
 
@@ -69,6 +77,8 @@ Default: ``'Projector Basic Auth'``
 Text which would appear during basic authorization process within projector's
 context. Projects' owners can override this *per project*.
 
+.. setting:: PROJECTOR_CHANGESETS_PAGINATE_BY
+
 PROJECTOR_CHANGESETS_PAGINATE_BY
 --------------------------------
 
@@ -76,14 +86,19 @@ Default: ``10``
 
 Number of changesets listed at one page.
 
+.. setting:: PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY
+
 PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY
 ---------------------------------------
 
 Default: ``True``
 
-When new project is created some actions are made using `Djangos' signals <http://docs.djangoproject.com/en/dev/topics/signals/#topics-signals>`_.
-By default those actions are made asynchronousely by new thread in order not to
+When new project is created some actions are made using `Djangos' signals
+<http://docs.djangoproject.com/en/dev/topics/signals/#topics-signals>`_.  By
+default those actions are made asynchronousely by new thread in order not to
 block client.
+
+.. setting:: PROJECTOR_DEFAULT_PROJECT_WORKFLOW
 
 PROJECTOR_DEFAULT_PROJECT_WORKFLOW
 ----------------------------------
@@ -102,6 +117,8 @@ pairs:
 - **statuses**: *name*, *oder*, *is_resolved*, *is_initial*
 
 See source code pointed by default value for more detail.
+
+.. setting:: PROJECTOR_EDITABLE_PERMISSIONS
 
 PROJECTOR_EDITABLE_PERMISSIONS
 ------------------------------
@@ -136,6 +153,8 @@ List of permission codenames allowed to be edited by projects' owners.
    projector to show forms for permission editing with specified
    codenames.
 
+.. setting:: PROJECTOR_FORK_EXTERNAL_ENABLED
+
 PROJECTOR_FORK_EXTERNAL_ENABLED
 -------------------------------
 
@@ -150,6 +169,8 @@ locations (read more at :ref:`projects-forking-external`).
    external hosts by sending crafted values to the fork form. This should be
    validated by the form first, though.
 
+.. setting:: PROJECTOR_FORK_EXTERNAL_MAP
+
 PROJECTOR_FORK_EXTERNAL_MAP
 ---------------------------
 
@@ -163,6 +184,8 @@ Dictionary of forms to be used for external forking. Keys would be used as
 choices at the first step of external forking process. Values should be paths
 to the fork form. Read more at :ref:`projects-forking-external`.
 
+.. setting:: PROJECTOR_FROM_EMAIL_ADDRESS
+
 PROJECTOR_FROM_EMAIL_ADDRESS
 ----------------------------
 
@@ -170,12 +193,16 @@ Default: would try to get value from ``settings.DEFAULT_FROM_EMAIL``.
 
 Email address used as sender for all mails send by projector.
 
+.. setting:: PROJECTOR_MAX_PROJECTS_PER_USER
+
 PROJECTOR_MAX_PROJECTS_PER_USER
 -------------------------------
 
 Default: ``50``
 
 Specifies maximum number of projects one user may create.
+
+.. setting:: PROJECTOR_MILESTONE_DEADLINE_DELTA
 
 PROJECTOR_MILESTONE_DEADLINE_DELTA
 ----------------------------------
@@ -185,6 +212,8 @@ Default: ``60`` (60 days)
 This is default value of time delta (in days) added to current date during
 milestone creation.
 
+.. setting:: PROJECTOR_MILIS_BETWEEN_PROJECT_CREATION
+
 PROJECTOR_MILIS_BETWEEN_PROJECT_CREATION
 ----------------------------------------
 
@@ -192,6 +221,8 @@ Default: ``15000`` (15 seconds)
 
 After user created a project, he/she need to wait for time specified with
 this setting until another project may be created by him/her.
+
+.. setting:: PROJECTOR_PRIVATE_ONLY
 
 PROJECTOR_PRIVATE_ONLY
 ----------------------
@@ -201,6 +232,9 @@ Default: ``False``
 If ``True`` then only *private* projects may be created. Does *not* affect
 existing projects.
 
+
+.. setting:: PROJECTOR_PROJECTS_ROOT_DIR
+
 PROJECTOR_PROJECTS_ROOT_DIR
 ---------------------------
 
@@ -209,6 +243,25 @@ Default: ``None``
 If not specified, no repositories would be created. Must be valid directory
 path. 
 
+.. setting:: PROJECTOR_PROJECTS_HOMEDIR_GETTER
+
+PROJECTOR_PROJECTS_HOMEDIR_GETTER
+---------------------------------
+
+Default: :py:class:`projector.utils.helpers.get_homedir`
+
+Location of the function which should return relative project path. In order to
+calculate full path of homedir, :py:class:`projector.models.Project` calls
+pointed function and appends result to the
+:setting:`PROJECTOR_PROJECTS_ROOT_DIR` value.
+
+It is possible to change this location and override function. It takes one
+required ``project`` parameter - instance of
+:py:class:`projector.models.Project`. Default implementation returns simply
+stringified primary key of the given ``project``.
+
+.. setting:: PROJECTOR_SEND_MAILS_USING_MAILER
+
 PROJECTOR_SEND_MAILS_USING_MAILER
 ---------------------------------
 
@@ -216,6 +269,8 @@ Default: ``False``
 
 If ``True``, would try to use ``django-mailer`` instead of build in mail
 sending functions.
+
+.. setting:: PROJECTOR_TASK_EMAIL_SUBJECT_SUMMARY_FORMAT
 
 PROJECTOR_TASK_EMAIL_SUBJECT_SUMMARY_FORMAT
 -------------------------------------------

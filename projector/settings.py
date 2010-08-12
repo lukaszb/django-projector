@@ -107,6 +107,9 @@ else:
         logging.info("django-projector: created %s directory"
             % PROJECTS_ROOT_DIR)
 
+PROJECTS_HOMEDIR_GETTER = getattr(settings, 'PROJECTOR_PROJECTS_HOMEDIR_GETTER',
+    'projector.utils.helpers.get_homedir')
+
 PRIVATE_ONLY = getattr(settings,
     'PROJECTOR_PRIVATE_ONLY', False)
 
@@ -118,6 +121,10 @@ SEND_MAILS_USING_MAILER = False
 TASK_EMAIL_SUBJECT_SUMMARY_FORMAT = getattr(settings,
     'PROJECTOR_TASK_EMAIL_SUBJECT_SUMMARY_FORMAT',
     "[$project] #$id: $summary")
+
+# =================== #
+# Settings dictionary #
+# =================== #
 
 PROJECTOR = {
     'ALWAYS_SEND_MAILS_TO_MEMBERS': 'ALWAYS_SEND_MAILS_TO_MEMBERS',
@@ -134,6 +141,7 @@ PROJECTOR = {
     'MILIS_BETWEEN_PROJECT_CREATION': MILIS_BETWEEN_PROJECT_CREATION,
     'PRIVATE_ONLY': PRIVATE_ONLY,
     'PROJECTS_ROOT_DIR': PROJECTS_ROOT_DIR,
+    'PROJECTS_HOMEDIR_GETTER': PROJECTS_HOMEDIR_GETTER,
     'SEND_MAILS_USING_MAILER': SEND_MAILS_USING_MAILER,
     'TASK_EMAIL_SUBJECT_SUMMARY_FORMAT': TASK_EMAIL_SUBJECT_SUMMARY_FORMAT,
 }

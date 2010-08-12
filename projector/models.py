@@ -10,7 +10,8 @@ from django.contrib.auth.models import User, Group, AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import ValidationError, PermissionDenied,\
+    ImproperlyConfigured
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -31,7 +32,7 @@ from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
 from projector.settings import get_config_value, get_workflow
 from projector.signals import messanger, post_fork
-from projector.utils import abspath, using_projector_profile
+from projector.utils import abspath, str2obj, using_projector_profile
 from projector.utils.lazy import LazyProperty
 
 from vcs.web.simplevcs.models import Repository
@@ -398,10 +399,21 @@ class Project(AL_Node, Watchable):
     def _get_homedir(self):
         """
         Returns directory containing all files related to this project.
+
+        This is semi *private* method as we cannot allow this to be called at
+        templates (methods starting with underscore cannot be called within
+        django templates).
         """
-        homedir = abspath(projector_settings.PROJECTS_ROOT_DIR, str(self.id))
-        if not homedir.endswith('/'):
-            homedir += '/'
+        try:
+            getter_path = get_config_value('PROJECTS_HOMEDIR_GETTER')
+            getter = str2obj(getter_path)
+        except ImportError, err:
+            raise ImproperlyConfigured("PROJECTOR_PROJECTS_HOMEDIR_GETTER "
+            "does not point to proper function. Error was: %s" % err)
+        relative_path = getter(self)
+        homedir = abspath(projector_settings.PROJECTS_ROOT_DIR, relative_path)
+        if not homedir.endswith(os.path.sep):
+            homedir += os.path.sep
         if os.path.exists(projector_settings.PROJECTS_ROOT_DIR) and \
             not os.path.exists(homedir):
             os.mkdir(homedir)
