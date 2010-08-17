@@ -10,11 +10,17 @@ Return to :ref:`api`.
 
 .. _api-models-core:
 
+.. model:: Project
+
 Project
 =======
 
 .. autoclass:: projector.models.Project
    :members:
+
+See also :manager:`ProjectManager`.
+
+.. model:: Config
 
 Config
 ======
@@ -24,11 +30,15 @@ Config
 
 .. _api-models-workflow:
 
+.. model:: Milestone
+
 Milestone
 =========
 
 .. autoclass:: projector.models.Milestone
    :members:
+
+.. model:: Component
 
 Component
 =========
@@ -36,11 +46,15 @@ Component
 .. autoclass:: projector.models.Component
    :members:
 
+.. model:: Priority
+
 Priority
 ========
 
 .. autoclass:: projector.models.Priority
    :members:
+
+.. model:: Status
 
 Status
 ======
@@ -48,11 +62,15 @@ Status
 .. autoclass:: projector.models.Status
    :members:
 
+.. model:: Transition
+
 Transition
 ==========
 
 .. autoclass:: projector.models.Transition
    :members:
+
+.. model:: TaskType
 
 TaskType
 ========
@@ -60,17 +78,24 @@ TaskType
 .. autoclass:: projector.models.TaskType
    :members:
 
+
+.. model:: AbstractTask
+
 AbstractTask
 ============
 
 .. autoclass:: projector.models.Task
    :members:
 
+.. model:: TaskRevision
+
 TaskRevision
 ============
 
 .. autoclass:: projector.models.TaskRevision
    :members:
+
+.. model:: Task
 
 Task
 ====
@@ -80,17 +105,16 @@ Task
 
 .. _api=models=auth:
 
+.. model:: Membership
+
 Membership
 ==========
 
 .. autoclass:: projector.models.Membership
    :members:
 
-UserProfile
-===========
 
-.. autoclass:: projector.models.UserProfile
-   :members:
+.. model:: Team
 
 Team
 ====
@@ -100,4 +124,13 @@ Team
 
 .. autoclass:: projector.managers.TeamManager
    :members:
+
+.. model:: UserProfile
+
+UserProfile
+===========
+
+.. autoclass:: projector.models.UserProfile
+   :members:
+
 

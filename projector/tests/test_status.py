@@ -3,16 +3,17 @@ from django.contrib.auth.models import User
 
 from projector.tests.base import ProjectorTestCase
 from projector.models import Project
-from projector.settings import get_workflow
+from projector.utils import str2obj
+from projector.settings import get_config_value
 
-statuses = get_workflow().statuses
+statuses = str2obj(get_config_value('DEFAULT_PROJECT_WORKFLOW')).statuses
 
 class StatusTest(ProjectorTestCase):
 
     def setUp(self):
         self.client = Client()
         cred = 'statuser'
-        self.user, created = User.objects.get_or_create(
+        self.user = User.objects.create(
             username = cred,
             email = 'statuser@example.com',
             is_superuser = True,
@@ -20,7 +21,7 @@ class StatusTest(ProjectorTestCase):
         self.user.set_password(cred)
         self.user.save()
         self.user._plain_password = cred
-        self.project, created = Project.objects.get_or_create(
+        self.project = Project.objects.create_project(
             name = 'status-test-project',
             slug = 'status-test-project',
             author = self.user,

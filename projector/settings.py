@@ -2,7 +2,6 @@ import os
 import logging
 
 from django.conf import settings
-from django.utils.importlib import import_module
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
@@ -19,12 +18,14 @@ BANNED_PROJECT_NAMES += (
     'ban',
     'category', 'categories',
     'change',
+    'community',
     'create',
     'default',
     'delete',
     'edit', 'edits',
     'etc',
     'issue', 'issues',
+    'job', 'jobs',
     'mail', 'mails',
     'message', 'messages',
     'manager', 'managers',
@@ -48,9 +49,13 @@ CHANGESETS_PAGINATE_BY = getattr(settings,
 CREATE_PROJECT_ASYNCHRONOUSLY = getattr(settings,
     'PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY', True)
 
+CREATE_REPOSITORIES = getattr(settings, 'PROJECTOR_CREATE_REPOSITORIES', True)
+
 DEFAULT_PROJECT_WORKFLOW = getattr(settings,
     'PROJECTOR_DEFAULT_PROJECT_WORKFLOW',
     'projector.conf.workflow.DefaultWorkflow')
+
+DEFAULT_VCS_BACKEND = getattr(settings, 'PROJECTOR_DEFAULT_VCS_BACKEND', 'hg')
 
 EDITABLE_PERMISSIONS = getattr(settings,
     'PROJECTOR_EDITABLE_PERMISSIONS',
@@ -74,6 +79,9 @@ EDITABLE_PERMISSIONS = getattr(settings,
         'can_delete_team',
     )
 )
+
+ENABLED_VCS_BACKENDS = getattr(settings,
+    'PROJECTOR_ENABLED_VCS_BACKENDS', ['hg'])
 
 FROM_EMAIL_ADDRESS = settings.DEFAULT_FROM_EMAIL
 
@@ -132,10 +140,12 @@ PROJECTOR = {
     'BASIC_AUTH_REALM': BASIC_AUTH_REALM,
     'CHANGESETS_PAGINATE_BY': CHANGESETS_PAGINATE_BY,
     'CREATE_PROJECT_ASYNCHRONOUSLY': CREATE_PROJECT_ASYNCHRONOUSLY,
+    'CREATE_REPOSITORIES': CREATE_REPOSITORIES,
     'EDITABLE_PERMISSIONS': EDITABLE_PERMISSIONS,
-    'FROM_EMAIL_ADDRESS': settings.DEFAULT_FROM_EMAIL,
+    'ENABLED_VCS_BACKENDS': ENABLED_VCS_BACKENDS,
     'FORK_EXTERNAL_ENABLED': FORK_EXTERNAL_ENABLED,
     'FORK_EXTERNAL_MAP': FORK_EXTERNAL_MAP,
+    'FROM_EMAIL_ADDRESS': settings.DEFAULT_FROM_EMAIL,
     'MAX_PROJECTS_PER_USER': MAX_PROJECTS_PER_USER,
     'MILESTONE_DEADLINE_DELTA': MILESTONE_DEADLINE_DELTA,
     'MILIS_BETWEEN_PROJECT_CREATION': MILIS_BETWEEN_PROJECT_CREATION,
@@ -147,15 +157,12 @@ PROJECTOR = {
 }
 
 def get_config_value(key):
+    """
+    Returns value of the setting pointed by the given parameter. ``key`` may
+    be given without common prefix (``PROJECTOR_``). Using this method is a
+    preferred way to retrieve ``projector``'s configuration values.
+    """
     if key.startswith('PROJECTOR_'):
         key = key[key.find('PROJECTOR_'):]
     return globals()[key]
-    #return PROJECTOR[key]
-
-def get_workflow():
-    obj_path = get_config_value('DEFAULT_PROJECT_WORKFLOW')
-    modpath, clsname = obj_path.rsplit('.', 1)
-    mod = import_module(modpath)
-    workflow = getattr(mod, clsname)
-    return workflow
 

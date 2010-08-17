@@ -4,8 +4,11 @@ API Reference
 =============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   core/index.rst
+   managers
    models
    utils
+   signals
    

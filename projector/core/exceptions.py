@@ -1,18 +1,15 @@
 """
-Exceptions raised by ``django-projector``. All error classes should extend
-from one of those exceptions.
+Exceptions raised by ``django-projector``.
+
+All internal error classes should extend from one of those exceptions.
+
+:error:`ProjectorError` should always be *top-level* exception class.
 """
 
 class ProjectorError(Exception):
     """
     Main ``django-projector`` exception.
     """
-    pass
-
-class NotApplicableError(ProjectorError):
-    pass
-
-class NotRequestError(ProjectorError):
     pass
 
 class ConfigAlreadyExist(ProjectorError):

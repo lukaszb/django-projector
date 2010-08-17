@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.http import HttpResponseRedirect, Http404
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
@@ -14,8 +14,10 @@ from django.utils.decorators import method_decorator
 from projector.core.controllers import View
 from projector.core.exceptions import ProjectorError
 from projector.models import Project
-from projector.forms import ProjectForm, ConfigForm, ProjectForkForm
+from projector.forms import ProjectCreateForm, ProjectEditForm, ConfigForm,\
+    ProjectForkForm
 from projector.settings import get_config_value
+from projector.signals import setup_project
 
 from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
@@ -125,6 +127,7 @@ class ProjectView(View):
                         % (self.request.user, perm, self.project))
                 raise PermissionDenied()
 
+
 class ProjectDetailView(ProjectView):
     """
     Returns selected project's detail for user given in ``request``.
@@ -210,6 +213,7 @@ def _project_detail_hg(request, project):
     response = get_mercurial_response(request, **mercurial_info)
     return response
 
+
 class ProjectListView(View):
     """
     Project listing view.
@@ -225,6 +229,7 @@ class ProjectListView(View):
         }
         return context
 
+
 class ProjectCreateView(View):
     """
     New project creation view.
@@ -239,12 +244,12 @@ class ProjectCreateView(View):
         project = Project(
             author=request.user,
         )
-        form = ProjectForm(request.POST or None, instance=project,
+        form = ProjectCreateForm(request.POST or None, instance=project,
             initial={'public': u'private'})
         if request.method == 'POST' and form.is_valid() and \
                 self.can_create(request.user, request):
             project = form.save()
-            return HttpResponseRedirect(project.get_absolute_url())
+            return redirect(project.get_absolute_url())
         context = {
             'form' : form,
         }
@@ -253,13 +258,14 @@ class ProjectCreateView(View):
     @staticmethod
     def can_create(user, request=None):
         """
-        Checks if given user can create project. If
-        MILIS_BETWEEN_PROJECT_CREATION is greater than miliseconds from last
-        time this user has created a project then he or she is allowed to
-        create new one.
+        Checks if given user can create project. Note that this function will
+        not validate project itself. If
+        :setting:`PROJECTOR_MILIS_BETWEEN_PROJECT_CREATION` is greater than
+        miliseconds since last time this user has created a project then he or
+        she is allowed to create new one.
 
         If user is trying to create more project than specified by
-        MAX_PROJECTS_PER_USER configuration value then we disallow
+        MAX_PROJECTS_PER_USER configuration value then we disallow.
 
         If request is given, send messages.
         """
@@ -312,6 +318,7 @@ class ProjectForkView(ProjectView):
                 ProjectCreateView.can_create(request.user, request)
                 try:
                     fork = self.project.fork(user=request.user)
+                    setup_project.send(sender=Project, instance=fork)
                     return redirect(fork.get_absolute_url())
                 except ProjectorError, err:
                     messages.error(request, str(err))
@@ -328,28 +335,22 @@ class ProjectEditView(ProjectView):
     template_name = 'projector/project/edit.html'
     perms = ['view_project', 'change_project', 'admin_project']
 
-    @login_required_m
-    def response(self, request, username, project_slug):
-        self.context['project'] = self.project
-        self.validate_project_form(request)
-        self.validate_config_form(request)
-        return self.context
-
     def validate_project_form(self, request):
         public_val = self.project.is_public() and u'public' or u'private'
         if request.method == 'POST' and \
                 request.POST.get('submit_project', False):
-            form = ProjectForm(request.POST, instance=self.project,
+            form = ProjectEditForm(request.POST, instance=self.project,
                 initial={'public': public_val})
             if form.is_valid():
                 msg = _("Project edited successfully")
                 self.project = form.save()
                 messages.success(request, msg)
+                return redirect(self.project.get_edit_url())
             else:
                 msg = _("Form has not validated")
                 messages.error(request, msg)
         else:
-            form = ProjectForm(instance=self.project,
+            form = ProjectEditForm(instance=self.project,
                 initial={'public': public_val})
         self.context['form'] = form
 
@@ -359,7 +360,7 @@ class ProjectEditView(ProjectView):
             form = ConfigForm(request.POST, instance=self.project.config)
             if form.is_valid():
                 form.instance.editor = request.user
-                form.save()
+                self.project = form.save()
                 msg = _("Project's configuration updated successfully")
                 messages.success(request, msg)
             else:
@@ -369,4 +370,16 @@ class ProjectEditView(ProjectView):
         else:
             form = ConfigForm(instance=self.project.config)
         self.context['form_config'] = form
+
+    @login_required_m
+    def response(self, request, username, project_slug):
+        self.context['project'] = self.project
+        result = self.validate_project_form(request)
+        if result:
+            return result
+        result = self.validate_config_form(request)
+        if result:
+            return result
+        return self.context
+
 

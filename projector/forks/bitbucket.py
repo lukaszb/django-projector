@@ -32,7 +32,8 @@ class BitbucketForkForm(BaseExternalForkForm):
         data = self.cleaned_data
         url = self.get_url()
         try:
-            project = Project.objects.create(
+            project = Project.objects.create_project(
+                vcs_alias = 'hg',
                 author = request.user,
                 name = data['projectname'],
                 public = self.is_public(),

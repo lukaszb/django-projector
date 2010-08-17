@@ -189,6 +189,7 @@
                 {% endfor %}
         
 
+        {% comment %}{# Old dynamic form #}
             {# Form begin #}
             {% if user.is_authenticated %}
             <form action="." method="post" class="action-form">
@@ -218,6 +219,7 @@
                 <a href="{% url auth_login %}">{% trans "login" %}</a>.
             </p>
             {% endif %}
+        {% endcomment %}
 
         </div>
     </div>

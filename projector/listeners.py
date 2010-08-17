@@ -4,7 +4,6 @@ import logging
 import datetime
 import traceback
 
-from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -13,12 +12,11 @@ from django.core.mail import mail_admins
 from signals_ahoy.asynchronous import AsynchronousListener
 
 from projector import settings as projector_settings
-from projector.models import Project, Config, Task, WatchedItem
-from projector.signals import messanger, post_fork
+from projector.models import Project, Task, WatchedItem
+from projector.signals import messanger, post_fork, setup_project
+from projector.utils import str2obj
 
 from richtemplates.utils import get_user_profile_model
-from vcs.web.simplevcs.models import Repository
-from vcs.exceptions import VCSError
 
 def request_new_profile(sender, instance, **kwargs):
     """
@@ -36,50 +34,30 @@ def request_new_profile(sender, instance, **kwargs):
         profile.save()
         logging.debug("Created profile's id: %s" % profile.id)
 
-def project_created_listener(sender, instance, **kwargs):
+def project_setup_listener(sender, instance, vcs_alias=None,
+        workflow=None, **kwargs):
     """
     Creates all necessary related objects like statuses with transitions etc.
+    It simply calls setup and we do this here as in a production it would most
+    probably called asynchronously (with
+    :setting:`PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY` set to ``True``)
+
+    :param instance: instance of :model:`Project`
+    :param vcs_alias: alias of vcs backend
+    :param workflow: object or string representing project workflow
     """
-    if kwargs['created'] is False:
-        return
+    if isinstance(workflow, str):
+        workflow = str2obj(workflow)
+    instance.setup(vcs_alias=vcs_alias, workflow=workflow)
 
-    repo_path = instance._get_repo_path()
-
-    logging.info("Trying to initialize repository at %s" % repo_path)
-
-    # Hardcoding repository creation process until more backends
-    # are available from ``vcs``
-    alias = 'hg'
-    try:
-        clone_url = None
-        if instance.parent:
-            # Attempt to fork internally
-            clone_url = instance.parent._get_repo_path()
-        elif instance.fork_url:
-            # Attempt to fork from external location
-            clone_url = instance.fork_url
-        repository = Repository.objects.create(path=repo_path,
-            alias=alias, clone_url=clone_url)
-        instance.repository = repository
-    except VCSError, err:
-        traceback_msg = '\n'.join(traceback.format_exception(*(sys.exc_info())))
-        if clone_url is not None:
-            msg = "Couldn't clone repository. Original error was: %s" % err
-        else:
-            msg = "Couldn't create repository. Original error was: %s" % err
-        msg = '\n\n'.join((msg, traceback_msg))
-        logging.error(msg)
-        raise err
-
-    instance.create_workflow()
-    instance.save()
-    Config.create_for_project(instance)
-
-def async_project_created_listener(sender, instance, **kwargs):
+def async_project_setup_listener(sender, instance, vcs_alias=None,
+        workflow=None, **kwargs):
     """
     Project creation could be heavy so should by handled asynchronously.  On
     the other hand, new thread doesn't know if project has been already
     persisted or not - we need to check if it is available from database first.
+    This problem may not be related with all databases (but is for i.e.
+    PostgreSQL).
     """
     try:
         if not kwargs.get('created', False):
@@ -127,8 +105,8 @@ def async_project_created_listener(sender, instance, **kwargs):
         msg = '\n'.join(msg)
         mail_admins(subject, msg)
 
-async_project_created_listener = AsynchronousListener(
-    async_project_created_listener)
+async_project_setup_listener = AsynchronousListener(
+    async_project_setup_listener)
 
 def fork_done(sender, fork, **kwargs):
     """
@@ -150,11 +128,7 @@ def task_save_listener(sender, instance, **kwargs):
 def send_mail_listener(sender, subject, body, recipient_list,
         from_address=projector_settings.get_config_value('FROM_EMAIL_ADDRESS'),
         **kwargs):
-    if 'mailer' in settings.INSTALLED_APPS and \
-        projector_settings.get_config_value('SEND_MAILS_USING_MAILER'):
-        from mailer import send_mail
-    else:
-        from django.core.mail import send_mail
+    from django.core.mail import send_mail
     send_mail(subject, body, from_address, recipient_list)
     logging.debug("Sent mail to %s" % recipient_list)
 
@@ -186,9 +160,10 @@ def start_listening():
     post_fork.connect(fork_done)
 
     if projector_settings.CREATE_PROJECT_ASYNCHRONOUSLY:
-        post_save.connect(async_project_created_listener.listen, sender=Project)
+        setup_project.connect(async_project_setup_listener.listen,
+            sender=Project)
     else:
-        post_save.connect(project_created_listener, sender=Project)
+        setup_project.connect(project_setup_listener, sender=Project)
 
     if projector_settings.SEND_MAIL_ASYNCHRONOUSELY:
         messanger.connect(async_send_mail_listener.listen, sender=None)

@@ -1,5 +1,23 @@
 [
     {
+        "pk": -1, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "AnonymousUser", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2010-08-17 14:51:23", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "", 
+            "email": "", 
+            "date_joined": "2010-08-17 14:51:23"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "auth.user", 
         "fields": {
@@ -52,7 +70,7 @@
             "email": "joe@non-exist-31415926535.com", 
             "date_joined": "2010-07-20 13:00:00"
         }
-    },
+    }, 
     {
         "pk": 4, 
         "model": "auth.user", 
@@ -72,39 +90,195 @@
         }
     }, 
     {
-        "pk": 1, 
-        "model": "projector.project", 
-        "fields": {
-            "category": null, 
-            "name": "public project", 
-            "repository": 1, 
-            "author": 2, 
-            "created_at": "2010-07-20 20:00:00", 
-            "modified_at": "2010-07-20 20:00:00", 
-            "public": true, 
-            "home_page_url": "", 
-            "is_active": true, 
-            "outdated": false, 
-            "slug": "public-project", 
-            "description": ""
-        }
-    },
-    {
         "pk": 2, 
         "model": "projector.project", 
         "fields": {
             "category": null, 
+            "fork_url": null, 
             "name": "private project", 
-            "repository": 2, 
+            "repository": null, 
             "author": 3, 
-            "created_at": "2010-07-21 21:00:00", 
             "modified_at": "2010-07-21 21:00:00", 
+            "created_at": "2010-07-21 21:00:00", 
+            "is_active": true, 
             "public": false, 
             "home_page_url": "", 
-            "is_active": true, 
+            "parent": null, 
             "outdated": false, 
             "slug": "private-project", 
             "description": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.project", 
+        "fields": {
+            "category": null, 
+            "fork_url": null, 
+            "name": "public project", 
+            "repository": null, 
+            "author": 2, 
+            "modified_at": "2010-07-20 20:00:00", 
+            "created_at": "2010-07-20 20:00:00", 
+            "is_active": true, 
+            "public": true, 
+            "home_page_url": "", 
+            "parent": null, 
+            "outdated": false, 
+            "slug": "public-project", 
+            "description": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.config", 
+        "fields": {
+            "edited_at": "2010-08-17 14:53:08", 
+            "changesets_paginate_by": 10, 
+            "task_email_summary_format": "[$project] #$id: $summary", 
+            "milestone_deadline_delta": 60, 
+            "project": 2, 
+            "basic_realm": "Basic Auth Realm", 
+            "from_email_address": "webmaster@localhost", 
+            "editor": 3, 
+            "always_mail_members": false
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.config", 
+        "fields": {
+            "edited_at": "2010-08-17 14:53:09", 
+            "changesets_paginate_by": 10, 
+            "task_email_summary_format": "[$project] #$id: $summary", 
+            "milestone_deadline_delta": 60, 
+            "project": 1, 
+            "basic_realm": "Basic Auth Realm", 
+            "from_email_address": "webmaster@localhost", 
+            "editor": 2, 
+            "always_mail_members": false
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.component", 
+        "fields": {
+            "project": 2, 
+            "description": null, 
+            "name": "global", 
+            "slug": "global"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.component", 
+        "fields": {
+            "project": 1, 
+            "description": null, 
+            "name": "global", 
+            "slug": "global"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.membership", 
+        "fields": {
+            "member": 3, 
+            "project": 2, 
+            "joined_at": "2010-08-17 14:53:08"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.membership", 
+        "fields": {
+            "member": 2, 
+            "project": 1, 
+            "joined_at": "2010-08-17 14:53:09"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 2, 
+            "slug": "minor", 
+            "order": 1, 
+            "name": "minor", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.priority", 
+        "fields": {
+            "project": 1, 
+            "slug": "minor", 
+            "order": 1, 
+            "name": "minor", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "new", 
+            "is_resolved": false, 
+            "slug": "new", 
+            "project": 2, 
+            "is_initial": true, 
+            "order": 1, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.status", 
+        "fields": {
+            "name": "new", 
+            "is_resolved": false, 
+            "slug": "new", 
+            "project": 1, 
+            "is_initial": true, 
+            "order": 1, 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 1, 
+            "destination": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.transition", 
+        "fields": {
+            "source": 2, 
+            "destination": 2
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 2, 
+            "order": 1, 
+            "name": "task", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "projector.tasktype", 
+        "fields": {
+            "project": 1, 
+            "order": 1, 
+            "name": "task", 
+            "description": null
         }
     }
 ]

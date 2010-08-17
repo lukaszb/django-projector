@@ -1,7 +1,7 @@
 def get_homedir(project):
     """
     Returns unique home directory path for each project. Returned path should be
-    relative to ``projector.settings.PROJECTS_ROOT_DIR``.
+    relative to :setting:`PROJECTOR_PROJECTS_ROOT_DIR`.
 
     :param project: instance of :py:class:`projector.models.Project`
 

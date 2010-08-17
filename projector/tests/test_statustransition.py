@@ -14,7 +14,7 @@ class ProjectorStatusTransition(TestCase):
             email = 'admin@example.com',
             password = 'admin',
         )
-        self.project, craeted = Project.objects.get_or_create(
+        self.project = Project.objects.create_project(
             name=name,
             slug=slugify(name),
             author=self.admin,

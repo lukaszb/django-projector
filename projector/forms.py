@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.contrib.formtools.wizard import FormWizard
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 
 from guardian.shortcuts import assign, remove_perm, get_perms,\
@@ -24,12 +25,16 @@ from projector.models import Component
 from projector.models import Milestone
 from projector.models import UserProfile
 from projector.settings import get_config_value
+from projector.signals import setup_project
 from projector.utils.basic import str2obj
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
     ModelByNameField
 from richtemplates.widgets import RichCheckboxSelectMultiple
 from richtemplates.forms import RichSkinChoiceField, RichCodeStyleChoiceField
+
+from vcs.backends import get_supported_backends
+
 
 PUBLIC_RADIO_CHOICES = [
     (u'public', _("Public")),
@@ -52,24 +57,32 @@ class PerProjectUniqueNameMixin(object):
                     'class': self._meta.model.__name__}))
         return name
 
-class ProjectForm(forms.ModelForm):
+enabled_backends = get_config_value('ENABLED_VCS_BACKENDS')
+supported_backends = get_supported_backends()
+if not set(enabled_backends).issubset(set(supported_backends)):
+    raise ImproperlyConfigured("VCS supports only following backends: %s"
+        % ', '.join(supported_backends))
+
+VCS_BACKENDS_CHOICES = ((key, key) for key in enabled_backends)
+
+class ProjectBaseForm(forms.ModelForm):
     name = forms.CharField(min_length=2, max_length=64, label=_('Name'))
     public = forms.ChoiceField(label=_("Visibility"),
         choices=PUBLIC_RADIO_CHOICES,
         widget=forms.RadioSelect(),
         initial=u'private',
     )
-
     class Meta:
         model = Project
-        exclude = ('members', 'author', 'editor', 'repository', 'teams', 'parent')
+        exclude = ('members', 'author', 'editor', 'repository', 'teams',
+            'parent', 'fork_url', 'is_active')
 
     def __init__(self, *args, **kwargs):
-        res = super(ProjectForm, self).__init__(*args, **kwargs)
+        form = super(ProjectBaseForm, self).__init__(*args, **kwargs)
         # Update ``status`` field while creating new task
         if get_config_value('PRIVATE_ONLY'):
             self.fields['public'].choices.pop(0)
-        return res
+        return form
 
     def clean_public(self):
         data = self.cleaned_data['public']
@@ -89,17 +102,48 @@ class ProjectForm(forms.ModelForm):
             data]
         return teams
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if name.strip().lower() in get_config_value('BANNED_PROJECT_NAMES'):
+            raise forms.ValidationError(_("This name is restricted"))
+        if Project.objects\
+                .filter(name=name, author=self.instance.author)\
+                .exclude(pk=self.instance.pk).exists():
+            msg = _("You have project with same name already")
+            raise forms.ValidationError(msg)
+        return name
+
+
+class ProjectCreateForm(ProjectBaseForm):
+    vcs_alias = forms.ChoiceField(choices=VCS_BACKENDS_CHOICES,
+        label=_('Version Control Backend'),
+        initial=get_config_value('DEFAULT_VCS_BACKEND'))
+
     def save(self, commit=True):
-        instance = super(ProjectForm, self).save(commit=False)
+        instance = super(ProjectCreateForm, self).save(commit=False)
         if commit:
             instance.save()
+            if not self.instance.pk:
+                setup_project.send(sender=Project, instance=instance,
+                    vcs_alias=self.cleaned_data['vcs_alias'])
+                vcs_alias = self.cleaned_data['vcs_alias']
+                instance.set_vcs_alias(vcs_alias)
             for team in self.cleaned_data.get('teams', ()):
                 team.project = instance
                 team.save()
         return instance
 
-class ProjectForkForm(forms.Form):
+
+class ProjectEditForm(ProjectBaseForm):
     pass
+
+
+class ProjectForkForm(forms.Form):
+    """
+    Currently dummy form which is enough for fork page.
+    """
+    pass
+
 
 class ConfigForm(forms.ModelForm):
     changesets_paginate_by = forms.IntegerField(
@@ -110,9 +154,11 @@ class ConfigForm(forms.ModelForm):
         model = Config
         exclude = ['project', 'editor']
 
+
 class TaskCommentForm(forms.Form):
     comment = forms.CharField(label=_("Comment"), widget=forms.Textarea,
         required=False)
+
 
 class TaskForm(LimitingModelForm):
     owner = ModelByNameField(max_length=128, queryset=User.objects.all,
@@ -154,6 +200,7 @@ class TaskForm(LimitingModelForm):
             task.watch(editor)
         return task
 
+
 class TaskEditForm(TaskForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
@@ -175,6 +222,7 @@ class TaskEditForm(TaskForm):
         logging.debug("Setting comment to: %s" % comment)
         self.instance.comment = comment
         return super(TaskEditForm, self).clean()
+
 
 class MembershipForm(LimitingModelForm):
     member = ModelByNameField(max_length=128, queryset=User.objects.all,
@@ -202,8 +250,10 @@ def get_editable_perms():
     perms.sort(key=lambda pair: pair[0])
     return perms
 
+
 class MembershipDeleteForm(forms.Form):
     post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
+
 
 class ProjectMembershipPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(
@@ -259,6 +309,7 @@ class ProjectMembershipPermissionsForm(forms.Form):
                         }))
                 self._message('warning', _("Permission removed: %s" % perm))
 
+
 class ProjectTeamPermissionsForm(forms.Form):
     permissions = forms.MultipleChoiceField(
         choices = get_editable_perms(),
@@ -298,6 +349,7 @@ class ProjectTeamPermissionsForm(forms.Form):
                 remove_perm(perm, group, project)
                 self._message('warning', _("Permission removed: %s" % perm))
 
+
 class TeamForm(LimitingModelForm):
     group = ModelByNameField(queryset=Group.objects.all,
         max_length=64, label=_("Group"))
@@ -321,6 +373,7 @@ class TeamForm(LimitingModelForm):
 class TeamDeleteForm(forms.Form):
     post = forms.BooleanField(initial=True, widget=forms.HiddenInput)
 
+
 class MilestoneForm(forms.ModelForm, PerProjectUniqueNameMixin):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
@@ -329,11 +382,13 @@ class MilestoneForm(forms.ModelForm, PerProjectUniqueNameMixin):
         model = Milestone
         exclude = ['project', 'author']
 
+
 class ComponentForm(forms.ModelForm, PerProjectUniqueNameMixin):
 
     class Meta:
         model = Component
         exclude = ['project']
+
 
 class StatusEditForm(forms.ModelForm, PerProjectUniqueNameMixin):
 
@@ -341,11 +396,13 @@ class StatusEditForm(forms.ModelForm, PerProjectUniqueNameMixin):
         model = Status
         exclude = ['project']
 
+
 class StatusForm(StatusEditForm):
 
     class Meta:
         model = Status
         exclude = ['project', 'destinations']
+
 
 class BaseStatusFormSet(BaseModelFormSet):
 
@@ -413,8 +470,10 @@ map = get_config_value('FORK_EXTERNAL_MAP')
 fork_map = dict((key, str2obj(val)) for key, val in map.items())
 choices = tuple((key, key) for key in fork_map)
 
+
 class ExternalForkSourcesForm(forms.Form):
     source = forms.ChoiceField(choices=choices)
+
 
 class ExternalForkWizard(FormWizard):
 

@@ -17,7 +17,7 @@ class ComponentTest(ProjectorTestCase):
         self.user.set_password(cred)
         self.user.save()
         self.user._plain_password = cred
-        self.project, created = Project.objects.get_or_create(
+        self.project = Project.objects.create_project(
             name = 'component-test-project',
             slug = 'component-test-project',
             author = self.user,

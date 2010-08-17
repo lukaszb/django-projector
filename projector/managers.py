@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.contenttypes.models import ContentType
 
+from projector.signals import setup_project
+
 from richtemplates.shortcuts import get_first_or_None
 
 class ProjectManager(models.Manager):
@@ -36,6 +38,17 @@ class ProjectManager(models.Manager):
             .distinct()
 
         return qs
+
+    def create_project(self, vcs_alias=None, workflow=None, *args, **kwargs):
+        """
+        Creates new project and call it's setup function by sending
+        :signal:`setup_project` signal.
+        """
+        instance = self.create(*args, **kwargs)
+        setup_project.send(sender=self.model, instance=instance,
+            vcs_alias=vcs_alias, workflow=workflow)
+        return instance
+
 
 class TaskManager(models.Manager):
 

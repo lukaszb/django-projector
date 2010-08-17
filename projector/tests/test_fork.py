@@ -15,7 +15,8 @@ class ForkTest(TestCase):
     def setUp(self):
         self.anon = AnonymousUser()
         self.joe = User.objects.create(username='joe')
-        self.project = Project.objects.create(name='project', author=self.joe)
+        self.project = Project.objects.create_project(name='project',
+            author=self.joe)
 
 
     def test_anonymous(self):
@@ -85,7 +86,8 @@ class ForkViewTest(ProjectorTestCase):
     def setUp(self):
         self.joe = User.objects.create_user(username='joe',
             email='joe@example.com', password='joe')
-        self.project = Project.objects.create(name='project', author=self.joe)
+        self.project = Project.objects.create_project(name='project',
+            author=self.joe)
         self.jack = User.objects.create_user(username='jack',
             email='jack@example.com', password='jack')
         self.client = Client()
@@ -151,8 +153,8 @@ class BitbucketForkTest(TestCase):
     def test_fork(self):
         joe = User.objects.create(username='joe')
         data = {
-            'username': u'lukaszb',
-            'projectname': u'django-projector',
+            'username': u'marcinkuzminski',
+            'projectname': u'vcs',
             'as_private': u'checked',
         }
         form = BitbucketForkForm(data)

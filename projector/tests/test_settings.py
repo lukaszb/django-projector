@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from projector import settings
 from projector.models import Project
-from projector.forms import ProjectForm
+from projector.forms import ProjectCreateForm
 from projector.forms import ProjectMembershipPermissionsForm
 from projector.forms import ProjectTeamPermissionsForm
 from projector.forks import BaseExternalForkForm
@@ -32,11 +32,11 @@ class SettingsTest(TestCase):
 
     def test_PRIVATE_ONLY(self):
         settings.PRIVATE_ONLY = False
-        form = ProjectForm()
+        form = ProjectCreateForm()
         self.assertEqual(len(form.fields['public'].choices), 2)
 
         settings.PRIVATE_ONLY = True
-        form = ProjectForm()
+        form = ProjectCreateForm()
         self.assertEqual(len(form.fields['public'].choices), 1)
         self.assertEqual(form.fields['public'].choices[0][0], u'private')
 

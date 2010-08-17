@@ -1,14 +1,9 @@
 import logging
 
-from django.shortcuts import render_to_response
-from django.contrib.auth.decorators import login_required, permission_required,\
-    user_passes_test
-from django.template import RequestContext
+from django.contrib.auth.decorators import login_required, permission_required
 from django.views.generic import list_detail, create_update
-from django.contrib.auth.decorators import login_required
 
-from projector.models import Project, ProjectCategory, Membership
-from projector.forms import ProjectForm
+from projector.models import ProjectCategory
 
 @login_required
 def project_category_detail(request, project_category_slug,
@@ -32,7 +27,7 @@ def project_category_create(request, template_name='projector/project_category/c
         'model' : ProjectCategory,
         'template_name' : template_name,
     }
-    
+
     return create_update.create_object(request, **kwargs)
 
 def project_category_list(request, template_name='projector/project_category/list.html'):
@@ -42,6 +37,6 @@ def project_category_list(request, template_name='projector/project_category/lis
         'template_name' : template_name,
         'template_object_name' : 'project_category',
     }
-    
+
     return list_detail.object_list(request, **kwargs)
 

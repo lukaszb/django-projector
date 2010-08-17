@@ -41,8 +41,9 @@ refer to :ref:`internal fork <projects-forking-internal>`. External forking
 only allows to fork from external location.
 
 To enable this functionality, it's necessary to set
-``PROJECTOR_FORK_EXTERNAL_ENABLED = True`` at settings file. Moreover,
-``PROJECTOR_FORK_EXTERNAL_MAP`` dict setting should be set properly (see
+:setting:`PROJECTOR_FORK_EXTERNAL_ENABLED = True
+<PROJECTOR_FORK_EXTERNAL_ENABLED>` at settings file. Moreover,
+:setting:`PROJECTOR_FORK_EXTERNAL_MAP` dict setting should be set properly (see
 :ref:`configuration`).
 
 .. warning::
@@ -67,11 +68,11 @@ method:
 
   .. note::
      All exceptions at ``fork`` method should be caught and eventually
-     propagated but with type ``projector.core.exceptions.ProjectError`` (or a
-     subclass of it). It is necessary for
-     :py:class:`projector.forms.ExternalForkWizard` to properly notify user
-     if any error has occured during forking process. Those are not validation
-     errors as ``fork`` method should be called only after form is cleaned.
+     propagated but with type :error:`ProjectorError` (or a subclass of it). It
+     is necessary for :py:class:`projector.forms.ExternalForkWizard` to
+     properly notify user if any error has occured during forking process.
+     Those are not validation errors as ``fork`` method should be called only
+     after form is cleaned.
 
 Moreover, :py:class:`projector.forks.base.BaseExternalForkForm` comes with
 one field ``as_private``. After form validation it is possible to check

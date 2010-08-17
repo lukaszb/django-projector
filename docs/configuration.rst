@@ -7,13 +7,15 @@ Configuration
 After you hook ``django-projector`` into your project (see :ref:`installation`)
 you should probably change some of configuration variables.
 
+
 .. setting:: ALL
 
 Available settings
 ==================
 
 Those configurable variables should be defined at the project's settings module,
-just like standard `Django's variables <http://docs.djangoproject.com/en/dev/ref/settings/#ref-settings>`_.
+just like standard `Django's variables
+<http://docs.djangoproject.com/en/dev/ref/settings/#ref-settings>`_.
 
 .. setting:: PROJECTOR_ALWAYS_SEND_MAILS_TO_MEMBERS
 
@@ -107,8 +109,8 @@ Default: ``projector.conf.default_workflow``
 
 Path to object defining default workflow for new projects.
 
-Object must define following tuples: *components*, *task_types*, *priorities*
-and *statuses*. Each tuple should contain dictionaries with following key/value
+Object must define following iterables: *components*, *task_types*, *priorities*
+and *statuses*. Each one should contain dictionaries with following key/value
 pairs:
 
 - **components**: *name*
@@ -117,6 +119,19 @@ pairs:
 - **statuses**: *name*, *oder*, *is_resolved*, *is_initial*
 
 See source code pointed by default value for more detail.
+
+
+.. setting:: PROJECTOR_DEFAULT_VCS_BACKEND
+
+PROJECTOR_DEFAULT_VCS_BACKEND
+-----------------------------
+
+Default: ``'hg'``
+
+One of *aliases* specified at :setting:`PROJECTOR_ENABLED_VCS_BACKENDS`. See
+`vcs's documentation`_ for available aliases.
+
+
 
 .. setting:: PROJECTOR_EDITABLE_PERMISSIONS
 
@@ -152,6 +167,23 @@ List of permission codenames allowed to be edited by projects' owners.
    available permissions) would not affect permissions - it only tells
    projector to show forms for permission editing with specified
    codenames.
+
+
+.. setting:: PROJECTOR_ENABLED_VCS_BACKENDS
+
+PROJECTOR_ENABLED_VCS_BACKENDS
+------------------------------
+
+Default: ``[hg]``
+
+Iterable of vcs_ *aliases*. To check what backends are available run::
+
+    >>> import vcs
+    >>> vcs.backends.BACKENDS.keys()
+    ['hg']
+
+See more at `vcs's documentation`_.
+
 
 .. setting:: PROJECTOR_FORK_EXTERNAL_ENABLED
 
@@ -283,4 +315,16 @@ This is default subject format for messages related with tasks. Allows to move
 name placeholders (``$project``, ``$id``, ``$summary``). All placeholders are
 optional - but adviced, obviousely.
 
+
+
+.. setting:: get_config_value
+
+``get_config_value(key)``
+=========================
+
+.. autofunction:: projector.settings.get_config_value
+
+
+.. _vcs: http://bitbucket.org/marcinkuzminski/vcs/
+.. _vcs's documentation: http://packages.python.org/vcs/installation.html
 

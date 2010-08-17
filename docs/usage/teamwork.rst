@@ -102,8 +102,8 @@ described below:
    is automatically added to ``User.groups``.
 
 #. ``UserProfile.is_team`` attribute is set to ``True``. From now on, accessing
-   ``UserProfile.group`` would return :py:class:`auth.Group` instance created in previous
-   step.
+   ``UserProfile.group`` would return :py:class:`auth.Group` instance created in
+   previous step.
 
 Conversion's api is provided by :py:class:`projector.Team` manager's method
 :py:meth:`projector.managers.TeamManager.convert_from_user`.

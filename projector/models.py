@@ -1,7 +1,9 @@
 import os
+import sys
 import string
-import datetime
 import logging
+import datetime
+import traceback
 
 from decimal import Decimal
 
@@ -25,22 +27,29 @@ from guardian.shortcuts import assign, get_perms, get_perms_for_model
 from autoslug import AutoSlugField
 
 from projector import settings as projector_settings
-from projector.core.exceptions import ConfigAlreadyExist, ForkError
+from projector.core.exceptions import ProjectorError
+from projector.core.exceptions import ConfigAlreadyExist
+from projector.core.exceptions import ForkError
 from projector.managers import ProjectManager
 from projector.managers import TaskManager
 from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
-from projector.settings import get_config_value, get_workflow
+from projector.settings import get_config_value
 from projector.signals import messanger, post_fork
 from projector.utils import abspath, str2obj, using_projector_profile
 from projector.utils.lazy import LazyProperty
 
+from vcs.backends import get_supported_backends
+from vcs.exceptions import VCSError
 from vcs.web.simplevcs.models import Repository
 
 from richtemplates.models import UserProfile as RichUserProfile
 
 from treebeard.al_tree import AL_Node
 
+
+PROJECT_VCS_ALIAS_FIELD = '_vcs_alias'
+PROJECT_WORKFLOW_FIELD = '_workflow_obj'
 
 class WatchedItem(models.Model):
     """
@@ -211,15 +220,6 @@ class Project(AL_Node, Watchable):
     def __unicode__(self):
         return self.name
 
-    def _set_author_permissions(self):
-        """
-        Creates all permissions for project's author.
-        """
-        perms = [p.codename for p in get_perms_for_model(Project)
-            if p.codename != 'add_project']
-        for perm in perms:
-            assign(perm, self.author, self)
-
     def is_public(self):
         return self.public
 
@@ -231,9 +231,8 @@ class Project(AL_Node, Watchable):
         self.full_clean()
         project = super(Project, self).save(*args, **kwargs)
         # Add necessary permissions for author - we need to do this
-        # *NOT* asynchronousely as isntant redirect after project creation
+        # *NOT* asynchronousely as instant redirect after project creation
         # may cause it's author not to be able to see project page
-        self._set_author_permissions()
         return project
 
     @models.permalink
@@ -455,42 +454,63 @@ class Project(AL_Node, Watchable):
 
     def set_author_permissions(self):
         """
-        Creates all available permissions for the author of
-        the project. Should be called every time project is
-        saved to ensure that at any given time project's author
-        has all permissions for the project.
+        Creates all permissions for project's author.
         """
+        perms = set([p.codename for p in get_perms_for_model(Project)
+            if p.codename != 'add_project'])
+        author_perms = set(get_perms(self.author, self))
+        for perm in (perms - author_perms):
+            assign(perm, self.author, self)
+
+        # If author is Team we need to add perms to that Team too
+        if self.author.get_profile().is_team:
+            group = self.author.get_profile().group
+            team_perms = set(get_perms(group, self))
+            for perm in (perms - team_perms):
+                assign(perm, self.author.get_profile().group, self)
+
+    def set_memberships(self):
+        """
+        Creates :model:`Membership` for this project and it's author. If author
+        is a team, we need to create :model:`Team` object too.
+        """
+        Membership.objects.create(project=self, member=self.author)
         if self.author.is_superuser:
             # we don't need to add permissions for superuser
-            # as superusers has all permissions
+            # as superusers has always all permissions
             return
-        available_permissions = set([p.codename for p in
-            get_perms_for_model(Project) if p.codename != 'add_project'])
+        # If author is a team, we need to create :model:`Team` instance for
+        # his/her group
+        profile = self.author.get_profile()
+        if profile.is_team:
+            Team.objects.create(project=self, group=profile.group)
 
-        perms = get_perms(self.author, self)
-        perms_set = set(perms)
-        for perm in available_permissions:
-            if not perm in perms_set:
-                logging.debug("Project '%s': adding '%s' permission for user "
-                    "'%s'" % (self, perm, self.author))
-                assign(perm, self.author, self)
+    def set_workflow(self, workflow):
+        setattr(self, PROJECT_WORKFLOW_FIELD, workflow)
+
+    def get_workflow(self):
+        workflow = getattr(self, PROJECT_WORKFLOW_FIELD, None)
+        if workflow is None:
+            workflow = str2obj(get_config_value('DEFAULT_PROJECT_WORKFLOW'))
+        return workflow
 
     def create_workflow(self, workflow=None):
         """
-        Creates default workflow for the project. We need to create initial
-        member (author) and objects required to work on issues (components,
-        types, statuses with their transitions).
+        Creates default workflow for the project. We need to create objects
+        required to work on issues (components, types, statuses with their
+        transitions if custom workflow is used).
+
+        Workflow is retrieved using ``get_workflow`` method on the instance but
+        may be overridden by passing parameter directly.
 
         :param workflow: python object defining tuples of dicts with
-          information on project *metadata*; by default, object defined by
-          ``DEFAULT_PROJECT_WORKFLOW`` setting would be used.
+          information on project *metadata*; may be a string pointing to the
+          object; if parameter is None, value would be retrieved using
+          ``get_workflow`` instance's method
         """
 
         if workflow is None:
-            workflow = get_workflow()
-
-        Membership.objects.create(project=self, member=self.author)
-        self.set_author_permissions()
+            workflow = self.get_workflow()
 
         for component_info in workflow.components:
             component, created = Component.objects\
@@ -543,12 +563,148 @@ class Project(AL_Node, Watchable):
             .filter(source__in=self.status_set.all())
         return transitions
 
+    def set_vcs_alias(self, vcs_alias):
+        """
+        Prepares this project for repository creation process. Note that
+        :error:`ProjectorError` is raised if repository for this instance has
+        been already created. Same exception is raised if ``vcs`` does not support
+        backend for the given alias.
+
+        :param vcs_alias: alias for ``vcs`` backend
+        """
+        supported_backends = get_supported_backends()
+        if vcs_alias not in supported_backends:
+            raise ProjectorError("Unsupported backend %s. Supported backends "
+            "have following aliases: %s" % (vcs_alias,
+            ', '.join(supported_backends)))
+        if self.repository is not None:
+            raise ProjectorError("Cannot prepare project for repository "
+            "creation if it is already set")
+        setattr(self, PROJECT_VCS_ALIAS_FIELD, vcs_alias)
+
+    def get_vcs_alias(self):
+        """
+        Returns vcs_alias which should be already configured for this project.
+        Defaulting to :setting:`PROJECTOR_DEFAULT_VCS_BACKEND`. If repository
+        is already set at this instance, :error:`ProjectorError` is raised as
+        this method should be used before or during repository creation process.
+        If repository is already set, retrieve vcs_alias directly from it.
+        """
+        if self.repository is not None:
+            raise ProjectorError("Cannot retrieve vcs_alias for project with "
+            "repository already set")
+        default = get_config_value('DEFAULT_VCS_BACKEND')
+        vcs_alias = getattr(self, PROJECT_VCS_ALIAS_FIELD, default)
+        return vcs_alias
+
+    def create_repository(self, vcs_alias=None):
+        """
+        Creates repository for this project.
+
+        ``vcs_alias`` is retrieved using ``get_vcs_alias`` method but may be
+        overridden by passing parameter directly.
+
+        :param vcs_alias: alias for ``vcs`` backend, if None given this value
+          is retrieved using ``get_vcs_alias`` instance's method
+
+        :raise ImproperlyConfigured: if given ``vcs_alias`` is not one of
+          enabled backends
+
+        :raise ProjectorError: if repository is already created, or given
+          ``vcs_alias`` is not one of vcs supported backends
+        """
+        if not get_config_value('CREATE_REPOSITORIES'):
+            raise ProjectorError("Cannot create repository if "
+            "PROJECTOR_CREATE_REPOSITORIES is not set to True")
+
+        if self.repository is not None:
+            raise ProjectorError("Cannot create repository if project has one "
+            "already")
+
+        if vcs_alias is None:
+            vcs_alias = self.get_vcs_alias()
+
+        supported_backends = get_supported_backends()
+        if vcs_alias not in supported_backends:
+            raise ProjectorError("Unsupported backend %s. Supported backends "
+            "have following aliases: %s" % (vcs_alias,
+            ', '.join(supported_backends)))
+
+        enabled_backends = get_config_value('ENABLED_VCS_BACKENDS')
+        if vcs_alias not in enabled_backends:
+            raise ImproperlyConfigured("Cannot use VCS backend not specified at"
+            "PROJECTOR_ENABLED_VCS_BACKENDS. Tried %s and available backends "
+            "are: %s" % (vcs_alias, ', '.join(enabled_backends)))
+
+        # Repository creation process
+        try:
+            clone_url = None
+            if self.parent:
+                # Attempt to fork internally
+                clone_url = self.parent._get_repo_path()
+            elif self.fork_url:
+                # Attempt to fork from external location
+                clone_url = self.fork_url
+            repository = Repository.objects.create(path=self._get_repo_path(),
+                alias=vcs_alias, clone_url=clone_url)
+            # Update is much faster than save
+            self.repository = repository
+            Project.objects.filter(pk=self.pk).update(repository=repository)
+            return repository
+        except VCSError, err:
+            traceback_msg = '\n'.join(traceback.format_exception(*
+                (sys.exc_info())))
+            msg = "Couldn't create repository"
+            org_msg = msg + ". Original error was: %s" % err
+            org_msg = '\n\n'.join((msg, traceback_msg))
+            logging.error(org_msg)
+            if settings.DEBUG:
+                # Show original error only in debug mode
+                raise ProjectorError(org_msg)
+            else:
+                raise ProjectorError(msg)
+
+    def create_config(self):
+        """
+        Creates default configuration for given project.
+        """
+        if self.config_set.count() > 0:
+            raise ConfigAlreadyExist("Project %s with id %d has already "
+                "related configuration" % (self, self.id))
+        config = Config.objects.create(
+            project = self,
+            editor = self.author,
+        )
+        return config
+
     def get_config(self):
         """
         Returns Config for this project.
         """
         return Config.objects.get(project=self)
     config = property(get_config)
+
+    def setup(self, vcs_alias=None, workflow=None):
+        """
+        Should be called **AFTER** instance is saved into database as all
+        methods here creates necessary models for the project and in order
+        to create relations it is needed that instance is persisted first.
+        """
+        # Prepare if parametrs are given. Otherwise assume that preparation
+        # methods have been called already
+        if vcs_alias:
+            self.set_vcs_alias(vcs_alias)
+        if workflow:
+            self.set_workflow(workflow)
+
+        # Fire up methods
+        self.set_memberships()
+        self.set_author_permissions()
+        self.create_workflow()
+        self.create_config()
+
+        if get_config_value('CREATE_REPOSITORIES'):
+            self.create_repository(vcs_alias)
 
     def get_watchers(self):
         watchers = super(Project, self).get_watchers()
@@ -659,19 +815,6 @@ class Config(models.Model):
     def __unicode__(self):
         return u'<Config for %s>' % self.project
 
-    @staticmethod
-    def create_for_project(project):
-        """
-        Creates default configuration for given project.
-        """
-        if project.config_set.count() > 0:
-            raise ConfigAlreadyExist("Project %s with id %d has already "
-                "related configuration" % (project, project.id))
-        config = Config.objects.create(
-            project = project,
-            editor = project.author,
-        )
-        return config
 
 class Component(models.Model):
     project = models.ForeignKey(Project)
