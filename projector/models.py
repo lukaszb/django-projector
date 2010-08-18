@@ -397,12 +397,16 @@ class Project(AL_Node, Watchable):
 
     def _get_homedir(self):
         """
-        Returns directory containing all files related to this project.
+        Returns directory containing all files related to this project. If
+        repository is already set at this project, it's parent directory would
+        be returned. Otherwise path is computed.
 
         This is semi *private* method as we cannot allow this to be called at
         templates (methods starting with underscore cannot be called within
         django templates).
         """
+        if self.repository:
+            return abspath(self.repository.path, '..')
         try:
             getter_path = get_config_value('PROJECTS_HOMEDIR_GETTER')
             getter = str2obj(getter_path)
@@ -420,8 +424,18 @@ class Project(AL_Node, Watchable):
                 % (self, homedir))
         return homedir
 
-    def _get_repo_path(self):
-        repo_path = abspath(self._get_homedir(), 'hg')
+    def _get_repo_path(self, vcs_alias=None):
+        """
+        Returns path to this project's repository. If repository is already set
+        it's path is returned. Otherwise it is a join of *homedir* and vcs alias
+        (which may be given as a parameter).
+        """
+        if self.repository:
+            return self.repository.path
+        if vcs_alias is not None:
+            self.set_vcs_alias(vcs_alias)
+        alias = self.get_vcs_alias()
+        repo_path = abspath(self._get_homedir(), alias)
         return repo_path
 
     def get_repo_url(self):
@@ -645,7 +659,8 @@ class Project(AL_Node, Watchable):
             elif self.fork_url:
                 # Attempt to fork from external location
                 clone_url = self.fork_url
-            repository = Repository.objects.create(path=self._get_repo_path(),
+            repository = Repository.objects.create(
+                path=self._get_repo_path(vcs_alias),
                 alias=vcs_alias, clone_url=clone_url)
             # Update is much faster than save
             self.repository = repository
