@@ -27,9 +27,9 @@ Now we need to add *metadata* for created project. This is done in a few steps:
 
 - :ref:`projects-basics-create-set-memberships`
 - :ref:`projects-basics-create-set-author-permissions`
-- :ref:`projects-basics-create-create-workflow`
-- :ref:`projects-basics-create-create-config`
-- :ref:`projects-basics-create-create-repository`
+- :ref:`projects-basics-create-workflow`
+- :ref:`projects-basics-create-config`
+- :ref:`projects-basics-create-repository`
 
 .. _projects-basics-create-set-memberships:
 
@@ -70,7 +70,7 @@ We can now set permissions::
     >>> joe.has_perm('projector.change_project', project)
     >>> True
 
-.. _projects-basics-create-set-create-workflow:
+.. _projects-basics-create-workflow:
 
 ``create_workflow``
 -------------------
@@ -83,7 +83,7 @@ python object or an object itself. Again, simply fire up the method::
     >>> project.create_workflow()
 
 
-.. _projects-basics-create-create-config:
+.. _projects-basics-create-config:
 
 ``create_config``
 -----------------
@@ -93,7 +93,7 @@ all *changable* settings for each project all projects need one::
 
     >>> project.create_config()
 
-.. _projects-basics-create-create-repository:
+.. _projects-basics-create-repository:
 
 ``create_repository``
 ---------------------
