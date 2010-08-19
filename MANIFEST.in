@@ -16,3 +16,5 @@ recursive-include example_project *.py *.html
 
 recursive-include projector *.py *.png *.gif *.html *.json
 recursive-include projector/locale *.mo *.po
+
+exclude example_project/conf/local_settings.py
