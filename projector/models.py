@@ -599,14 +599,10 @@ class Project(AL_Node, Watchable):
     def get_vcs_alias(self):
         """
         Returns vcs_alias which should be already configured for this project.
-        Defaulting to :setting:`PROJECTOR_DEFAULT_VCS_BACKEND`. If repository
-        is already set at this instance, :error:`ProjectorError` is raised as
-        this method should be used before or during repository creation process.
-        If repository is already set, retrieve vcs_alias directly from it.
+        Defaulting to :setting:`PROJECTOR_DEFAULT_VCS_BACKEND`.
         """
         if self.repository is not None:
-            raise ProjectorError("Cannot retrieve vcs_alias for project with "
-            "repository already set")
+            return self.repository.alias
         default = get_config_value('DEFAULT_VCS_BACKEND')
         vcs_alias = getattr(self, PROJECT_VCS_ALIAS_FIELD, default)
         return vcs_alias

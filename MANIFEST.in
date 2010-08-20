@@ -13,6 +13,7 @@ recursive-include docs *.rst *.png
 recursive-include docs/theme *
 
 recursive-include example_project *.py *.html
+recursive-exclude example_project/projects *.py *.html
 
 recursive-include projector *.py *.png *.gif *.html *.json
 recursive-include projector/locale *.mo *.po

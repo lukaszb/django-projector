@@ -60,31 +60,25 @@ def async_project_setup_listener(sender, instance, vcs_alias=None,
     PostgreSQL).
     """
     try:
-        if not kwargs.get('created', False):
-            # This listener is aimed for newly created projects only
-            return
-        if projector_settings.PROJECTS_ROOT_DIR:
-            iter = 0
-            while True:
-                try:
-                    if iter > 10:
-                        raise Exception("Couldn't run post-save project script "
-                                "(tried %s times)" % iter)
-                    else:
-                        iter += 1
-                    instance = Project.objects.get(pk=instance.pk)
-                    project_created_listener(sender, instance, **kwargs)
-                except Project.DoesNotExist:
-                    secs = 1
-                    logging.info("Sleeping for %s second(s) while waiting for "
-                                 " '%s' project to be persisted" %
-                                 (secs, instance))
-                    time.sleep(secs)
+        iter = 0
+        while True:
+            try:
+                if iter > 10:
+                    raise Exception("Couldn't run post-save project script "
+                            "(tried %s times)" % iter)
                 else:
-                    break
-        else:
-            logging.debug("PROJECTOR_PROJECTS_ROOT_DIR is not set so we do NOT "
-                "create repository for this project.")
+                    iter += 1
+                instance = Project.objects.get(pk=instance.pk)
+                project_setup_listener(sender, instance,
+                    vcs_alias=vcs_alias, workflow=workflow, **kwargs)
+            except Project.DoesNotExist:
+                secs = 1
+                logging.info("Sleeping for %s second(s) while waiting for "
+                             " '%s' project to be persisted" %
+                             (secs, instance))
+                time.sleep(secs)
+            else:
+                break
     except (MemoryError, KeyboardInterrupt):
         pass
     except Exception, err:

@@ -123,11 +123,8 @@ class ProjectCreateForm(ProjectBaseForm):
         instance = super(ProjectCreateForm, self).save(commit=False)
         if commit:
             instance.save()
-            if not self.instance.pk:
-                setup_project.send(sender=Project, instance=instance,
-                    vcs_alias=self.cleaned_data['vcs_alias'])
-                vcs_alias = self.cleaned_data['vcs_alias']
-                instance.set_vcs_alias(vcs_alias)
+            setup_project.send(sender=Project, instance=instance,
+                vcs_alias=self.cleaned_data.get('vcs_alias', None))
             for team in self.cleaned_data.get('teams', ()):
                 team.project = instance
                 team.save()
