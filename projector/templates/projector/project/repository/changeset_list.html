@@ -1,6 +1,7 @@
 {% extends "projector/project/repository/browse.html" %}
 
 {% load i18n %}
+{% load gravatar_tags %}
 {% load richtemplates_tags %}
 {% load pagination_tags %}
 {% load projector_tags %}
@@ -52,7 +53,7 @@
             {% for changeset in repository %}
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td><a href="{% url projector_project_sources_browse project.author.username project.slug changeset.id '' %}"
-                       class="browser-changeset block-link show-tipsy-left"
+                       class="browser-changeset block-link show-tipsy-right"
                        title="{% trans "Browse revision's content" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
                 </td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
@@ -61,7 +62,9 @@
                 <td>
                     {% fetch_user changeset.author as "author" %}
                     {% if author %}
-                    <a href="{{ author.get_absolute_url }}">{{ author.username|tooltip:"15" }}</a>
+                    <img src="{% gravatar_for_user author 16 %}" alt="{% trans "Avatar" %}"/>
+                    <a href="{% url projector_users_profile_detail author.username %}"
+                            >{{ author.username|tooltip:"15" }}</a>
                     {% else %}
                     {{ changeset.author|tooltip:"15" }}
                     {% endif %}

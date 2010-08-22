@@ -14,7 +14,7 @@
         text-align: center;
     }
     table.action-table a.richbutton {
-        width: 120px;
+        width: 180px;
     }
 </style>
 {% endblock %}
@@ -60,13 +60,24 @@
     <h5>{% trans "Actions" %}</h5>
     <div class="richtemplates-panel-content">
 
-        <table class="action-table width-80">
+        <table class="action-table width-90">
             <thead>
                 <tr>
                     <th>{% trans "Action" %}</th>
                     <th>{% trans "Description" %}</th>
                 </tr>
             <tbody>
+            <tr>
+                <th>
+                    <a href="{% url auth_password_change %}"
+                       class="richbutton">{% trans "Change password" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>{% trans "Change your password" %}</p>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th>
                     <a href="{% url projector_project_create %}"

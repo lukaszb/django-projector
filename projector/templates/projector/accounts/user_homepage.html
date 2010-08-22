@@ -10,7 +10,7 @@
 	    <div class="richtemplates-panel-content">
             {% if user == profile.user %}
 			<ul class="nav-vertical">
-                <li><a href="{{ profile.user.get_absolute_url }}">{% trans "Show your public profile" %}</a></li>
+                <li><a href="{% url projector_users_profile_detail profile.user.username %}">{% trans "Show your public profile" %}</a></li>
             </ul>
             {% endif %}
 	    </div>

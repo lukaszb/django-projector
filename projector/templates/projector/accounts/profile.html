@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load i18n %}
+{% load gravatar_tags %}
 
 {% block col-left %}
     
@@ -10,7 +11,6 @@
             {% if user == profile.user %}
 			<ul class="nav-vertical">
                 <li><a href="{% url projector_users_profile_detail profile.user.username %}">{% trans "Show your public profile" %}</a></li>
-                <li><a href="{% url projector_dashboard %}">{% trans "Dashboard" %}</a></li>
             </ul>
             {% endif %}
 	    </div>
@@ -29,6 +29,10 @@
     </h5>
     <div class="richtemplates-panel-content">
         <div class="richblock">
+            <div>
+                <img src="{% gravatar_for_user profile.user 32 %}"
+                     alt="{% trans "Avatar" %}"/>
+            </div>
             <table class="richblock-properties">
                 <tbody>
                     <tr>
@@ -38,11 +42,7 @@
                     {% if not profile.is_team %}
                     <tr>
                         <th>{% trans "Full name" %}</th>
-                        <td>{{ profile.user.get_full_name }}</td>
-                    </tr>
-                    <tr>
-                        <th>E-mail</th>
-                        <td>{{ profile.user.email }}</td>
+                        <td>{{ profile.user.get_full_name|default:"-" }}</td>
                     </tr>
                     {% endif %}
                 </tbody>
