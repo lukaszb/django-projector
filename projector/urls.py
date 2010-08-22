@@ -17,12 +17,8 @@ urlpatterns += patterns('projector.views.project_category',
         'project_category_detail', name='projector_project_category_detail'),
 )
 
-# Users
+# User dashboard
 urlpatterns += patterns('projector.views.users',
-    url(r'^users/$',
-        view = 'UserListView',
-        name = 'projector_user_list'),
-
     url(r'^dashboard/convert-to-team/$',
         view = 'UserDashboardConvert2TeamView',
         name = 'projector_dashboard_convert_to_team'),
