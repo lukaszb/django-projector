@@ -161,10 +161,8 @@
             <script type="text/javascript">
                 $(document).ready(function(){
                     var history = $('#history');
-                    var nodeHistoryList = $('#node-history-list');
                     var nodePropertiesTable = $('#node-properties');
                     history.hide();
-                    //nodeHistoryList.hide();
                     $('tr:last', nodePropertiesTable).after('<tr><th>{% trans "History" %}</th><td>' + 
                         '<a id="toggle-history" href="#toggle-history">{% trans "Show/hide history" %}</a></td></tr>');
                     $('#toggle-history').toggle(
