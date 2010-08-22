@@ -75,7 +75,7 @@ class ProjectBaseForm(forms.ModelForm):
     class Meta:
         model = Project
         exclude = ('members', 'author', 'editor', 'repository', 'teams',
-            'parent', 'fork_url', 'is_active')
+            'parent', 'fork_url', 'is_active', 'category')
 
     def __init__(self, *args, **kwargs):
         form = super(ProjectBaseForm, self).__init__(*args, **kwargs)
@@ -117,7 +117,8 @@ class ProjectBaseForm(forms.ModelForm):
 class ProjectCreateForm(ProjectBaseForm):
     vcs_alias = forms.ChoiceField(choices=VCS_BACKENDS_CHOICES,
         label=_('Version Control Backend'),
-        initial=get_config_value('DEFAULT_VCS_BACKEND'))
+        initial=get_config_value('DEFAULT_VCS_BACKEND'),
+        widget=forms.HiddenInput) # Hidden until more backends are supported
 
     def save(self, commit=True):
         instance = super(ProjectCreateForm, self).save(commit=False)

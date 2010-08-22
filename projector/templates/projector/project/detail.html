@@ -191,10 +191,6 @@
                         <td>{{ project.name }}</td>
                     </tr>
                     <tr>
-                        <th>{% trans "Category" %}</th>
-                        <td>{{ project.category|default_if_none:"-" }}</td>
-                    </tr>
-                    <tr>
                         <th>{% trans "Author" %}</th>
                         <td><a href="{% url projector_users_profile_detail project.author.username %}">{{ project.author }}</a></td>
                     </tr>
