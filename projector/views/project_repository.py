@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from projector.views.project import ProjectView
 
+from vcs.exceptions import VCSError
 from vcs.web.simplevcs.views import browse_repository, diff_file
 
 class RepositoryView(ProjectView):
@@ -29,7 +30,10 @@ class RepositoryBrowseView(RepositoryView):
                 'project': self.project,
             },
         }
-        return browse_repository(self.request, **repo_info)
+        try:
+            return browse_repository(self.request, **repo_info)
+        except VCSError:
+            raise Http404
 
 class RepositoryFileDiffView(RepositoryView):
 
@@ -47,7 +51,10 @@ class RepositoryFileDiffView(RepositoryView):
                 'project': self.project,
             },
         }
-        return diff_file(self.request, **diff_info)
+        try:
+            return diff_file(self.request, **diff_info)
+        except VCSError:
+            raise Http404
 
 class RepositoryFileRaw(RepositoryView):
     """
@@ -74,7 +81,10 @@ class RepositoryFileAnnotate(RepositoryView):
                     'project': self.project,
                 },
             }
-        return browse_repository(self.request, **repo_info)
+        try:
+            return browse_repository(self.request, **repo_info)
+        except VCSError:
+            raise Http404
 
 class RepositoryChangesets(RepositoryView):
 

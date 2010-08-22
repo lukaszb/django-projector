@@ -1,8 +1,10 @@
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
+from django.http import Http404
 
 from projector.models import Membership, Watchable
 from vcs.utils.annotate import annotate_highlight
+from vcs.exceptions import VCSError
 from native_tags.decorators import function, filter
 
 def get_project_permissions(project=None, for_bit=None, user=None):
@@ -67,13 +69,12 @@ def annotate_content(context, filenode, **options):
         out = render_to_string(template_name, context)
         return out
 
-    order = ['ls', 'annotate', 'code']
-    headers = {
-        'ls': _('Line no'),
-        'annotate': _('Annotate'),
-        'code': _('Code'),
-    }
-    return annotate_highlight(filenode, order=order, headers=headers,
-        annotate_from_changeset_func=annotate_changeset, **options)
+    order = ['annotate', 'ls', 'code']
+    headers = {}
+    try:
+        return annotate_highlight(filenode, order=order, headers=headers,
+            annotate_from_changeset_func=annotate_changeset, **options)
+    except VCSError:
+        raise Http404
 annotate_content = function(annotate_content, is_safe=True, takes_context=True)
 
