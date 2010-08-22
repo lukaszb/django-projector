@@ -84,23 +84,9 @@ class ProjectView(View):
 
     def get_required_perms(self):
         """
-        We have to create new list basing on class attributes. New list
-        is required as previous code:::
-
-            perms = self.perms
-            if self.request.method == 'GET':
-                perms += self.perms_GET
-            elif self.request.method == 'POST':
-                perms += self.perms_POST
-
-            if self.project.is_private():
-                perms += self.perms_private
-
-            return perms
-
-        has been changing class (not instance) attribute due to first
-        line (object binding) which caused errors when multi-threaded.
-        Have on mind while subclassing and overriding this method.
+        Returns list of required perms based on instance's attributes.
+        If modified, make sure it's thread-safe, i.e. don't change self.perms
+        directly but create new temporary list of permissions.
         """
         perms = [p for p in self.perms]
 
@@ -116,7 +102,7 @@ class ProjectView(View):
 
     def check_permissions(self):
         # Owner's are always allowed to do anything with their projects
-        # this would also make less database hits
+        # - this would make less database hits
         if self.project.author == self.request.user:
             return
         perms = self.get_required_perms()
@@ -150,7 +136,7 @@ class ProjectDetailView(ProjectView):
         try:
 
             if is_mercurial(request):
-                return _project_detail_hg(request, self.project)
+                return self.response_hg(request, self.project)
             last_part = request.path.split('/')[-1]
             if last_part and last_part != project_slug:
                 raise Http404("Not a mercurial request and path longer than "
@@ -164,6 +150,10 @@ class ProjectDetailView(ProjectView):
             if not isinstance(err, dont_log_exceptions):
                 log_error(err)
             raise err
+
+    def response_hg(self, request, project):
+        return _project_detail_hg(request, project)
+
 
 def _project_detail_hg(request, project):
     """

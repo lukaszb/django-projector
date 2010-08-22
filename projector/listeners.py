@@ -8,6 +8,8 @@ from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import mail_admins
+from django.template.defaultfilters import filesizeformat
+from django.utils.translation import ugettext_lazy as _
 
 from signals_ahoy.asynchronous import AsynchronousListener
 
@@ -17,6 +19,8 @@ from projector.signals import messanger, post_fork, setup_project
 from projector.utils import str2obj
 
 from richtemplates.utils import get_user_profile_model
+
+from vcs.web.simplevcs.signals import retrieve_hg_post_push_messages
 
 def request_new_profile(sender, instance, **kwargs):
     """
@@ -140,6 +144,16 @@ def watcheditem_delete_listener(sender, instance, **kwargs):
     logging.info("%s stopped watching %s" % (instance.user,
         instance.content_object))
 
+
+def hg_extra_messages(sender, repository, **kwargs):
+    """
+    Adds extra messages appended to request after successful push
+    to mercurial repository.
+    """
+    size = repository.info.size
+    msg = _('Repository size: %s' % filesizeformat(size))
+    sender.messages.append(msg)
+
 def start_listening():
     """
     As listeners use projectors' models we need to connect signals after they
@@ -163,4 +177,7 @@ def start_listening():
         messanger.connect(async_send_mail_listener.listen, sender=None)
     else:
         messanger.connect(send_mail_listener, sender=None)
+
+    retrieve_hg_post_push_messages.connect(hg_extra_messages,
+        sender=None)
 
