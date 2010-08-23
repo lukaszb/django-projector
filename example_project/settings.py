@@ -57,7 +57,6 @@ INSTALLED_APPS = (
     'tagging',
     'projector',
     'vcs.web.simplevcs',
-    'mailer',
 
     'example_project',
 )
@@ -107,7 +106,7 @@ USE_L10N = True
 CACHE_PREFIX = 'projector-example-project'
 #CACHE_TIMEOUT = 1 # For dev server
 
-LOGIN_REDIRECT_URL = '/projector/'
+LOGIN_REDIRECT_URL = '/'
 AUTH_PROFILE_MODULE = 'projector.UserProfile'
 
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
