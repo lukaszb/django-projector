@@ -292,16 +292,6 @@ required ``project`` parameter - instance of
 :py:class:`projector.models.Project`. Default implementation returns simply
 stringified primary key of the given ``project``.
 
-.. setting:: PROJECTOR_SEND_MAILS_USING_MAILER
-
-PROJECTOR_SEND_MAILS_USING_MAILER
----------------------------------
-
-Default: ``False``
-
-If ``True``, would try to use ``django-mailer`` instead of build in mail
-sending functions.
-
 .. setting:: PROJECTOR_TASK_EMAIL_SUBJECT_SUMMARY_FORMAT
 
 PROJECTOR_TASK_EMAIL_SUBJECT_SUMMARY_FORMAT
