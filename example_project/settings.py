@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'django_sorting',
     'djcelery',
     'ghettoq',
+    'gravatar',
     'guardian',
     'keyedcache',
     'pagination',

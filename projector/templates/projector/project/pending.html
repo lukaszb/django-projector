@@ -2,10 +2,6 @@
 
 {% load i18n %}
 
-{% block project-links %}
-<div id="project-links" class="hidden">{{ block.super }}</div>
-{% endblock %}
-
 {% block col-single-extra %}
 
 <div class="richtemplates-panel">
@@ -80,6 +76,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#no-js-msg').remove();
+        $('#project-links').hide();
 
         var states = {{ STATES.as_json_choices|safe }};
         var current_state = {{ project.state }};

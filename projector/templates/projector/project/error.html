@@ -13,9 +13,17 @@
                 We are sorry but project was not created
                 {% endblocktrans %}
             </li>
+            {% if project.error_text %}
+            <li class="message message-error">{{ project.error_text }}</li>
+            {% endif %}
         </ul>
     </div>
 </div>
 
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#project-links').hide();
+    });
+</script>
 {% endblock %}
 

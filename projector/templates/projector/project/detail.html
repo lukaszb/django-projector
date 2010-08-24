@@ -32,80 +32,6 @@
     {% include "projector/menu.html" %}
 {% endblock %}
 
-{% comment %}
-{% block col-left %}{{ block.super }}
-
-{% get_obj_perms request.user for project as "project_perms" %}
-
-<div class="richtemplates-panel">
-    <h5>{% trans "Projects' tasks summary" %}</h5>
-    <div class="richtemplates-panel-content">
-        <table class="datatable centered">
-            <caption>{% trans "Open tasks" %}</caption>
-            <tr>
-                <th colspan="2">{% trans "By assignee" %}</th>
-            </tr>
-            {% regroup project.get_open_tasks by owner as tasks_by_owner %}
-            {% for owner in tasks_by_owner %}
-            <tr>
-                <td>
-                    <a href="{{ owner.grouper.get_absolute_url }}">{{ owner.grouper }}</a>
-                </td>
-                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&owner={{ owner.grouper.id }}"
-                        class="block-link show-tipsy"
-                        title="{% trans "Show open tasks for user" %}
-                        {{ owner.grouper }}">{{ owner.list|length }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-
-            <tr>
-                <th colspan="2">{% trans "By status" %}</th>
-            </tr>
-            {% regroup project.get_open_tasks by status as tasks_by_status %}
-            {% for status in tasks_by_status %}
-            <tr>
-                <td>
-                    {{ status.grouper }}
-                </td>
-                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&status={{ status.grouper.id }}"
-                        class="block-link show-tipsy"
-                        title="{% trans "Show open tasks with status" %}
-                        {{ status.grouper }}">{{ status.list|length }}</a>
-                </td>
-            </tr>
-
-            {% endfor %}
-
-            <tr>
-                <th colspan="2">{% trans "By component" %}</th>
-            </tr>
-            {% regroup project.get_open_tasks by component as tasks_by_component %}
-            {% for component in tasks_by_component %}
-            <tr>
-                <td>
-                    {{ component.grouper }}
-                </td>
-                <td><a href="{{ project.get_task_list_url }}?is_resolved=3&component={{ component.grouper.id }}"
-                        class="block-link show-tipsy"
-                        title="{% trans "Show open tasks with component" %}
-                        {{ component.grouper }}">{{ component.list|length }}</a>
-                </td>
-            </tr>
-
-            {% endfor %}
-
-            <tr>
-                <th>{% trans "All open tasks" %}</th>
-                <th><a href="{{ project.get_task_list_url }}?is_resolved=3"
-                        class="block-link">{{ project.get_open_tasks.count }}</a></th>
-            </tr>
-        </table>
-    </div>
-</div>
-
-{% endblock %}
-{% endcomment %}
 
 {% block col-single-title %}{{ project.name }}{% endblock %}
 
@@ -126,8 +52,8 @@
             </div>
         {% endif %}
 
+        <div id="project-links">
         {% block project-links %}
-        
         <ul class="nav-inline">
             <li class="richbuttonset"><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project detail" %}</a></li>
             {% if project.get_repo_url %}
@@ -181,6 +107,7 @@
         {% endwith %}
 
         {% endblock project-links %}
+        </div>
     
     </div>
 </div>
