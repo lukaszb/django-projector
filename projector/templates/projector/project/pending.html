@@ -98,7 +98,6 @@
             window.scrollTo(0, offsettop);
 
             if (data.state == {{ STATES.ERROR }}) {
-                alert('error!');
                 $('#state-{{ STATES.ERROR }}').text(data.error_text);
                 $('#state-{{ STATES.ERROR }}').show();
                 clearInterval(autorefresh);
