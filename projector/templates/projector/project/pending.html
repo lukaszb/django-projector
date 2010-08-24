@@ -1,0 +1,134 @@
+{% extends "projector/project/detail.html" %}
+
+{% load i18n %}
+
+{% block project-links %}
+<div id="project-links" class="hidden">{{ block.super }}</div>
+{% endblock %}
+
+{% block col-single-extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Creating project" %}</h5>
+    <div class="richtemplates-panel-content" style="min-width: 600px;">
+        <ul id="project-state" class="messages">
+            
+            <li id="no-js-msg" class="message message-info">
+                {% trans "Project is being created. Refresh in a few seconds." %}
+            </li>
+
+            {# If we already know project has error state #}
+            {% if project.state == STATES.ERROR %}
+                <li class="message message-error">{% trans "Error during project creation" %}</li>
+                {% if project.error_text %}
+                <li class="message message-error">{{ project.error_text }}</li>
+                {% endif %}
+            {% endif %}
+
+            {% if project.is_pending %}
+            <li id="state-{{ STATES.PENDING }}" class="message message-info">
+                {% trans "Project setup started" %}
+            </li>
+
+            <li id="state-{{ STATES.CREATED }}" class="message message-info">
+                {% trans "Project created" %}
+            </li>
+            
+            <li id="state-{{ STATES.MEMBERSHIPS_CREATED }}" class="message message-info hidden">
+                {% if project.author.get_profile.is_team %}
+                    {% trans "Memberships and teams created" %}
+                {% else %}
+                    {% trans "Memberships created" %}
+                {% endif %}
+            </li>
+
+            <li id="state-{{ STATES.AUTHOR_PERMISSIONS_CREATED }}" class="message message-info hidden">
+                {% trans "Project author's permissions created" %}
+            </li>
+
+            <li id="state-{{ STATES.WORKFLOW_CREATED }}" class="message message-info hidden">
+                {% trans "Workflow created" %}
+            </li>
+
+            <li id="state-{{ STATES.CONFIG_CREATED }}" class="message message-info hidden">
+                {% trans "Project's configuration created" %}
+            </li>
+
+            <li id="state-{{ STATES.REPOSITORY_CREATED }}" class="message message-info hidden">
+                {% trans "Project's repository created" %}
+            </li>
+
+            <li id="state-{{ STATES.READY }}" class="message message-success hidden">
+                {% trans "Project and all components created successfuly." %}
+                {% trans "Simply reload the page." %}
+            </li>
+
+            <li id="state-{{ STATES.ERROR }}" class="message message-error hidden"></li>
+
+            {% endif %}
+
+
+        </ul>
+
+            {% if project.state != STATES.ERROR %}
+            <div id="indicator"><img src="{{ RICHTEMPLATES_MEDIA_URL }}img/indicator.gif"/></div>
+            {% endif %}
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#no-js-msg').remove();
+
+        var states = {{ STATES.as_json_choices|safe }};
+        var current_state = {{ project.state }};
+        var refresh_url = "{% url projector_project_state project.author.username project.slug %}";
+        var INTERVAL = 250;
+        var autorefresh = 0;
+        
+        function updatePage(data) {
+            // Show all messages with state of the current project's state or lower
+            $('[id^=state-]:hidden').each(function(){
+                var id = $(this).attr('id');
+                var state_no = parseInt(id.split('-')[1]);
+                if (state_no >= 0 && state_no <= data.state){
+                    $(this).fadeIn('slow');
+                }
+            });
+            // Scroll to the bottom of the page
+            var offsettop = parseInt($("body").css("height"));
+            window.scrollTo(0, offsettop);
+
+            if (data.state == {{ STATES.ERROR }}) {
+                alert('error!');
+                $('#state-{{ STATES.ERROR }}').text(data.error_text);
+                $('#state-{{ STATES.ERROR }}').show();
+                clearInterval(autorefresh);
+                $('#indicator').remove();
+            }
+
+            if (data.state == {{ STATES.READY }}){
+                // Refresh entire page
+                // TODO: Should take user's attention (lightbox maybe?)
+                //location.reload();
+                clearInterval(autorefresh);
+                $('#indicator').remove();
+                $('#project-links').fadeIn("slow");
+            }
+        }
+        function getState(){
+            $.getJSON(refresh_url, function(data){
+                updatePage(data);
+            });
+        }
+
+        var autorefresh = setInterval(function(){
+            getState();
+        }, INTERVAL);
+
+    });
+</script>
+
+{% endblock %}
+

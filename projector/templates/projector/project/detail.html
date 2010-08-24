@@ -125,6 +125,9 @@
                 </p>
             </div>
         {% endif %}
+
+        {% block project-links %}
+        
         <ul class="nav-inline">
             <li class="richbuttonset"><a class="button-link" href="{{ project.get_absolute_url }}">{% trans "Project detail" %}</a></li>
             {% if project.get_repo_url %}
@@ -176,6 +179,8 @@
             {% endif %}
         </ul>
         {% endwith %}
+
+        {% endblock project-links %}
     
     </div>
 </div>

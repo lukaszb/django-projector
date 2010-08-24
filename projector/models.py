@@ -35,9 +35,10 @@ from projector.managers import TaskManager
 from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
 from projector.settings import get_config_value
-from projector.signals import messanger, post_fork
+from projector.signals import mails, post_fork
 from projector.utils import abspath, str2obj, using_projector_profile
 from projector.utils.lazy import LazyProperty
+from projector.utils.helpers import Choices
 
 from vcs.backends import get_supported_backends
 from vcs.exceptions import VCSError
@@ -156,6 +157,22 @@ def validate_project_name(name):
     if name.strip().lower() in projector_settings.BANNED_PROJECT_NAMES:
         raise ValidationError(_("This name is restricted"))
 
+
+class State(Choices):
+    """
+    Represents state of the project.
+    """
+    ERROR = -1
+    PENDING = 0
+    CREATED = 10
+    MEMBERSHIPS_CREATED = 20
+    AUTHOR_PERMISSIONS_CREATED = 30
+    WORKFLOW_CREATED = 40
+    CONFIG_CREATED = 50
+    REPOSITORY_CREATED = 60
+    READY = 100
+
+
 class Project(AL_Node, Watchable):
     """
     Most important models within whole application. It provides connection with
@@ -164,10 +181,10 @@ class Project(AL_Node, Watchable):
 
     name = models.CharField(_('name'), max_length=64,
         validators=[validate_project_name])
+    slug = models.SlugField(validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
         null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
-    slug = models.SlugField(validators=[validate_project_name])
     home_page_url = models.URLField(_("home page url "), null=True, blank=True,
         verify_exists=False)
     is_active = models.BooleanField(_('is active'), default=True)
@@ -183,6 +200,10 @@ class Project(AL_Node, Watchable):
     outdated = models.BooleanField(_('outdated'), default=False)
     repository = models.ForeignKey(Repository, null=True, blank=True,
         verbose_name=_("repository"), default=None)
+    state = models.IntegerField(_('state'), choices=State.as_choices(),
+        default=0)
+    error_text = models.CharField(_('error text'), max_length=256, null=True,
+        blank=True)
 
     parent = models.ForeignKey('self', related_name='children_set',
        null=True, blank=True, db_index=True)
@@ -247,6 +268,13 @@ class Project(AL_Node, Watchable):
         return ('projector_project_edit', (), {
             'username': self.author.username,
             'project_slug' : self.slug,
+        })
+
+    @models.permalink
+    def get_state_url(self):
+        return ('projector_project_state', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
         })
 
     @models.permalink
@@ -377,6 +405,9 @@ class Project(AL_Node, Watchable):
             'project_slug': self.slug,
         })
 
+    def is_pending(self):
+        return self.state != State.ERROR and self.state < State.READY
+
     def get_task(self, id):
         queryset = Task.objects.filter(project=self)
         if not queryset:
@@ -469,6 +500,10 @@ class Project(AL_Node, Watchable):
     def set_author_permissions(self):
         """
         Creates all permissions for project's author.
+
+        If successful, project should change it's state to
+        ``State.AUTHOR_PERMISSIONS_CREATED``. Note, that this method doesn't
+        make any database related queries - state should be flushed manually.
         """
         perms = set([p.codename for p in get_perms_for_model(Project)
             if p.codename != 'add_project'])
@@ -482,11 +517,16 @@ class Project(AL_Node, Watchable):
             team_perms = set(get_perms(group, self))
             for perm in (perms - team_perms):
                 assign(perm, self.author.get_profile().group, self)
+        self.state = State.AUTHOR_PERMISSIONS_CREATED
 
     def set_memberships(self):
         """
         Creates :model:`Membership` for this project and it's author. If author
         is a team, we need to create :model:`Team` object too.
+
+        If successful, project should change it's state to
+        ``State.MEMBERSHIPS_CREATED``. Note, that this method doesn't make any
+        database related queries - state should be flushed manually.
         """
         Membership.objects.create(project=self, member=self.author)
         if self.author.is_superuser:
@@ -498,6 +538,7 @@ class Project(AL_Node, Watchable):
         profile = self.author.get_profile()
         if profile.is_team:
             Team.objects.create(project=self, group=profile.group)
+        logging.debug("Memberships created for project %s" % self)
 
     def set_workflow(self, workflow):
         setattr(self, PROJECT_WORKFLOW_FIELD, workflow)
@@ -516,6 +557,10 @@ class Project(AL_Node, Watchable):
 
         Workflow is retrieved using ``get_workflow`` method on the instance but
         may be overridden by passing parameter directly.
+
+        If successful, project should change it's state to
+        ``State.WORKFLOW_CREATED``. Note, that this method doesn't make any
+        database related queries - state should be flushed manually.
 
         :param workflow: python object defining tuples of dicts with
           information on project *metadata*; may be a string pointing to the
@@ -554,6 +599,8 @@ class Project(AL_Node, Watchable):
         # Create necessary transitions
         logging.debug("Creating transitions")
         self.create_all_transitions()
+
+        self.state = State.WORKFLOW_CREATED
 
     def create_all_transitions(self):
         """
@@ -613,6 +660,10 @@ class Project(AL_Node, Watchable):
 
         ``vcs_alias`` is retrieved using ``get_vcs_alias`` method but may be
         overridden by passing parameter directly.
+
+        If successful, project should change it's state to
+        ``State.REPOSITORY_CREATED``. Note, that this method doesn't make any
+        database related queries - state should be flushed manually.
 
         :param vcs_alias: alias for ``vcs`` backend, if None given this value
           is retrieved using ``get_vcs_alias`` instance's method
@@ -674,10 +725,17 @@ class Project(AL_Node, Watchable):
                 raise ProjectorError(org_msg)
             else:
                 raise ProjectorError(msg)
+        else:
+            logging.debug("%s created for project %s" % (repository, self))
+            self.state = State.REPOSITORY_CREATED
 
     def create_config(self):
         """
         Creates default configuration for given project.
+
+        If successful, project should change it's state to
+        ``State.CONFIG_CREATED``. Note, that this method doesn't make any
+        database related queries - state should be flushed manually.
         """
         if self.config_set.count() > 0:
             raise ConfigAlreadyExist("Project %s with id %d has already "
@@ -686,6 +744,7 @@ class Project(AL_Node, Watchable):
             project = self,
             editor = self.author,
         )
+        self.state = State.CONFIG_CREATED
         return config
 
     def get_config(self):
@@ -1387,10 +1446,10 @@ class Task(AbstractTask, Watchable):
         recipient_list=set(recipient_list)
         mail_info = {
             'subject': self.get_long_summary(),
-            'body': self.get_long_content(),
+            'message': self.get_long_content(),
             'recipient_list': [addr for addr in recipient_list],
         }
-        messanger.send(None, **mail_info)
+        mails.send(None, **mail_info)
 
 
 class TaskRevision(AbstractTask):

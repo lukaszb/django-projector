@@ -75,7 +75,7 @@ class ProjectBaseForm(forms.ModelForm):
     class Meta:
         model = Project
         exclude = ('members', 'author', 'editor', 'repository', 'teams',
-            'parent', 'fork_url', 'is_active', 'category')
+            'parent', 'fork_url', 'is_active', 'category', 'state')
 
     def __init__(self, *args, **kwargs):
         form = super(ProjectBaseForm, self).__init__(*args, **kwargs)

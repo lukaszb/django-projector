@@ -166,22 +166,25 @@ class BitbucketForkTest(TestCase):
         self.assertTrue(len(fork.repository.revisions) > 100)
         self.assertTrue(fork.is_private())
 
-    def test_wrong_values(self):
-        joe = User.objects.create(username='joe')
-        data = {
-            'username': u'x',
-            'projectname': u'x',
-        }
-        form = BitbucketForkForm(data)
-        self.assertTrue(form.is_valid())
-        request = HttpRequest()
-        request.user = joe
-        try:
-            form.fork(request)
-        except ProjectorError:
-            pass
-        else:
-            self.fail("Form should raise subclass of ProjectorError")
+    # Deprecated: errors are handled during project setup as projects are now
+    # created asynchronously
+
+    #def test_wrong_values(self):
+        #joe = User.objects.create(username='joe')
+        #data = {
+            #'username': u'x',
+            #'projectname': u'x',
+        #}
+        #form = BitbucketForkForm(data)
+        #self.assertTrue(form.is_valid())
+        #request = HttpRequest()
+        #request.user = joe
+        #try:
+            #form.fork(request)
+        #except ProjectorError:
+            #pass
+        #else:
+            #self.fail("Form should raise subclass of ProjectorError")
 
     def test_valid(self):
         """

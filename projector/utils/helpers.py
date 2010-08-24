@@ -25,3 +25,29 @@ def get_homedir(project):
     """
     return str(project.pk)
 
+
+class Choices(object):
+    """
+    Inspired by same object from Repocracy.
+    """
+
+    @classmethod
+    def as_choices(cls):
+        from django.utils.translation import ugettext as _
+        keys = [key for key in dir(cls) if isinstance(getattr(cls, key), int)\
+            and key.isupper()]
+        slugs = dict((key, key.capitalize().replace('_', ' ')) for key in keys)
+        choices = [(getattr(cls, key), _(slugs[key])) for key in keys]
+        choices.sort()
+        return choices
+
+    @classmethod
+    def as_dict(cls):
+        return dict(cls.as_choices())
+
+    @classmethod
+    def as_json_choices(cls):
+        choices = cls.as_dict()
+        from django.utils.simplejson import dumps
+        return dumps(choices)
+

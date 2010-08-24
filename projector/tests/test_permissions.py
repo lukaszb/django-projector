@@ -82,6 +82,7 @@ class ProjectorPermissionTests(ProjectorTestCase):
             self.private_project.get_teams_add_url(),
             #self.private_project.get_teams_edit_url(),
             self.private_project.get_fork_url(),
+            self.private_project.get_state_url(),
 
             self.private_project.get_task_list_url(),
             self.private_project.get_create_task_url(),
@@ -180,6 +181,7 @@ class ProjectorPermissionTests(ProjectorTestCase):
             self.private_project.get_components_url(),
             self.private_project.get_milestones_url(),
             self.private_project.get_workflow_url(),
+            self.private_project.get_state_url(),
         )
         for ulr in urls:
             self._get_response(url, code=200)

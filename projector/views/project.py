@@ -6,14 +6,16 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext
+from django.utils.simplejson import dumps
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
 from projector.core.controllers import View
 from projector.core.exceptions import ProjectorError
-from projector.models import Project
+from projector.models import Project, State
 from projector.forms import ProjectCreateForm, ProjectEditForm, ConfigForm,\
     ProjectForkForm
 from projector.settings import get_config_value
@@ -45,6 +47,9 @@ class ProjectView(View):
     perms_GET = []
     perms_POST = []
 
+    template_error_name = 'projector/project/error.html'
+    template_pending_name = 'projector/project/pending.html'
+
     def __init__(self, request, username=None, project_slug=None, *args,
             **kwargs):
         self.request = request
@@ -55,6 +60,7 @@ class ProjectView(View):
         super(ProjectView, self).__init__(request=request, username=username,
             project_slug=project_slug, *args, **kwargs)
         self.context['project'] = self.project
+        self.context['STATES'] = State
 
         # Set forks without additional queries if is a root (not forked project)
         if self.project.is_root():
@@ -81,6 +87,14 @@ class ProjectView(View):
                         break
             self.context['user_fork'] = user_fork
 
+
+    def __after__(self):
+        if self.project.state == State.ERROR:
+            return render_to_response(self.template_error_name, self.context,
+                RequestContext(self.request))
+        if self.project.is_pending():
+            return render_to_response(self.template_pending_name, self.context,
+                RequestContext(self.request))
 
     def get_required_perms(self):
         """
@@ -114,6 +128,19 @@ class ProjectView(View):
                 raise PermissionDenied()
 
 
+class ProjectState(ProjectView):
+
+    def __after__(self):
+        pass
+
+    def response(self, request, username, project_slug):
+        data = {'state': self.project.state}
+        if self.project.state == State.ERROR:
+            data['error_text'] = self.project.error_text or ''
+        json_data = dumps(data)
+        return HttpResponse(json_data, content_type='application/json')
+
+
 class ProjectDetailView(ProjectView):
     """
     Returns selected project's detail for user given in ``request``.
@@ -142,7 +169,8 @@ class ProjectDetailView(ProjectView):
                 raise Http404("Not a mercurial request and path longer than "
                     " should be: %s" % request.path)
 
-            # project is injected into the contest at ProjectView constructor
+            # project is injected into the context at ProjectView constructor
+            # so we do not need to add it here
             return self.context
 
         except Exception, err:

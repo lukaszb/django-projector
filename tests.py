@@ -11,9 +11,6 @@ import sys
 os.environ["DJANGO_SETTINGS_MODULE"] = "example_project.settings_test"
 from example_project import settings_test as settings
 
-# Hide logging messages
-settings.DJALOG_LEVEL = 30
-
 def main():
     sys.path.insert(0, os.path.abspath(os.path.curdir))
     from django.test.utils import get_runner

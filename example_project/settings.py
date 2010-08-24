@@ -11,6 +11,8 @@ PROJECT_ROOT = abspath(os.path.dirname(__file__))
 PROJECTOR_MODULE_PATH = abspath(PROJECT_ROOT, '..')
 sys.path.insert(0, PROJECTOR_MODULE_PATH)
 
+TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -43,11 +45,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.webdesign',
 
+
     # External
+    'debug_toolbar',
     'djalog',
+    'djangodblog',
     'django_extensions',
     'django_sorting',
-    'debug_toolbar',
+    'djcelery',
+    'ghettoq',
     'guardian',
     'keyedcache',
     'pagination',
@@ -109,8 +115,6 @@ CACHE_PREFIX = 'projector-example-project'
 LOGIN_REDIRECT_URL = '/'
 AUTH_PROFILE_MODULE = 'projector.UserProfile'
 
-TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
-
 # ================== #
 # PROJECTOR SETTINGS #
 # ================== #
@@ -119,7 +123,7 @@ PROJECTOR_PROJECTS_ROOT_DIR = abspath(
     PROJECT_ROOT, 'projects')
 PROJECTOR_BANNED_PROJECT_NAMES = ('barfoo',)
 PROJECTOR_SEND_MAIL_ASYNCHRONOUSELY = True
-PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY = False
+PROJECTOR_CREATE_PROJECT_ASYNCHRONOUSLY = True
 
 # =============== #
 # DJALOG SETTINGS #
@@ -203,4 +207,17 @@ try:
         pass
 except ImportError:
     pass
+
+
+# ================ #
+# CELLERY SETTINGS #
+# ================ #
+
+CARROT_BACKEND = "ghettoq.taproot.Database"
+
+BROKER_CONNECTION_MAX_RETRIES = 0
+
+CELERY_ALWAYS_EAGER = False
+CELERYD_MAX_TASKS_PER_CHILD = 100
+CELERYD_LOG_LEVEL = 'DEBUG'
 

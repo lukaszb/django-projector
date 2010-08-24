@@ -1,0 +1,21 @@
+{% extends "projector/project/detail.html" %}
+
+{% load i18n %}
+
+{% block col-single-extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Error message" %}</h5>
+    <div class="richtemplates-panel-content">
+        <ul class="messages">
+            <li class="message message-error">
+                {% blocktrans %}
+                We are sorry but project was not created
+                {% endblocktrans %}
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
+
