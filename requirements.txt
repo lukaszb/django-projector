@@ -14,7 +14,6 @@ django-native-tags==0.4
 django-notification==0.1.5
 django-pagination==1.0.7
 django-registration==0.7
-django-signals-ahoy
 -e git+git://github.com/lukaszb/django-sorting.git#egg=django_sorting-forked
 django-treebeard==1.61
 docutils==0.7

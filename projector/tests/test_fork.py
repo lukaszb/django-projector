@@ -123,48 +123,65 @@ class ForkViewTest(ProjectorTestCase):
 
 class BaseExternalForkFormTest(TestCase):
 
+    def setUp(self):
+        self.request = HttpRequest()
+
     def test_not_cleaned_no_data(self):
-        form = BaseExternalForkForm()
+        form = BaseExternalForkForm(self.request)
         self.assertRaises(ProjectorError, form.is_public)
         self.assertRaises(ProjectorError, form.is_private)
 
     def test_not_cleaned_with_data(self):
-        form = BaseExternalForkForm({'as_private': u'checked'})
+        form = BaseExternalForkForm(self.request, {'as_private': u'checked'})
         self.assertRaises(ProjectorError, form.is_public)
         self.assertRaises(ProjectorError, form.is_private)
 
     def test_valid_public(self):
-        form = BaseExternalForkForm({})
+        form = BaseExternalForkForm(self.request, {})
         self.assertTrue(form.is_valid())
         # as_private not checked
         self.assertTrue(form.is_public())
         self.assertFalse(form.is_private())
 
     def test_valid_private(self):
-        form = BaseExternalForkForm({'as_private': u'checked'})
+        form = BaseExternalForkForm(self.request, {'as_private': u'checked'})
         self.assertTrue(form.is_valid())
         # as_public checked
         self.assertFalse(form.is_public())
         self.assertTrue(form.is_private())
 
+    def test_no_request_given(self):
+        self.assertRaises(ValueError, BaseExternalForkForm, {'key': 'value'})
+
 
 class BitbucketForkTest(TestCase):
 
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.user = User.objects.create(username='joe')
+
     def test_fork(self):
-        joe = User.objects.create(username='joe')
         data = {
             'username': u'marcinkuzminski',
             'projectname': u'vcs',
             'as_private': u'checked',
         }
-        form = BitbucketForkForm(data)
+        form = BitbucketForkForm(self.request, data)
         self.assertTrue(form.is_valid())
-        request = HttpRequest()
-        request.user = joe
-        fork = form.fork(request)
+        fork = form.fork()
         fork = Project.objects.get(pk=fork.pk)
         self.assertTrue(len(fork.repository.revisions) > 100)
         self.assertTrue(fork.is_private())
+
+    def test_fork_with_same_name(self):
+        Project.objects.create(name=u'joe-project', author=self.request.user)
+        data = {
+            'username': u'whatever',
+            'projectname': u'joe-project',
+            'as_private': u'checked',
+        }
+        form = BitbucketForkForm(self.request, data)
+        self.assertFalse(form.is_valid())
 
     # Deprecated: errors are handled during project setup as projects are now
     # created asynchronously
@@ -199,7 +216,6 @@ class BitbucketForkTest(TestCase):
             ('../../', 'foobar'),
         ))]
         for data in data_list:
-            form = BitbucketForkForm(data)
+            form = BitbucketForkForm(self.request, data)
             self.assertFalse(form.is_valid())
-
 

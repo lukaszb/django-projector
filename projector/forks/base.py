@@ -1,4 +1,5 @@
 from django import forms
+from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 
 from projector.core.exceptions import ProjectorError
@@ -12,6 +13,20 @@ class BaseExternalForkForm(forms.Form):
 
     as_private = forms.BooleanField(initial=False, label=_('As private'),
         help_text=_('Forks project as your private project'), required=False)
+
+    def __init__(self, request, *args, **kwargs):
+        """
+        Needs one extra parameter to be passed:
+
+        :param request: :py:class:`django.http.HttpRequest`` object is required
+          at forking process and/or validation of the form
+        """
+        if not isinstance(request, HttpRequest):
+            raise ValueError("Fork form's first argument should always be a "
+                             "request")
+        form = super(BaseExternalForkForm, self).__init__(*args, **kwargs)
+        self.request = request
+        return form
 
     def is_public(self):
         if not hasattr(self, 'cleaned_data'):
@@ -29,7 +44,7 @@ class BaseExternalForkForm(forms.Form):
         raise NotImplementedError("Must be implemented in order to let project "
             "instance know where it was forked from")
 
-    def fork(self, request):
+    def fork(self):
         """
         Actions needed to fork the project. Real fork command should be fired by
         ``Project``'s ``post_save`` signal handler.
@@ -42,8 +57,6 @@ class BaseExternalForkForm(forms.Form):
         fork from external location. We can get various errors here, such as
         problem with network etc..
 
-        :param request: :py:class:`django.http.HttpRequest`` object is required
-          at forking process
         """
         raise NotImplementedError("ForkForm requires ``fork`` method to "
             "implements logic required for the forking process")

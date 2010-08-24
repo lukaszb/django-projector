@@ -59,7 +59,7 @@ External fork form should subclass
 :py:class:`projector.forks.base.BaseExternalForkForm` and implement ``fork``
 method:
 
-* ``fork(request)``: this method should implement action required to create
+* ``fork()``: this method should implement action required to create
   :py:class:`projector.models.Project` instance. Note that real fork procedure
   is fired by project creation handler. We may create a project in whatever way
   we want here but most basic scenario is to pass ``author``, ``name`` and
@@ -74,15 +74,20 @@ method:
      Those are not validation errors as ``fork`` method should be called only
      after form is cleaned.
 
-Moreover, :py:class:`projector.forks.base.BaseExternalForkForm` comes with
-one field ``as_private``. After form validation it is possible to check
-if project should be forked as *public* or *private* by calling ``is_public``
-form's method. This method would return ``True`` or ``False``.
+Moreover, :py:class:`projector.forks.base.BaseExternalForkForm` subclasses need
+to be initialized with :py:class:`django.http.HttpRequest` as first positional
+argument (this is required for further form's validation).
 
-After form is implemented we can hook it at the ``PROJECTOR_FORK_EXTERNAL_MAP``
-setting.
+Base fork form class comes with one field ``as_private``. After form validation
+it is possible to check if project should be forked as *public* or *private* by
+calling ``is_public`` form's method. This method would return ``True`` or
+``False``.
+
+After form is implemented we can hook it at the
+:setting:`PROJECTOR_FORK_EXTERNAL_MAP`.
 
 We advice to review code of :py:mod:`projector.forks.bitbucket` module to see
 full example.
 
 .. _Bitbucket: http://bitbucket.org
+

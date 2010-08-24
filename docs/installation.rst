@@ -18,10 +18,8 @@ Following packages are needed to get ``django-projector`` working:
 - `django-extensions`_
 - `django-gravatar`_
 - `django-guardian`_
-- `django-keyedcache`_
 - `django-pagination`_
 - `django-richtemplates`_
-- `django-signals-ahoy`_
 - `django-sorting`_
 - `django-tagging`_
 - `django-treebeard`_
@@ -43,8 +41,6 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-celery: http://pypi.python.org/pypi/django-celery/
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
 .. _django-guardian: http://packages.python.org/django-guardian/
-.. _django-keyedcache: http://bitbucket.org/bkroeze/django-keyedcache/
-.. _django-signals-ahoy: http://bitbucket.org/bkroeze/django-signals-ahoy/
 .. _django-pagination: http://code.google.com/p/django-pagination/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/
 .. _django-sorting: http://github.com/directeur/django-sorting

@@ -24,7 +24,18 @@ class BitbucketForkForm(BaseExternalForkForm):
         help_text=_('If checked, would clone project using secured '
                     'connection'), required=False)
 
-    def fork(self, request):
+    def clean_projectname(self):
+        data = self.cleaned_data['projectname']
+        try:
+            Project.objects.get(name=data, author=self.request.user)
+        except Project.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError(_("Project with same name already "
+                                          "exists"))
+        return data
+
+    def fork(self):
         """
         This method only creates ``Project`` instance with proper attributes
         as real fork is done by ``Project``'s ``post_save`` handler.
@@ -34,7 +45,7 @@ class BitbucketForkForm(BaseExternalForkForm):
         try:
             project = Project.objects.create_project(
                 vcs_alias = 'hg',
-                author = request.user,
+                author = self.request.user,
                 name = data['projectname'],
                 public = self.is_public(),
                 fork_url = url)

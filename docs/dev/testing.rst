@@ -22,3 +22,11 @@ In order to run test suite we simply run::
 
 This should invoke preparation process and fire up Django test runner.
 
+.. note::
+   It is also possible to run test suite using management command but please
+   remember that we have to use some custom settings and therefor it is
+   **required** to use ``example_project/settings_test.py``. Simply run
+   following command within example project::
+
+      $ python manage.py test projector --settings=settings_test
+

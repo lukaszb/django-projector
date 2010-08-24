@@ -478,7 +478,7 @@ class ExternalForkWizard(FormWizard):
     def done(self, request, form_list):
         form = form_list[1]
         try:
-            fork = form.fork(request)
+            fork = form.fork()
         except ProjectorError, err:
             msg = _("Error occured while trying to fork %s" % form.get_url())
             messages.error(request, msg)
