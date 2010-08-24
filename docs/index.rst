@@ -17,17 +17,19 @@ customized or plugged into existing systems.
 Features
 --------
 
-- Task tracker with full history of changes
 - Mercurial_ repository integration
-- Repository web browser (basic... really)
+- Granual permissions management (see :ref:`authorization`)
+- Scalable architecture (AMQP) build on top of excellent celery_
+- Task tracker with full history of changes
+- Repository web browser
 - Customizable workflow for each project
 - Grouping tasks in milestones
 - Roadmap
-- Granual permissions management (see :ref:`authorization`)
+- Teams support
 - Documents based on `restructuredText`_
+- Email notification
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
-- More to come
 
 Incoming
 --------
@@ -36,10 +38,12 @@ Here are some additional points which are the target for future
 release.
 
 - Wiki per project
+- Plugin system
+- Code review
+- Sphinx integration
 - Other version control systems in backend (git_, subversion_...)
 - Charts, statistics, graphs, plots, analyzies
 - Functional timeline
-- Email notification
 - `django-piston`_ integration for RESTful API
 
 .. warning::
@@ -89,6 +93,7 @@ Other topics
 * :ref:`genindex`
 * :ref:`search`
 
+.. _celery: http://celeryproject.org/
 .. _django: http://www.djangoproject.com/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/django-richtemplates/
 .. _django-piston: http://bitbucket.org/jespern/django-piston/
