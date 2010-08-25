@@ -8,8 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from projector.settings import get_config_value
 from projector.models import Project, Task, WatchedItem
-from projector.signals import mails, post_fork, setup_project
-from projector.tasks import send_mail
+from projector.signals import post_fork, setup_project
 from projector.tasks import setup_project as setup_project_task
 
 from richtemplates.utils import get_user_profile_model
@@ -85,17 +84,6 @@ def hg_extra_messages(sender, repository, **kwargs):
     sender.messages.append(msg)
 
 
-def send_mail_listener(sender, subject, message, from_email=None,
-        recipient_list=[], **kwargs):
-    """
-    Task ``send_mail`` wrapper for signals framework.
-    """
-    if get_config_value('CREATE_PROJECT_ASYNCHRONOUSLY'):
-        func = send_mail.delay
-    else:
-        func = send_mail
-    return func(subject, message, from_email, recipient_list)
-
 def start_listening():
     """
     As listeners use projectors' models we need to connect signals after they
@@ -110,7 +98,6 @@ def start_listening():
     # Projector signals connection
     post_fork.connect(fork_done)
     setup_project.connect(setup_project_listener, sender=Project)
-    mails.connect(send_mail_listener, sender=None)
     retrieve_hg_post_push_messages.connect(hg_extra_messages,
         sender=None)
 

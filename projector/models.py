@@ -14,6 +14,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, PermissionDenied,\
     ImproperlyConfigured
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -35,7 +36,7 @@ from projector.managers import TaskManager
 from projector.managers import TeamManager
 from projector.managers import WatchedItemManager
 from projector.settings import get_config_value
-from projector.signals import mails, post_fork
+from projector.signals import post_fork
 from projector.utils import abspath, str2obj, using_projector_profile
 from projector.utils.lazy import LazyProperty
 from projector.utils.helpers import Choices
@@ -1447,9 +1448,10 @@ class Task(AbstractTask, Watchable):
         mail_info = {
             'subject': self.get_long_summary(),
             'message': self.get_long_content(),
+            'from_email': settings.DEFAULT_FROM_EMAIL,
             'recipient_list': [addr for addr in recipient_list],
         }
-        mails.send(None, **mail_info)
+        send_mail(**mail_info)
 
 
 class TaskRevision(AbstractTask):

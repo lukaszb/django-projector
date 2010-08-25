@@ -3,48 +3,11 @@ import logging
 
 from celery.decorators import task
 
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.core.mail import mail_admins as django_mail_admins
-from django.core.mail import mail_managers as django_mail_managers
 from django.utils.translation import ugettext as _
 
 from projector.models import Project, State
 from projector.utils import str2obj
 from projector.settings import get_config_value
-
-@task
-def send_mail(subject, message, from_email=None, recipient_list=None):
-    if from_email is None:
-        from_email = settings.DEFAULT_FROM_EMAIL
-    if recipient_list is None:
-        return 0
-    sent = EmailMessage(subject, message, from_email, recipient_list).send()
-    logging.debug("%s | %s | mails sent: %d" % (subject, recipient_list, sent))
-    return sent
-
-
-@task
-def mail_admins(subject, message, fail_silently=False, connection=None):
-    """
-    Wrapper for django build-in mail_admins function.
-    """
-    if not settings.ADMINS:
-        logging.warn("No ADMINS defined at settings module: no mails send")
-        return 0
-    sent = django_mail_admins(subject, message, fail_silently, connection)
-    return sent
-
-@task
-def mail_managers(subject, message, fail_silently=False, connection=None):
-    """
-    Wrapper for django build-in mail_admins function.
-    """
-    if not settings.MANAGERS:
-        logging.warn("No ADMINS defined at settings module: no mails send")
-        return 0
-    sent = django_mail_managers(subject, message, fail_silently, connection)
-    return sent
 
 @task
 def project_create_repository(instance, vcs_alias=None):
