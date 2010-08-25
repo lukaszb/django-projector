@@ -11,7 +11,7 @@ Features
 --------
 
 - Mercurial_ repository integration
-- Granual permissions management (see :ref:`authorization`)
+- Granual permissions management
 - Scalable architecture (AMQP) build on top of excellent celery_
 - Task tracker with full history of changes
 - Repository web browser
