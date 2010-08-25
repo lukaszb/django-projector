@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_sorting',
     'djcelery',
+    'djcelery_email',
     'ghettoq',
     'gravatar',
     'guardian',
@@ -177,13 +178,25 @@ REQUEST_IGNORE_PATHS = (
 # ============== #
 
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = 'localhost'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_HOST_USER = ''
 EMAIL_PORT = 25
 EMAIL_SUBJECT_PREFIX = '[Django] '
 EMAIL_USE_TLS = False
+
+EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
+
+CELERY_EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+CELERY_EMAIL_TASK_CONFIG = {
+    'queue' : 'email',
+    'rate_limit' : '60/m', # 60 emails per minute
+}
+
+# ======================= #
+# AUTHENTICATION SETTINGS #
+# ======================= #
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
