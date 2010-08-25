@@ -53,6 +53,13 @@ See http://packages.python.org/django-projector/installation.html
 for information on installing ``django-projector``. It is also
 available in ``docs`` directory at ``docs/installation.rst``.
 
+-----------------------------
+Source code and issue tracker
+-----------------------------
+
+Source code is along with issue tracker is available at
+http://bitbucket.org/lukaszb/django-projector/.
+
 -------------
 Documentation
 -------------
@@ -60,9 +67,12 @@ Documentation
 Online documentation for development version is available at
 http://packages.python.org/django-projector/.
 
-You may also build documentation for yourself - go into ``docs/`` and run::
+------------
+Demo project
+------------
 
-   make html
+Demo project have been deployed at https://python-center.org. It is still
+rather experimental.
 
 -------
 License

@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+============================================
 Welcome to django-projector's documentation!
 ============================================
 
@@ -14,6 +15,7 @@ customized or plugged into existing systems.
 .. image:: static/django-projector-01.png
    :width: 760px
 
+--------
 Features
 --------
 
@@ -31,6 +33,7 @@ Features
 - Make use of `django-richtemplates`_ so templates are ready to use
   out of the box
 
+--------
 Incoming
 --------
 
@@ -52,6 +55,29 @@ release.
    for your Django_ based project. Still, it probably should **NOT** be used
    in production as it wasn't fully tested and may contain security issues.
 
+-----------
+Source code
+-----------
+
+Source code is along with issue tracker is available at
+http://bitbucket.org/lukaszb/django-projector/.
+
+------------
+Demo project
+------------
+
+Demo project have been deployed at https://python-center.org. It is still
+rather experimental.
+
+-------
+License
+-------
+
+``django-projector`` is released under MIT_ license. You should get a copy
+of the license with source distribution, at the root location, within
+``LICENSE`` file.
+
+=============
 Documentation
 =============
 
@@ -102,6 +128,7 @@ Other topics
 .. _subversion: http://subversion.tigris.org/
 .. _git: http://git-scm.com/
 .. _trac: http://trac.edgewall.org/
+.. _MIT: http://www.opensource.org/licenses/mit-license.php
 
 .. [1] Don't get us wrong, Trac_ is great tool but we believe that
    django's pluggable applications are far easier to configure and
