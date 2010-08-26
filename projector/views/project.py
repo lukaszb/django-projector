@@ -378,7 +378,7 @@ class ProjectEditView(ProjectView):
             form = ConfigForm(request.POST, instance=self.project.config)
             if form.is_valid():
                 form.instance.editor = request.user
-                self.project = form.save()
+                form.save()
                 msg = _("Project's configuration updated successfully")
                 messages.success(request, msg)
             else:
