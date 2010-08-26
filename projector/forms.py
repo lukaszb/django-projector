@@ -151,7 +151,7 @@ class ConfigForm(forms.ModelForm):
 
     class Meta:
         model = Config
-        exclude = ['project', 'editor']
+        exclude = ['project', 'editor', 'from_email_address']
 
 
 class TaskCommentForm(forms.Form):
