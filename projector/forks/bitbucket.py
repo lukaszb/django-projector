@@ -26,13 +26,13 @@ class BitbucketForkForm(BaseExternalForkForm):
 
     def clean_projectname(self):
         data = self.cleaned_data['projectname']
-        try:
-            Project.objects.get(name=data, author=self.request.user)
-        except Project.DoesNotExist:
-            pass
-        else:
-            raise forms.ValidationError(_("Project with same name already "
-                                          "exists"))
+        if getattr(self, 'request', None) is not None:
+            try:
+                Project.objects.get(name=data, author=self.request.user)
+                raise forms.ValidationError(_("Project with same name already "
+                                              "exists"))
+            except Project.DoesNotExist:
+                pass
         return data
 
     def fork(self):

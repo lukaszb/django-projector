@@ -16,7 +16,8 @@ dist
 .pydevproject
 
 example_project/media
-example_project/conf/local_settings.py
+example_project/conf/*settings*.py
+example_project/celerybeat-schedule
 projector/plugins
 
 bin

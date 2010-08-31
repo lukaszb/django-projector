@@ -127,31 +127,32 @@ class BaseExternalForkFormTest(TestCase):
         self.request = HttpRequest()
 
     def test_not_cleaned_no_data(self):
-        form = BaseExternalForkForm(self.request)
+        form = BaseExternalForkForm()
+        form.request = self.request
         self.assertRaises(ProjectorError, form.is_public)
         self.assertRaises(ProjectorError, form.is_private)
 
     def test_not_cleaned_with_data(self):
-        form = BaseExternalForkForm(self.request, {'as_private': u'checked'})
+        form = BaseExternalForkForm({'as_private': u'checked'})
+        form.request = self.request
         self.assertRaises(ProjectorError, form.is_public)
         self.assertRaises(ProjectorError, form.is_private)
 
     def test_valid_public(self):
-        form = BaseExternalForkForm(self.request, {})
+        form = BaseExternalForkForm({})
+        form.request = self.request
         self.assertTrue(form.is_valid())
         # as_private not checked
         self.assertTrue(form.is_public())
         self.assertFalse(form.is_private())
 
     def test_valid_private(self):
-        form = BaseExternalForkForm(self.request, {'as_private': u'checked'})
+        form = BaseExternalForkForm({'as_private': u'checked'})
+        form.request = self.request
         self.assertTrue(form.is_valid())
         # as_public checked
         self.assertFalse(form.is_public())
         self.assertTrue(form.is_private())
-
-    def test_no_request_given(self):
-        self.assertRaises(ValueError, BaseExternalForkForm, {'key': 'value'})
 
 
 class BitbucketForkTest(TestCase):
@@ -166,7 +167,8 @@ class BitbucketForkTest(TestCase):
             'projectname': u'vcs',
             'as_private': u'checked',
         }
-        form = BitbucketForkForm(self.request, data)
+        form = BitbucketForkForm(data)
+        form.request = self.request
         self.assertTrue(form.is_valid())
         fork = form.fork()
         fork = Project.objects.get(pk=fork.pk)
@@ -180,7 +182,8 @@ class BitbucketForkTest(TestCase):
             'projectname': u'joe-project',
             'as_private': u'checked',
         }
-        form = BitbucketForkForm(self.request, data)
+        form = BitbucketForkForm(data)
+        form.request = self.request
         self.assertFalse(form.is_valid())
 
     # Deprecated: errors are handled during project setup as projects are now
@@ -216,6 +219,7 @@ class BitbucketForkTest(TestCase):
             ('../../', 'foobar'),
         ))]
         for data in data_list:
-            form = BitbucketForkForm(self.request, data)
+            form = BitbucketForkForm(data)
+            form.request = self.request
             self.assertFalse(form.is_valid())
 

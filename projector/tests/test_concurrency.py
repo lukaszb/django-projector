@@ -13,7 +13,7 @@ class ThreadedProjectTest(TestCase):
 
         url = reverse('projector_project_list')
 
-        @test_concurrently(15)
+        @test_concurrently(10)
         def toggle_test():
             client = Client()
             client.get(url)

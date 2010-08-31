@@ -478,6 +478,7 @@ class ExternalForkWizard(FormWizard):
 
     def done(self, request, form_list):
         form = form_list[1]
+        form.request = request
         try:
             fork = form.fork()
         except ProjectorError, err:
@@ -493,6 +494,8 @@ class ExternalForkWizard(FormWizard):
         if step == 0:
             source = form.cleaned_data['source']
             self.form_list[1] = fork_map[source]
+            # TODO: Setting request here is kind of *magic*
+            self.form_list[1].request = request
         elif step == 1:
             if not isinstance(form, BaseExternalForkForm):
                 raise ProjectorError(

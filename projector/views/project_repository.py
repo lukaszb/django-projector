@@ -26,7 +26,7 @@ class RepositoryView(ProjectView):
             msg = _("There is something wrong with project's repository")
             messages.error(self.request, msg)
             response = redirect(self.project)
-        if not self.project.repository.revisions:
+        if not self.project.repository or not self.project.repository.revisions:
             messages.info(self.request, _("Repository has no changesets yet"))
             response = redirect(self.project)
         return response
