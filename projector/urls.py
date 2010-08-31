@@ -27,6 +27,10 @@ urlpatterns += patterns('projector.views.users',
         view = 'UserDashboardForkView',
         name = 'projector_dashboard_fork'),
 
+    url(r'^dashboard/add-member/$',
+        view = 'UserDashboardAddMember',
+        name = 'projector_dashboard_add_member'),
+
     url(r'^dashboard/$',
         view = 'UserDashboardView',
         name = 'projector_dashboard'),

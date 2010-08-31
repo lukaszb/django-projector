@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from projector.models import Status, Task, Priority,\
     Project, ProjectCategory, TaskType, Milestone, Component,\
     TaskRevision
-from projector.models import Membership
+from projector.models import Membership, Team
 
 from richtemplates.forms import LimitingModelForm
 
@@ -166,6 +166,7 @@ admin.site.register(Task, TaskAutocompleteAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectCategory)
 admin.site.register(Membership)
+admin.site.register(Team)
 #admin.site.register(Component)
 #admin.site.register(Milestone) # Should be maintain with project itself
 

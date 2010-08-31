@@ -29,7 +29,7 @@ from projector.signals import setup_project
 from projector.utils.basic import str2obj
 
 from richtemplates.forms import LimitingModelForm, RestructuredTextAreaField,\
-    ModelByNameField
+    ModelByNameField, UserByNameField
 from richtemplates.widgets import RichCheckboxSelectMultiple
 from richtemplates.forms import RichSkinChoiceField, RichCodeStyleChoiceField
 
@@ -500,4 +500,34 @@ class ExternalForkWizard(FormWizard):
 
     def get_template(self, step):
         return 'projector/accounts/dashboard-external-fork.html'
+
+
+class DashboardAddMemberForm(forms.Form):
+    user = UserByNameField()
+
+    def __init__(self, group, *args, **kwargs):
+        self.group = group
+        super(DashboardAddMemberForm, self).__init__(*args, **kwargs)
+
+    def clean_user(self):
+        """
+        Raises ``ValidationError`` if user is already member of given group or
+        user does not exist.
+        """
+        user = self.cleaned_data['user']
+        if user:
+            try:
+                user.groups.get(name=self.group.name)
+            except Group.DoesNotExist:
+                pass
+            else:
+                raise forms.ValidationError(_("User %s is already member of %s"
+                    % (user, self.group)))
+        return user
+
+    def save(self, commit=True):
+        user = self.cleaned_data['user']
+        if commit:
+            user.groups.add(self.group)
+        return user
 

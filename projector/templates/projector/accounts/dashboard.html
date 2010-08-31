@@ -26,12 +26,42 @@
 	    <div class="richtemplates-panel-content">
             {% if request.user == profile.user %}
 			<ul class="nav-vertical">
-                <li><a href="{% url projector_users_profile_detail request.user.username %}">{% trans "Show your public profile" %}</a></li>
+                <li><a href="{% url projector_users_profile_detail request.user.username %}"
+                            >{% trans "Show your public profile" %}</a></li>
                 <li><a href="{% url projector_dashboard %}">{% trans "Dashboard" %}</a></li>
             </ul>
             {% endif %}
 	    </div>
 	</div>
+
+    {% if profile.is_team %}
+    <div class="richtemplates-panel">
+        <h5>{% trans "Team's members" %} ({{ profile.group.user_set.all|length }})</h5>
+	    <div class="richtemplates-panel-content">
+            {% if request.user == profile.user %}
+            {% endif %}
+            {% if not profile.group.user_set.all|length %}
+                <p>{% trans "No members" %}</p>
+            {% else %}
+                <table class="datatable">
+                    <thead class="datatable-thead">
+                        <tr class="datatable-thead-subheader lefted">
+                            <th class="width-10">{% trans "Member" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="datatable-tbody">
+                        {% for member in profile.group.user_set.all %}
+                        <tr class="{% cycle "odd" "even" %} hoverable">
+                            <td><a href="{% url projector_users_profile_detail member.username %}"
+                                   class="block-link">{{ member }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+	    </div>
+	</div>
+    {% endif %}
 
 {% endblock %}
 
@@ -69,23 +99,23 @@
             <tbody>
             <tr>
                 <th>
-                    <a href="{% url auth_password_change %}"
-                       class="richbutton">{% trans "Change password" %}</a>
-                </th>
-                <td>
-                    <div class="message message-info">
-                        <p>{% trans "Change your password" %}</p>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th>
                     <a href="{% url projector_project_create %}"
                        class="richbutton">{% trans "Create project" %}</a>
                 </th>
                 <td>
                     <div class="message message-info">
                         <p>{% trans "Create new project" %}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <a href="{% url auth_password_change %}"
+                       class="richbutton">{% trans "Change password" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>{% trans "Change your password" %}</p>
                     </div>
                 </td>
             </tr>
@@ -108,7 +138,22 @@
                 </td>
             </tr>
             {% endif %}
-            {% if not profile.is_team %}
+
+            {% if profile.is_team %}
+            {# Team actions #}
+            <tr>
+                <th>
+                    <a href="{% url projector_dashboard_add_member %}"
+                       class="richbutton">{% trans "Add member" %}</a>
+                </th>
+                <td>
+                    <div class="message message-info">
+                        <p>{% trans "Allow to add new member" %}</p>
+                    </div>
+                </td>
+            </tr>            
+            {% else %}
+            {# Standard (not-team) user actions #}
             <tr>
                 <th>
                     <a href="{% url projector_dashboard_convert_to_team %}"

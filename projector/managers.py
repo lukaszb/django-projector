@@ -13,7 +13,7 @@ class ProjectManager(models.Manager):
 
     def for_user(self, user=None):
         """
-        Returns queryset of Project instances available
+        Returns queryset of :model:`Project` instances available
         for given user. If no user is given or user
         is inactive/anonymous, only public projects are
         returned.
@@ -29,7 +29,7 @@ class ProjectManager(models.Manager):
                 qset = qset & \
                     Q(public=True) | \
                     Q(public=False, membership__member=user) | \
-                    Q(public=False, team__group__in=user.groups.all)
+                    Q(public=False, team__group__user=user)
         else:
             qset = qset & Q(public=True)
         qs = qs.filter(qset)\

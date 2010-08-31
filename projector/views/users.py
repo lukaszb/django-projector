@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from projector.core.controllers import View
 from projector.forms import UserProfileForm, UserConvertToTeamForm
 from projector.forms import ExternalForkWizard, ExternalForkSourcesForm
+from projector.forms import DashboardAddMemberForm
 from projector.models import Team, Project
 from projector.settings import get_config_value
 
@@ -132,7 +133,7 @@ class UserDashboardConvert2TeamView(View):
             raise PermissionDenied
         if request.user.get_profile().is_team:
             messages.warning(request,
-                "This account is already converted to team!")
+                _("This account have been already converted to team!"))
             return redirect(reverse('projector_users_profile_detail',
                 kwargs={'username': request.user.username}))
         form = UserConvertToTeamForm(request.POST or None)
@@ -148,5 +149,31 @@ class UserDashboardConvert2TeamView(View):
                 messages.error(request, msg)
         self.context['form'] = form
         self.context['profile'] = request.user.get_profile()
+        return self.context
+
+class UserDashboardAddMember(View):
+    """
+    Add new member view.
+    """
+
+    template_name = 'projector/accounts/dashboard-add-new-member.html'
+
+    def response(self, request):
+        profile = request.user.get_profile()
+        if request.user.is_anonymous() or not request.user.is_anonymous or \
+            not profile or not profile.is_team:
+            messages.warning(request, _('Only teams are allowed to add member'))
+            return redirect(reverse('projector_users_profile_detail',
+                kwargs={'username': request.user.username}))
+        form = DashboardAddMemberForm(profile.group, request.POST or None)
+        if request.method == 'POST' and form.is_valid():
+            form.save()
+            user = form.cleaned_data['user']
+            msg = _("User %s is now member of this team!" % user)
+            messages.success(request, msg)
+            return redirect(reverse('projector_users_profile_detail',
+                kwargs={'username': request.user.username}))
+        self.context['form'] = form
+        self.context['profile'] = profile
         return self.context
 
