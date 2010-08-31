@@ -1,10 +1,7 @@
 import datetime
-import logging
 
-from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
-from django.forms.formsets import formset_factory
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -12,12 +9,11 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
 from projector.models import Task
-from projector.forms import TaskForm, TaskEditForm, TaskCommentForm
+from projector.forms import TaskForm, TaskEditForm
 from projector.filters import TaskFilter
 from projector.views.project import ProjectView
 
 from richtemplates.shortcuts import get_json_response
-from richtemplates.forms import DynamicActionChoice, DynamicActionFormFactory
 
 login_required_m = method_decorator(login_required)
 
@@ -60,62 +56,9 @@ class TaskDetailView(ProjectView):
             project__author__username = username,
             project__slug = project_slug)
 
-        # We create formset for comment here as comment is only optional
-        CommentFormset = formset_factory(TaskCommentForm, extra=1)
-
-        destinations = task.status.destinations.all()
-        # Init choices
-        task_action_choices = [
-            DynamicActionChoice(0, _("Don't change status")),
-        ]
-        if request.user.has_perm('can_change_task', task.project):
-            if destinations:
-                task_action_choices.append(DynamicActionChoice(1,
-                    _("Change status"),
-                    {'new_status': forms.ModelChoiceField(
-                        queryset=destinations.exclude(id=task.status.id),
-                        empty_label=None)
-                    }))
-
-        TaskActionForm = DynamicActionFormFactory(task_action_choices)
-        action_form = TaskActionForm(request.POST or None, request.FILES or None)
-
-        comment_formset = CommentFormset(request.POST or None)
-        if request.method == 'POST':
-
-            if action_form.is_valid() and comment_formset.is_valid():
-                # Comment handler
-                comment_form = comment_formset.forms[0]
-                if comment_form.cleaned_data.has_key('comment'):
-                    comment = comment_form.cleaned_data['comment']
-                else:
-                    comment = None
-                # Task handler
-                data = action_form.cleaned_data
-                task.editor = request.user
-                task.editor_ip = request.META.get('REMOTE_ADDR', '')
-                # action_type number as defined before at DynamicActionChoices
-                action_type = data['action_type']
-                if request.user.has_perm('can_change_task', task.project):
-                    if action_type == 1:
-                        task.status = data['new_status']
-                if action_type > 0 or comment:
-                    messages.success(request, _("Task updated successfully"))
-                    task.save()
-                    task.comment = comment
-                    task.create_revision()
-                    task.notify()
-                else:
-                    messages.warning(request, _("There were no changes"))
-                return redirect(task.get_absolute_url())
-            else:
-                logging.error(action_form.errors)
-
         self.context['task'] = task
         self.context['is_watched'] = task.is_watched(request.user)
         self.context['now'] = datetime.datetime.now()
-        self.context['action_form'] = action_form
-        self.context['comment_formset'] = comment_formset
 
         return self.context
 

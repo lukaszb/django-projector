@@ -154,11 +154,6 @@ class ConfigForm(forms.ModelForm):
         exclude = ['project', 'editor', 'from_email_address']
 
 
-class TaskCommentForm(forms.Form):
-    comment = forms.CharField(label=_("Comment"), widget=forms.Textarea,
-        required=False)
-
-
 class TaskForm(LimitingModelForm):
     owner = ModelByNameField(max_length=128, queryset=User.objects.all,
         attr='username', label=_('Owner'), required=False)
