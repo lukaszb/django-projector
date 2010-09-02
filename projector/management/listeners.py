@@ -57,7 +57,7 @@ def put_missing_project_configs(sender, **kwargs):
                         .annotate(config_count=Count('config'))\
                         .filter(config_count=0)
                     for project in projects:
-                        config = Config.create_for_project(project)
+                        config = project.create_config()
                         msg = "[INFO] Created %s" % config
                         if kwargs['verbosity'] >= 1:
                             print msg

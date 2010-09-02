@@ -876,12 +876,11 @@ class Config(models.Model):
     milestone_deadline_delta = models.PositiveIntegerField(
         default = get_config_value('MILESTONE_DEADLINE_DELTA'),
         verbose_name = _('Milestone deadline delta'),
-        help_text = _(''.join((
-            'Every milestone has its deadline and this number specifies ',
-            'how many days would be given by default. It may be set to ',
-            'any date during milestone creation process though.',
-        ))),
-        )
+        help_text = _(
+            u'Every milestone has its deadline and this number specifies '
+            u'how many days would be given by default. It may be set to '
+            u'any date during milestone creation process though.',
+        ))
 
     def __unicode__(self):
         return u'<Config for %s>' % self.project
@@ -1473,7 +1472,7 @@ class UserProfile(RichUserProfile):
     Would be abstract if ``AUTH_PROFILE_MODULE`` is not set or doesn't equal
     with ``projector.UserProfile``.
     """
-    activation_token = models.CharField(_('activation_token'), max_length=32,
+    activation_token = models.CharField(_('activation token'), max_length=32,
         editable=False)
     group = models.OneToOneField(Group, verbose_name=_('group'), null=True,
         blank=True)
@@ -1501,7 +1500,7 @@ class UserId(models.Model):
     user = models.ForeignKey(User, verbose_name = _('user'))
     raw_id = models.CharField(_('Raw ID'), max_length=128, unique=True)
     is_active = models.BooleanField(_('is active'), default=False)
-    activation_token = models.CharField(_('activation_token'), max_length=32,
+    activation_token = models.CharField(_('activation token'), max_length=32,
         editable=False)
 
     def __unicode__(self):

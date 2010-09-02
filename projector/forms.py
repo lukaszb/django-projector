@@ -521,8 +521,9 @@ class DashboardAddMemberForm(forms.Form):
             except Group.DoesNotExist:
                 pass
             else:
-                raise forms.ValidationError(_("User %s is already member of %s"
-                    % (user, self.group)))
+                raise forms.ValidationError(_("User %(user)s is already a "
+                    "member of %(group)s" %
+                    {'user': user, 'group': self.group}))
         return user
 
     def save(self, commit=True):

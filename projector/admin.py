@@ -78,10 +78,6 @@ class TaskAdmin(admin.ModelAdmin):
                 ('author', 'author_ip'),
                 ('editor', 'editor_ip'),
             ),
-            'description': _("""This are readonly fields. In Django 1.2
-                they will be probably really uneditable. For now, they are
-                here but even if you change them, they will be overriden
-                at the time of pushing data into database.""")
         }),
     )
 
