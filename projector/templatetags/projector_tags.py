@@ -9,6 +9,8 @@ from django.utils.translation import ugettext as _
 
 from projector.models import Task
 from projector.models import get_user_from_string
+from projector.settings import get_config_value
+from projector.utils.email import EMAIL_RE
 
 register = template.Library()
 
@@ -26,6 +28,18 @@ def restructuredtext(value):
         parts = publish_parts(source=smart_str(value), writer_name="html4css1",
             settings_overrides=docutils_settings)
         return mark_safe(force_unicode(parts["fragment"]))
+
+@register.filter
+def hide_email(value, sub=None):
+    """
+    Hide all emails founded within given value and replace them with given
+    ``sub``stitution. If no ``sub`` is given,
+    :setting:`PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION` would be used.
+    """
+    if sub is None:
+        sub = get_config_value('HIDDEN_EMAIL_SUBSTITUTION')
+    value = EMAIL_RE.sub(sub, value)
+    return value
 
 @register.filter
 def changeset_message(value, project=None, path=None):

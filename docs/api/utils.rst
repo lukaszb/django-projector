@@ -27,6 +27,11 @@ Returns absolute path for given ``*paths``.
 
 .. autofunction:: projector.utils.using_projector_profile
 
+Email
+=====
+
+.. autofunction:: projector.utils.email.extract_emails
+
 Helpers
 =======
 

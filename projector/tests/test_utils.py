@@ -45,4 +45,3 @@ class ExtractEmailsTest(TestCase):
             set((extract_emails(text)))
         )
 
-

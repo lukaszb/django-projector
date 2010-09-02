@@ -11,5 +11,6 @@ from test_settings import *
 from test_statustransition import *
 from test_status import *
 from test_teams import *
+from test_templatetags import *
 from test_user2team_conversion import *
 from test_utils import *

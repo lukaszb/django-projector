@@ -95,6 +95,9 @@ FORK_EXTERNAL_MAP = getattr(settings,
     }
 )
 
+HIDDEN_EMAIL_SUBSTITUTION = getattr(settings,
+    'PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION', u'email')
+
 MAX_PROJECTS_PER_USER = getattr(settings,
     'PROJECTOR_MAX_PROJECTS_PER_USER', 50)
 

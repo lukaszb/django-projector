@@ -225,6 +225,17 @@ Default: would try to get value from ``settings.DEFAULT_FROM_EMAIL``.
 
 Email address used as sender for all mails send by projector.
 
+.. setting:: PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION
+
+PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION
+-----------------------------------
+
+Default: ``'HIDDEN_EMAIL'``.
+
+Used as default substitution for hidden emails while using
+:py:func:`projector.templatetags.hide_email` filter (if no parameter is
+specified).
+
 .. setting:: PROJECTOR_MAX_PROJECTS_PER_USER
 
 PROJECTOR_MAX_PROJECTS_PER_USER
