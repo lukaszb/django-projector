@@ -1,8 +1,9 @@
 {% extends "projector/project/detail.html" %}
 
 {% load i18n %}
-{% load richtemplates_tags %}
 {% load native %}
+{% load projector_tags %}
+{% load richtemplates_tags %}
 
 {% comment %}
 {% block col-left %}{{ block.super }}
@@ -87,7 +88,7 @@
         {% if changeset %}
         <ul class="messages">
             <li class="message message-info">
-                {% trans "Committed by" %} {{ changeset.author }}
+                {% trans "Committed by" %} {{ changeset.author|hide_email }}
                 <span class="show-tipsy" title="{{ changeset.date }}">{{ changeset.date|timesince }}</span>
                 {% trans "ago" %}<br/><br/>
                 {{ changeset.message }}
@@ -113,7 +114,7 @@
                     {% if root.is_file %}
                     <tr>
                         <th>{% trans "Last committer" %}</th>
-                        <td>{{ root.last_changeset.author|tooltip:"80" }}</td>
+                        <td>{{ root.last_changeset.author|hide_email|tooltip:"80" }}</td>
                     </tr>
                     <tr>
                         <th>{% trans "Last modified" %}</th>
@@ -231,7 +232,7 @@
                         {{ node.last_changeset.date|timesince }} {% trans "ago" %}
                         </span>
                     </td>
-                    <td class="righted">{{ node.last_changeset.author|tooltip:"20" }}</td>
+                    <td class="righted">{{ node.last_changeset.author|hide_email|tooltip:"20" }}</td>
                     {% endif %}
                 </tr>
                 {% endfor %}

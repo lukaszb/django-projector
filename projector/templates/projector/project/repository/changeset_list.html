@@ -66,7 +66,7 @@
                     <a href="{% url projector_users_profile_detail author.username %}"
                             >{{ author.username|tooltip:"15" }}</a>
                     {% else %}
-                    {{ changeset.author|tooltip:"15" }}
+                    {{ changeset.author|hide_email|tooltip:"15" }}
                     {% endif %}
                 </td>
                 <td>{{ changeset.message|tooltip:"90" }}</td>
