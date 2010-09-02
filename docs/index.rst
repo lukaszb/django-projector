@@ -77,9 +77,9 @@ License
 of the license with source distribution, at the root location, within
 ``LICENSE`` file.
 
-=============
+-------------
 Documentation
-=============
+-------------
 
 **Installation:**
 
@@ -113,8 +113,9 @@ Documentation
 
    api/index
  
+------------
 Other topics
-============
+------------
 
 * :ref:`genindex`
 * :ref:`search`

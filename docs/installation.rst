@@ -40,6 +40,7 @@ Following packages are needed to get ``django-projector`` working:
 .. _django-autoslug: http://bitbucket.org/neithere/django-autoslug/
 .. _django-celery: http://pypi.python.org/pypi/django-celery/
 .. _django-extensions: http://code.google.com/p/django-command-extensions/
+.. _django-gravatar: http://github.com/DrMegahertz/django-gravatar
 .. _django-guardian: http://packages.python.org/django-guardian/
 .. _django-pagination: http://code.google.com/p/django-pagination/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/richtemplates/
