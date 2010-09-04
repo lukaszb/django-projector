@@ -71,8 +71,8 @@ http://packages.python.org/django-projector/.
 Demo project
 ------------
 
-Demo project have been deployed at https://python-center.org. It is still
-rather experimental.
+Demo project have been deployed at https://forge.django-projector.org. It is
+still rather experimental.
 
 -------
 License
