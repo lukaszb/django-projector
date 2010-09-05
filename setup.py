@@ -16,7 +16,7 @@ except IOError, err:
 setup(
     name = 'django-projector',
     version = projector.__version__,
-    url = 'http://bitbucket.org/lukaszb/django-projector/',
+    url = 'http://www.django-projector.org',
     author = 'Lukasz Balcerzak',
     author_email = 'lukasz.balcerzak@python-center.pl',
     description = projector.__doc__,

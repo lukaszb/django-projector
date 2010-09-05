@@ -176,7 +176,7 @@ class State(Choices):
 
 class Project(AL_Node, Watchable):
     """
-    Most important models within whole application. It provides connection with
+    Most important model within whole application. It provides connection with
     all other models.
     """
 
