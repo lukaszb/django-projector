@@ -66,7 +66,7 @@
                         <li class="removed show-tipsy"
                             title="{% trans "Removed" %}: {{ changeset.removed|length }}">{{ changeset.removed|length }}</li>
                     </ul>
-                    <a href="{% url projector_project_changeset_diff project.author.username project.slug changeset.raw_id %}"
+                    <a href="{% url projector_project_changeset_detail project.author.username project.slug changeset.raw_id %}"
                        class="show-tipsy"
                        title="{% trans "Shows diff for whole changeset" %}">{% trans "Show diff" %}</a>
                 </td>

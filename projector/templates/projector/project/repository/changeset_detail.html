@@ -1,0 +1,70 @@
+{% extends "projector/project/repository/browse.html" %}
+
+{% load i18n %}
+{% load native %}
+{% load breadcrumber %}
+
+{% block col-left %}
+{% with file_old as root %}{{ block.super }}{% endwith %}
+{% endblock %}
+
+{% block browse-content %}
+{% block changeset-message %}{{ block.super }}{% endblock %}
+
+<div id="changeset-changes" class="richblock">
+    {% if changeset.added %}
+    <ul id="changeset-changes-added" class="nav-vertical">
+        {% for node in changeset.added %}
+        <li><img src="{% richicon_src 'add.png' %}" alt=""/>
+            <a href="#changeset-node:{{ node.path }}">{{ node.path }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if changeset.changed %}
+    <ul id="changeset-changes-changed" class="nav-vertical">
+        {% for node in changeset.changed %}
+        <li><img src="{% richicon_src 'page_edit.png' %}" alt=""/>
+            <a href="#changeset-node:{{ node.path }}">{{ node.path }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if changeset.removed %}
+    <ul id="changeset-changes-removed" class="nav-vertical">
+        {% for node in changeset.removed %}
+        <li><img src="{% richicon_src 'delete.png' %}" alt=""/>{{ node.path }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+<div id="changeset-diffs">
+    {% if changeset.added %}
+    <h2>{% trans "added" %}</h2>
+    {% for node in changeset.added %}
+        <h3 id="changeset-node:{{ node.path }}">
+            <a class="show-tipsy-bottom"
+               title="{% trans "Show content at revision" %} {{ changeset.raw_id }}"
+               href="{% url projector_project_sources_browse project.author.username project.slug changeset.raw_id node.path %}">{{ node.path }}</a>
+        </h3>
+        <div class="diffblock">
+            {{ node.diff.as_html|safe }}
+        </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if changeset.changed %}
+    <h2>{% trans "changed" %}</h2>
+    {% for node in changeset.changed %}
+        <h3 id="changeset-node:{{ node.path }}">
+            <a class="show-tipsy-bottom"
+               title="{% trans "Show content at revision" %} {{ changeset.raw_id }}"
+               href="{% url projector_project_sources_browse project.author.username project.slug changeset.raw_id node.path %}">{{ node.path }}</a>
+        </h3>
+        <div class="diffblock">
+            {{ node.diff.as_html|safe }}
+        </div>
+    {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -141,12 +141,8 @@ urlpatterns += patterns('projector.views.project_team',
 # Project's repository browsing
 urlpatterns += patterns('projector.views.project_repository',
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision_old>[\w]*)-(?P<revision_new>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='RepositoryFileDiffView',
-        name='projector_project_file_diff'),
-
-    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision>[\w]*)/$',
-        view='RepositoryChangesetDiffView',
-        name='projector_project_changeset_diff'),
+        view='RepositoryFileDiff',
+        name='projector_project_sources_diff'),
 
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
         view='RepositoryFileRaw',
@@ -157,15 +153,19 @@ urlpatterns += patterns('projector.views.project_repository',
         name='projector_project_sources_annotate'),
 
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/changesets/$',
-        view='RepositoryChangesets',
+        view='RepositoryChangesetList',
         name='projector_project_changesets'),
 
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/changesets/(?P<revision>[\w]*)/$',
+        view='RepositoryChangesetDetail',
+        name='projector_project_changeset_detail'),
+
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
-        view='RepositoryBrowseView',
+        view='RepositoryBrowse',
         name='projector_project_sources_browse'),
 
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/$',
-        view='RepositoryBrowseView',
+        view='RepositoryBrowse',
         name='projector_project_sources'),
 )
 

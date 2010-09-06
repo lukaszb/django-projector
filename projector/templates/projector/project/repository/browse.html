@@ -96,7 +96,7 @@
                    class="show-tipsy"
                    title="{% trans "Show at revision" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
             {% if root.changeset.id != changeset.id %}
-            (<a href="{% url projector_project_file_diff project.author.username project.slug changeset.id root.changeset.id root.path %}"
+            (<a href="{% url projector_project_sources_diff project.author.username project.slug changeset.id root.changeset.id root.path %}"
                class="show-tipsy"
                title="{% trans "Show diff" %}">{% trans "diff" %}</a>)
             {% endif %}

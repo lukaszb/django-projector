@@ -8,6 +8,7 @@ from projector.utils.lazy import LazyProperty
 
 from vcs.web.simplevcs.views import browse_repository, diff_file, diff_changeset
 
+
 class RepositoryView(ProjectView):
 
     perms_private = ['view_project', 'can_read_repository']
@@ -45,7 +46,8 @@ class RepositoryView(ProjectView):
             return self.has_errors
         return
 
-class RepositoryBrowseView(RepositoryView):
+
+class RepositoryBrowse(RepositoryView):
 
     template_name = 'projector/project/repository/browse.html'
 
@@ -65,26 +67,9 @@ class RepositoryBrowseView(RepositoryView):
         return browse_repository(self.request, **repo_info)
 
 
-class RepositoryChangesetDiffView(RepositoryView):
+class RepositoryFileDiff(RepositoryView):
 
     template_name = 'projector/project/repository/diff.html'
-
-    def response(self, request, username, project_slug, revision):
-        if self.has_errors:
-            return self.get_error_response()
-        diff_info = {
-            'repository': self.project.repository,
-            'revision': revision,
-            'template_name': self.template_name,
-            'extra_context': {
-                'project': self.project,
-            }
-        }
-        return diff_changeset(self.request, **diff_info)
-
-class RepositoryFileDiffView(RepositoryView):
-
-    template_name = 'projector/project/repository/diff_file.html'
 
     def response(self, request, username, project_slug, revision_old,
             revision_new, rel_repo_url):
@@ -102,6 +87,7 @@ class RepositoryFileDiffView(RepositoryView):
         }
         return diff_file(self.request, **diff_info)
 
+
 class RepositoryFileRaw(RepositoryView):
     """
     This view returns FileNode from repository as file attachment.
@@ -114,6 +100,7 @@ class RepositoryFileRaw(RepositoryView):
         response = HttpResponse(node.content, mimetype=node.mimetype)
         response['Content-Disposition'] = 'attachment; filename=%s' % node.name
         return response
+
 
 class RepositoryFileAnnotate(RepositoryView):
 
@@ -133,7 +120,8 @@ class RepositoryFileAnnotate(RepositoryView):
             }
         return browse_repository(self.request, **repo_info)
 
-class RepositoryChangesets(RepositoryView):
+
+class RepositoryChangesetList(RepositoryView):
 
     template_name = 'projector/project/repository/changeset_list.html'
 
@@ -147,4 +135,23 @@ class RepositoryChangesets(RepositoryView):
         context['CHANGESETS_PAGINATE_BY'] = \
             self.project.config.changesets_paginate_by
         return context
+
+
+class RepositoryChangesetDetail(RepositoryView):
+
+    template_name = 'projector/project/repository/changeset_detail.html'
+
+    def response(self, request, username, project_slug, revision):
+        if self.has_errors:
+            return self.get_error_response()
+        diff_info = {
+            'repository': self.project.repository,
+            'revision': revision,
+            'template_name': self.template_name,
+            'extra_context': {
+                'project': self.project,
+            }
+        }
+        return diff_changeset(self.request, **diff_info)
+
 
