@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
@@ -10,7 +10,7 @@ from projector.core.controllers import View
 from projector.forms import UserProfileForm, UserConvertToTeamForm
 from projector.forms import ExternalForkWizard, ExternalForkSourcesForm
 from projector.forms import DashboardAddMemberForm
-from projector.models import Team, Project
+from projector.models import Project
 from projector.settings import get_config_value
 
 
@@ -67,8 +67,9 @@ class UserProfileDetailView(View):
         user = get_object_or_404(User, username=username)
         context = {
             'profile': user.get_profile(),
-            'project_list': Project.objects.for_user(request.user),
-            'teams': Team.objects.for_user(user)
+            'project_list': Project.objects.for_member(request.user),
+            'groups': Group.objects.filter(user__userprofile__is_team=True)\
+                .filter(user=user)
         }
         return context
 

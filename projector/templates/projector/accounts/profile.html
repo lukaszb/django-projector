@@ -6,7 +6,7 @@
 {% block col-left %}
     
     <div class="richtemplates-panel">
-        <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ request.user }}</h5>
+        <h5>{% if profile.is_team %}{% trans "Team" %}{% else %}{% trans "User" %}{% endif %}: {{ profile.user }}</h5>
 	    <div class="richtemplates-panel-content">
             {% if user == profile.user %}
 			<ul class="nav-vertical">
@@ -52,6 +52,7 @@
             <ul>
                 <li><a href="#projects"><span>{% trans "Projects" %}</span></a></li>
                 <li><a href="#teams">{% trans "Teams" %}</a></li>
+                {% if profile.is_team %}<li><a href="#members">{% trans "Members" %}</a></li>{% endif %}
             </ul>
         
             <div id="projects">
@@ -87,14 +88,36 @@
                         </tr>
                     </thead>
                     <tbody class="datatable-tbody">
-                        {% for team in teams %}
+                        {% for group in groups %}
                         <tr class="{% cycle "odd" "even" %} hoverable">
-                            <td><a class="block-link" href="#">{{ team.group }}</a></td>
+                            <td><a class="block-link" href="{% url projector_users_profile_detail group.name %}">{{ group }}</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            {% if profile.is_team %}
+            <div id="members">
+                <h3>{% trans "Members of this team" %}</h3>
+                <table class="datatable">
+                    <thead>
+                        <tr class="datatable-thead">
+                            <th>{% trans "User" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="datatable-tbody">
+                        {% for user in profile.group.user_set.all %}
+                        <tr class="{% cycle "odd" "even" %} hoverable">
+                            <td><a href="{% url projector_users_profile_detail user.username %}"
+                                   class="block-link">{{ user }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
         </div>
 
     </div>

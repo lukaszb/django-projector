@@ -13,10 +13,9 @@ class ProjectManager(models.Manager):
 
     def for_user(self, user=None):
         """
-        Returns queryset of :model:`Project` instances available
-        for given user. If no user is given or user
-        is inactive/anonymous, only public projects are
-        returned.
+        Returns queryset of :model:`Project` instances available for given
+        user. If no user is given or user is inactive/anonymous, only public
+        projects are returned.
         """
         if not user:
             user = AnonymousUser()
@@ -32,6 +31,29 @@ class ProjectManager(models.Manager):
                     Q(public=False, team__group__user=user)
         else:
             qset = qset & Q(public=True)
+        qs = qs.filter(qset)\
+            .select_related('membership__member')\
+            .order_by('name')\
+            .distinct()
+
+        return qs
+
+    def for_member(self, user):
+        """
+        Returns queryset of :model:`Project` instances available for given user.
+        If given user is inactive/anonymous only public projects are returned.
+        """
+        qs = self.get_query_set()
+        qset = Q()
+        if user.is_active and not user.is_anonymous():
+            if user.is_superuser:
+                pass
+            else:
+                qset = qset & \
+                    Q(membership__member=user) | \
+                    Q(team__group__user=user)
+        else:
+            raise ValueError("User %s must be active" % user)
         qs = qs.filter(qset)\
             .select_related('membership__member')\
             .order_by('name')\
