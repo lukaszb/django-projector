@@ -44,9 +44,10 @@
         <thead class="datatable-thead">
             <tr class="datatable-thead-subheader lefted">
                 <th class="width-5">{% trans "Revision" %}</th>
+                <th class="width-10">{% trans "Differences" %}</th>
                 <th class="width-15">{% trans "Commited at" %}</th>
                 <th class="width-10">{% trans "Author" %}</th>
-                <th class="width-70">{% trans "Message" %}</th>
+                <th class="width-65">{% trans "Message" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
@@ -55,6 +56,19 @@
                 <td><a href="{% url projector_project_sources_browse project.author.username project.slug changeset.id '' %}"
                        class="browser-changeset block-link show-tipsy-right"
                        title="{% trans "Browse revision's content" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
+                </td>
+                <td>
+                    <ul class="changeset-changes centered">
+                        <li class="added show-tipsy"
+                            title="{% trans "Added" %}: {{ changeset.added|length }}">{{ changeset.added|length }}</li>
+                        <li class="changed show-tipsy"
+                            title="{% trans "Changed" %}: {{ changeset.changed|length }}">{{ changeset.changed|length }}</li>
+                        <li class="removed show-tipsy"
+                            title="{% trans "Removed" %}: {{ changeset.removed|length }}">{{ changeset.removed|length }}</li>
+                    </ul>
+                    <a href="{% url projector_project_changeset_diff project.author.username project.slug changeset.raw_id %}"
+                       class="show-tipsy"
+                       title="{% trans "Shows diff for whole changeset" %}">{% trans "Show diff" %}</a>
                 </td>
                 <td class="show-tipsy" title="{{ changeset.date }}">
                     {{ changeset.date|timesince }} {% trans "ago" %}

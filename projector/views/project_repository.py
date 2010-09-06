@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from projector.views.project import ProjectView
 from projector.utils.lazy import LazyProperty
 
-from vcs.web.simplevcs.views import browse_repository, diff_file
+from vcs.web.simplevcs.views import browse_repository, diff_file, diff_changeset
 
 class RepositoryView(ProjectView):
 
@@ -64,9 +64,27 @@ class RepositoryBrowseView(RepositoryView):
         }
         return browse_repository(self.request, **repo_info)
 
-class RepositoryFileDiffView(RepositoryView):
+
+class RepositoryChangesetDiffView(RepositoryView):
 
     template_name = 'projector/project/repository/diff.html'
+
+    def response(self, request, username, project_slug, revision):
+        if self.has_errors:
+            return self.get_error_response()
+        diff_info = {
+            'repository': self.project.repository,
+            'revision': revision,
+            'template_name': self.template_name,
+            'extra_context': {
+                'project': self.project,
+            }
+        }
+        return diff_changeset(self.request, **diff_info)
+
+class RepositoryFileDiffView(RepositoryView):
+
+    template_name = 'projector/project/repository/diff_file.html'
 
     def response(self, request, username, project_slug, revision_old,
             revision_new, rel_repo_url):

@@ -144,6 +144,10 @@ urlpatterns += patterns('projector.views.project_repository',
         view='RepositoryFileDiffView',
         name='projector_project_file_diff'),
 
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/diff/(?P<revision>[\w]*)/$',
+        view='RepositoryChangesetDiffView',
+        name='projector_project_changeset_diff'),
+
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
         view='RepositoryFileRaw',
         name='projector_project_sources_raw'),
