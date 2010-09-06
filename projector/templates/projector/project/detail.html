@@ -136,6 +136,16 @@
                             {% endif %}
                         </td>
                     </tr>
+                    <tr>
+                        <th>{% trans "Homepage" %}</th>
+                        <td>
+                            {% if project.home_page_url %}
+                            <a href="{{ project.home_page_url }}">{{ project.home_page_url }}</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
