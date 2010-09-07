@@ -126,7 +126,6 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ('category', 'is_active', 'public', 'outdated')
     save_on_top = True
     search_fields = ['name', 'description']
-    prepopulated_fields = {"slug": ("name",)}
 
     inlines = [MilestoneInline, ComponentInline, TaskTypeInline,
         StatusInline, PriorityInline]
