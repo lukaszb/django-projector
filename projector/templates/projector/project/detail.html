@@ -3,6 +3,7 @@
 {% load markup %}
 {% load i18n %}
 {% load guardian_tags %}
+{% load gravatar_tags %}
 {% load richtemplates_tags %}
 {% load native %}
 
@@ -124,7 +125,12 @@
                     </tr>
                     <tr>
                         <th>{% trans "Author" %}</th>
-                        <td><a href="{% url projector_users_profile_detail project.author.username %}">{{ project.author }}</a></td>
+                        <td>
+                            <img src="{% gravatar_for_user project.author %}"
+                                 width="16"
+                                 height="16"/>
+                            <a href="{% url projector_users_profile_detail project.author.username %}">{{ project.author }}</a>
+                        </td>
                     </tr>
                     <tr>
                         <th>{% trans "Visibility" %}</th>
