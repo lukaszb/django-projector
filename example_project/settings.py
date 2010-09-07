@@ -205,6 +205,7 @@ AUTHENTICATION_BACKENDS = (
 ANONYMOUS_USER_ID = -1
 
 ACCOUNT_ACTIVATION_DAYS = 7
+GRAVATAR_DEFAULT_IMAGE = 'mm'
 
 try:
     from conf.local_settings import *

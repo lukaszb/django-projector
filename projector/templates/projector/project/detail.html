@@ -130,9 +130,9 @@
                         <th>{% trans "Visibility" %}</th>
                         <td>
                             {% if project.is_public %}
-                            {% trans "Public" %}
+                            {% richicon "lock_open.png" %} <span>{% trans "Public" %}</span>
                             {% else %}
-                            {% trans "Private" %}
+                            {% richicon "lock.png" %} <span>{% trans "Private" %}</span>
                             {% endif %}
                         </td>
                     </tr>

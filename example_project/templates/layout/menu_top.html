@@ -1,5 +1,6 @@
 {% extends "richtemplates/layout/menu_top.html" %}
 {% load i18n %}
+{% load gravatar_tags %}
 
 {% block menu-top-left %}
     <li><a href="/">Home</a></li>
@@ -28,6 +29,12 @@
         class="show-tipsy-bottom"
         title="{% trans "Show user's public profile" %}">{{ user }}</a>
     </li>
+    <li><img src="{% gravatar_for_user user 16 %}"
+             alt="{% trans "Avatar" %}"
+             style="padding:0; margin:0"
+             width="16"
+             height="16"/>
+     </li>
     {% endif %}
 
 {% endblock %}
