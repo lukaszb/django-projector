@@ -182,7 +182,8 @@ class Project(AL_Node, Watchable):
 
     name = models.CharField(_('name'), max_length=64,
         validators=[validate_project_name])
-    slug = models.SlugField(validators=[validate_project_name])
+    slug = AutoSlugField(max_length=128, populate_from='name',
+        unique_with='author', validators=[validate_project_name])
     category = models.ForeignKey(ProjectCategory, verbose_name=_('category'),
         null=True, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
