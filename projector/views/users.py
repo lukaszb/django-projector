@@ -67,7 +67,7 @@ class UserProfileDetailView(View):
         user = get_object_or_404(User, username=username)
         context = {
             'profile': user.get_profile(),
-            'project_list': Project.objects.for_member(request.user),
+            'project_list': Project.objects.for_member(user, request.user),
             'groups': Group.objects.filter(user__userprofile__is_team=True)\
                 .filter(user=user)
         }

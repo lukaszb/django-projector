@@ -22,13 +22,10 @@ class ProjectManager(models.Manager):
         qs = self.get_query_set()
         qset = Q()
         if user.is_active:
-            if user.is_superuser:
-                pass
-            else:
-                qset = qset & \
-                    Q(public=True) | \
-                    Q(public=False, membership__member=user) | \
-                    Q(public=False, team__group__user=user)
+            qset = qset & \
+                Q(public=True) | \
+                Q(public=False, membership__member=user) | \
+                Q(public=False, team__group__user=user)
         else:
             qset = qset & Q(public=True)
         qs = qs.filter(qset)\
@@ -38,22 +35,22 @@ class ProjectManager(models.Manager):
 
         return qs
 
-    def for_member(self, user):
+    def for_member(self, user, requested_by):
         """
-        Returns queryset of :model:`Project` instances available for given user.
-        If given user is inactive/anonymous only public projects are returned.
+        Returns queryset of :model:`Project` instances which given ``user`` is
+        member of with exclusion of those projects which ``requested_by`` user
+        cannot see (i.e. are private and ``requested_by`` is not member of).
         """
-        qs = self.get_query_set()
+        qs = self.for_user(requested_by)
         qset = Q()
-        if user.is_active and not user.is_anonymous():
-            if user.is_superuser:
-                pass
-            else:
-                qset = qset & \
-                    Q(membership__member=user) | \
-                    Q(team__group__user=user)
-        else:
-            raise ValueError("User %s must be active" % user)
+
+        if user.is_anonymous():
+            raise ValueError("Only requeted_by parameter may be anonymous")
+
+        qset = qset & \
+            Q(membership__member=user) | \
+            Q(team__group__user=user)
+
         qs = qs.filter(qset)\
             .select_related('membership__member')\
             .order_by('name')\
