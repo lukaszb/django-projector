@@ -11,6 +11,7 @@ Features
 --------
 
 - Mercurial_ repository integration
+- Easy repositories forking
 - Granual permissions management
 - Scalable architecture (AMQP) build on top of excellent celery_
 - Task tracker with full history of changes
