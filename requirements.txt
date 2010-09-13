@@ -19,3 +19,4 @@ django-treebeard==1.61
 docutils==0.7
 mercurial>=1.6
 wsgiref==0.1.2
+-e hg+http://bitbucket.org/marcinkuzminski/vcs/@27cd5cce30c96924232dffcd24178a07ffeb5dfc#egg=vcs-tip
