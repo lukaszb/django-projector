@@ -1,6 +1,7 @@
 {% extends "projector/project/detail.html" %}
 
 {% load i18n %}
+{% load markup %}
 {% load native %}
 {% load projector_tags %}
 {% load richtemplates_tags %}
@@ -207,10 +208,8 @@
 <div class="richtemplates-panel">
     <h5>{{ readme_node }}</h5>
     <div class="richtemplates-panel-content">
-        <div class="richblock">
-            <div class="codeblock">
-                {% highlight readme_node.content readme_node.lexer_alias linenos=true anchorlinenos=true lineanchors=line cssclass="code-highlight" %}
-            </div>
+        <div class="codeblock">
+            {% highlight readme_node.content readme_node.lexer_alias linenos=true anchorlinenos=true lineanchors=line cssclass="code-highlight" %}
         </div>
     </div>
 </div>
