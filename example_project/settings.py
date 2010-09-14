@@ -73,7 +73,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
 
     'djalog.middleware.SQLLoggingMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'richtemplates.middleware.Http403Middleware',
     'django_sorting.middleware.SortingMiddleware',
     'vcs.web.simplevcs.middleware.PaginationMiddleware',
