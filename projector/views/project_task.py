@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 
@@ -37,6 +38,28 @@ class TaskListView(ProjectView):
             return redirect(task.get_absolute_url())
         self.context['filters'] = filters
         return self.context
+
+
+class TaskListDataView(ProjectView):
+    """
+    Tasks data for charts.
+    """
+
+    def response(self, request, username, project_slug):
+        import random
+        import pyofc2
+        t = pyofc2.title(text=_("Tasks"))
+        b1 = pyofc2.bar()
+        b1.values = range(10)
+        b2 = pyofc2.bar()
+        b2.values = [random.randint(0,9) for i in range(9)]
+        b2.colour = '#56acde'
+        chart = pyofc2.open_flash_chart()
+        chart.title = t
+        chart.add_element(b1)
+        chart.add_element(b2)
+        return HttpResponse(chart.render())
+
 
 class TaskDetailView(ProjectView):
     """

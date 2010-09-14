@@ -2,7 +2,6 @@ import django_filters
 
 from django import forms
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 
 from projector.models import Task
 
@@ -27,7 +26,7 @@ def TaskFilter(data=None, queryset=Task.objects.all(), project=None):
         class Meta:
             model = Task
             fields = ['id', 'priority', 'milestone', 'status', 'component',
-                'owner']
+                'owner', 'type']
 
         def __init__(self, *args, **kwargs):
             super(TaskFilter, self).__init__(*args, **kwargs)
@@ -42,6 +41,8 @@ def TaskFilter(data=None, queryset=Task.objects.all(), project=None):
                     {'queryset': project.component_set.all()})
                 self.filters['owner'].extra.update(
                     {'queryset': project.members.order_by('username')})
+                self.filters['type'].extra.update(
+                    {'queryset': project.tasktype_set.all()})
                 #self.filters['owner'].extra.update(
                 #    {'label': _('Assigned to')})
     filterset = TaskFilter(data, queryset)

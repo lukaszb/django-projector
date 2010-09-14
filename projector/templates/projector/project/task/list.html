@@ -4,11 +4,13 @@
 {% load pagination_tags %}
 {% load sorting_tags %}
 
-{% comment %}
-{% block col-left %}{{ block.super }}
+{% block col-single-extra %}
 
-<div class="richtemplates-panel">
-    <h5>{% trans "Task search" %}</h5>
+{% autosort filters.qs as task_list %}
+{% autopaginate task_list %}
+
+<div class="richtemplates-panel width-10 float-left">
+    <h5>{% trans "Filters" %}</h5>
     <div class="richtemplates-panel-content">
         <form action="." method="get">
             <table class="filterform-table">
@@ -22,15 +24,8 @@
         </form>
     </div>
 </div>
-{% endblock %}
-{% endcomment %}
 
-{% block col-single-extra %}
-
-{% autosort filters.qs as task_list %}
-{% autopaginate task_list %}
-
-<div class="richtemplates-panel">
+<div class="richtemplates-panel width-75 float-right">
     <h5>{% trans "Project's task list" %}</h5>
     <div class="richtemplates-panel-content">
     <h2>{% trans "Task List" %}</h2>
@@ -49,14 +44,12 @@
                 <th>{% anchor summary "Summary" %}</th>
                 <th>{% anchor milestone "Milestone" %}</th>
                 <th>{% anchor created_at "Created at" %}</th>
-                <th>{% anchor edited_at "Last update" %}</th>
-                <th>{% anchor deadline "Deadline" %}</th>
                 <th>{% anchor priority "Priority" %}</th>
                 <th>{% anchor type "Type" %}</th>
                 <th>{% anchor component "Component" %}</th>
                 <th>{% anchor status "Status" %}</th>
                 <th>{% anchor author "Reported by" %}</th>
-                <th>{% anchor owner "Owner" %}</th>
+                <th>{% anchor owner "Assigned to" %}</th>
             </tr>
         </thead>
         <tbody class="datatable-tbody">
@@ -66,8 +59,6 @@
                 <td><a href="{{ task.get_absolute_url }}" class="block-link">{{ task.summary }}</a></td>
                 <td><a href="{{ task.milestone.get_absolute_url }}" class="block-link">{{ task.milestone }}</a></td>
                 <td>{{ task.created_at|date:"Y-m-d" }}</td>
-                <td>{{ task.edited_at|date:"Y-m-d" }}</td>
-                <td>{{ task.deadline|date:"Y-m-d" }}</td>
                 <td>{{ task.priority.name }}</td>
                 <td>{{ task.type }}</td>
                 <td><a href="{{ task.component.get_absolute_url }}" class="block-link">{{ task.component }}</a></td>
@@ -95,5 +86,6 @@
     {% endif %}
 </div>
 </div>
+
 {% endblock %}
 
