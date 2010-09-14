@@ -26,7 +26,7 @@ When specifing commands we assume we are at ``example_project`` directory.
 Before we can run example project we need to include media files. Thanks to
 `django-richtemplates`_ this is as easy as running one management command::
 
-   python manage.py import_media richtemplates projector
+    python manage.py import_media richtemplates projector
 
 This would fetch all necessary media files and put them into ``MEDIA_ROOT``
 defined at settings module.
@@ -37,16 +37,26 @@ Step 2 - database
 Now we need to create database (we use ``sqlite3`` backend for sample project).
 Type following command::
 
-   python manage.py syncdb
+    python manage.py syncdb
 
-Step 3 - finalize
+Step 3 - fire up a worker
+-------------------------
+
+We need to run a celery worker for some heavy jobs to be done asynchronously.
+As we use celery_ we need to start it at one terminal::
+
+    python manage.py celeryd -l DEBUG
+
+
+Step 4 - finalize
 -----------------
 
-In fact there is no step 3 - simply run development server::
+In fact there is no step 4 - simply run development server::
 
-   python manage.py runserver
+    python manage.py runserver
 
 ... and open ``http://localhost:8000`` location in a browser.
 
+.. _celery: http://celeryproject.org/
 .. _django-richtemplates: http://bitbucket.org/lukaszb/django-richtemplates/
 

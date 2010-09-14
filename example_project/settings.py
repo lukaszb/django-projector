@@ -47,9 +47,7 @@ INSTALLED_APPS = (
 
 
     # External
-    'debug_toolbar',
     'djalog',
-    'djangodblog',
     'django_extensions',
     'django_sorting',
     'djcelery',
@@ -60,7 +58,6 @@ INSTALLED_APPS = (
     'pagination',
     'registration',
     'richtemplates',
-    'tagging',
     'projector',
     'vcs.web.simplevcs',
 
