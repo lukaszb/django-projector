@@ -4,7 +4,7 @@ Installation
 ============
 
 ``django-projector`` is aimed to work with Django 1.2 or later. Moreover, we
-strongly suggest to use `virtualenv`_ and `virtualenvwrapper`_ - great tools
+strongly suggest to use virtualenv_ and virtualenvwrapper_ - great tools
 for creating temporary environment to work on.
 
 Requirements
@@ -24,8 +24,8 @@ Trying it out
 
 .. [1] `pip <http://pip.openplans.org/>`_ is tool similar to `easy_install
     <http://pypi.python.org/pypi/setuptools>`_ with some more power (like
-    smooth integration with `virtualenv <http://virtualenv.openplans.org/>`_,
-    ``freeze`` command, package uninstallation, search and others.
+    smooth integration with virtualenv_, ``freeze`` command, package
+    uninstallation, search and others.
 
 .. _virtualenv: http://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://pypi.python.org/pypi/virtualenvwrapper
