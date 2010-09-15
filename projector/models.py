@@ -746,6 +746,7 @@ class Project(AL_Node, Watchable):
             project = self,
             editor = self.author,
         )
+        logging.debug("Project '%s': created config %s" % (self, config))
         self.state = State.CONFIG_CREATED
         return config
 

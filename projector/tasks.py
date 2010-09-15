@@ -62,8 +62,7 @@ def setup_project(instance, vcs_alias=None, workflow=None):
         if get_config_value('CREATE_REPOSITORIES'):
             # We spawn sub task here as creating repositories is most crucial
             # task durgin project setup
-            result = project_create_repository.delay(instance)
-            result.wait()
+            instance.create_repository(vcs_alias=vcs_alias)
             current_state = State.REPOSITORY_CREATED
             Project.objects.filter(pk=instance.pk).update(state=current_state)
 
