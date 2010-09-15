@@ -1,5 +1,6 @@
 import sys
 
+from django.conf import settings
 from django.test import TestCase
 
 class ProjectorTestCase(TestCase):
@@ -58,6 +59,13 @@ def test_concurrently(times):
     """
     def test_concurrently_decorator(test_func):
         def wrapper(*args, **kwargs):
+            if settings.DATABASE_ENGINE == 'sqlite3' or \
+                ('default' in settings.DATABASES and
+                 settings.DATABASES['default']['ENGINE'].split('.')[-1] ==
+                 'sqlite3'):
+                print "[WARNING] Concurrency tests are not applicable if "\
+                      "sqlite3 is used as database engine"
+                return
             exceptions = []
             import threading
             def call_test_func():
