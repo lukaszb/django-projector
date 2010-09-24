@@ -82,7 +82,7 @@ class ProjectBaseForm(forms.ModelForm):
         form = super(ProjectBaseForm, self).__init__(*args, **kwargs)
         # Update ``status`` field while creating new task
         if get_config_value('PRIVATE_ONLY'):
-            self.fields['public'].choices.pop(0)
+            self.fields['public'].choices = PUBLIC_RADIO_CHOICES[1:]
         return form
 
     def clean_public(self):

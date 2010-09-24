@@ -136,7 +136,7 @@ DJALOG_FORMAT = "[%(levelname)s] %(message)s"
 # ====================== #
 
 RICHTEMPLATES_RESTRUCTUREDTEXT_DIRECTIVES = {
-    'code-block': 'richtemplates.rstdirectives.pygments_directive',
+    'code-block': 'richtemplates.rstdirectives.CodeBlock',
 }
 RICHTEMPLATES_DEFAULT_SKIN = 'ruby'
 RICHTEMPLATES_PYGMENTS_STYLES = {
