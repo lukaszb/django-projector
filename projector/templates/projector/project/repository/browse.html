@@ -55,7 +55,7 @@
                     <th>{% trans "Revision" %}</th>
                     <td><a class="show-tipsy"
                            href="{% url projector_project_sources_browse project.author.username project.slug root.changeset.id '' %}"
-                           title="{% trans "Show changeset" %}">{{ root.changeset.revision }}:{{ root.changeset.raw_id }}</a></td>
+                           title="{% trans "Show changeset" %}">{{ root.changeset }}</a></td>
                 </tr>
                 {% if root.is_file %}
                 <tr>
@@ -95,7 +95,7 @@
             <li>
                 <a href="{% url projector_project_sources_browse project.author.username project.slug changeset.id root.path %}"
                    class="show-tipsy"
-                   title="{% trans "Show at revision" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
+                   title="{% trans "Show at revision" %}">{{ changeset }}</a>
             {% if root.changeset.id != changeset.id %}
             (<a href="{% url projector_project_sources_diff project.author.username project.slug changeset.id root.changeset.id root.path %}"
                class="show-tipsy"

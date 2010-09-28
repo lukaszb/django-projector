@@ -55,7 +55,7 @@
             <tr class="{% cycle "odd" "even" %} hoverable">
                 <td><a href="{% url projector_project_sources_browse project.author.username project.slug changeset.id '' %}"
                        class="browser-changeset block-link show-tipsy-right"
-                       title="{% trans "Browse revision's content" %}">{{ changeset.revision }}:{{ changeset.raw_id }}</a>
+                       title="{% trans "Browse revision's content" %}">{{ changeset }}</a>
                 </td>
                 <td>
                     <ul class="changeset-changes centered">

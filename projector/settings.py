@@ -81,7 +81,7 @@ EDITABLE_PERMISSIONS = getattr(settings,
 )
 
 ENABLED_VCS_BACKENDS = getattr(settings,
-    'PROJECTOR_ENABLED_VCS_BACKENDS', ['hg'])
+    'PROJECTOR_ENABLED_VCS_BACKENDS', ['hg', 'git'])
 
 FROM_EMAIL_ADDRESS = settings.DEFAULT_FROM_EMAIL
 

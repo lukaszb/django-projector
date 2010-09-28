@@ -1,5 +1,5 @@
 {% load i18n projector_tags %}{% spaceless %}
 <a href="{% url projector_project_sources_browse project.author.username project.slug line_changeset.raw_id root.path %}"
    title="{% trans "Show changeset" %} {{ line_changeset.raw_id }} {% trans "by" %} {{ line_changeset.author|hide_email }}"
-   class="show-tipsy">{{ line_changeset.revision }}:{{ line_changeset.raw_id }}</a>
+   class="show-tipsy">{{ line_changeset }}</a>
 {% endspaceless %}
