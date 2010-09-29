@@ -21,7 +21,6 @@ from projector.forms import ProjectCreateForm, ProjectEditForm, ConfigForm,\
 from projector.settings import get_config_value
 from projector.signals import setup_project
 
-from vcs.web.simplevcs import settings as simplevcs_settings
 from vcs.web.simplevcs.utils import get_mercurial_response, is_mercurial
 from vcs.web.simplevcs.utils import log_error, basic_auth, ask_basic_auth
 from vcs.web.simplevcs.exceptions import NotMercurialRequest
@@ -197,11 +196,12 @@ def _project_detail_hg(request, project):
     if request.method not in ('GET', 'POST'):
         raise NotMercurialRequest("Only GET/POST methods are allowed, got %s"
             % request.method)
+    PUSH_SSL = get_config_value('HG_PUSH_SSL') and 'true' or 'false'
     # Allow to read from public projects
     if project.is_public() and request.method == 'GET':
         mercurial_info = {
             'repo_path': project._get_repo_path(),
-            'push_ssl': simplevcs_settings.PUSH_SSL,
+            'push_ssl': PUSH_SSL,
         }
         return get_mercurial_response(request, **mercurial_info)
 
@@ -222,7 +222,7 @@ def _project_detail_hg(request, project):
 
     mercurial_info = {
         'repo_path': project._get_repo_path(),
-        'push_ssl': simplevcs_settings.PUSH_SSL,
+        'push_ssl': PUSH_SSL,
     }
 
     if request.user and request.user.is_active:

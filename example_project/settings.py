@@ -6,6 +6,7 @@ from django.conf import global_settings
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
 DEBUG = True
+PROJECTOR_HG_PUSH_SSL = False
 
 PROJECT_ROOT = abspath(os.path.dirname(__file__))
 PROJECTOR_MODULE_PATH = abspath(PROJECT_ROOT, '..')

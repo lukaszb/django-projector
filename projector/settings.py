@@ -3,6 +3,8 @@ import logging
 
 from django.conf import settings
 
+from vcs.web.simplevcs import settings as vcs_settings
+
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 
 ALWAYS_SEND_MAILS_TO_MEMBERS = getattr(settings,
@@ -83,8 +85,6 @@ EDITABLE_PERMISSIONS = getattr(settings,
 ENABLED_VCS_BACKENDS = getattr(settings,
     'PROJECTOR_ENABLED_VCS_BACKENDS', ['hg', 'git'])
 
-FROM_EMAIL_ADDRESS = settings.DEFAULT_FROM_EMAIL
-
 FORK_EXTERNAL_ENABLED = getattr(settings,
     'PROJECTOR_FORK_EXTERNAL_ENABLED', False)
 
@@ -94,6 +94,11 @@ FORK_EXTERNAL_MAP = getattr(settings,
         'bitbucket.org': 'projector.forks.bitbucket.BitbucketForkForm',
     }
 )
+
+FROM_EMAIL_ADDRESS = settings.DEFAULT_FROM_EMAIL
+
+HG_PUSH_SSL = getattr(settings, 'PROJECTOR_HG_PUSH_SSL',
+        getattr(vcs_settings, 'PUSH_SSL', False))
 
 HIDDEN_EMAIL_SUBSTITUTION = getattr(settings,
     'PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION', u'email')
@@ -147,6 +152,8 @@ PROJECTOR = {
     'FORK_EXTERNAL_ENABLED': FORK_EXTERNAL_ENABLED,
     'FORK_EXTERNAL_MAP': FORK_EXTERNAL_MAP,
     'FROM_EMAIL_ADDRESS': settings.DEFAULT_FROM_EMAIL,
+    'HG_PUSH_SSL': HG_PUSH_SSL,
+    'HIDDEN_EMAIL_SUBSTITUTION': HIDDEN_EMAIL_SUBSTITUTION,
     'MAX_PROJECTS_PER_USER': MAX_PROJECTS_PER_USER,
     'MILESTONE_DEADLINE_DELTA': MILESTONE_DEADLINE_DELTA,
     'MILIS_BETWEEN_PROJECT_CREATION': MILIS_BETWEEN_PROJECT_CREATION,

@@ -225,6 +225,16 @@ Default: would try to get value from ``settings.DEFAULT_FROM_EMAIL``.
 
 Email address used as sender for all mails send by projector.
 
+.. setting:: PROJECTOR_HG_PUSH_SSL
+
+PROJECTOR_HG_PUSH_SSL
+---------------------
+
+Default: ``False``.
+
+If set to ``True``, underlying mercurial engine would transmit data using
+encryption. This setting has precedence over vcs specific configuration.
+
 .. setting:: PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION
 
 PROJECTOR_HIDDEN_EMAIL_SUBSTITUTION
