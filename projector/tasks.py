@@ -1,5 +1,6 @@
-import sys
 import logging
+import StringIO
+import traceback
 
 from celery.decorators import task
 
@@ -80,8 +81,12 @@ def setup_project(instance, vcs_alias=None, workflow=None):
         Project.objects.filter(pk=instance.pk).update(state=State.ERROR)
         user_error_text = _("There were some crazy error during project setup "
                             "process")
+        stack = StringIO.StringIO()
+        traceback.print_exc(file=stack)
+        stacktrace = stack.getvalue()
+
         logging.error("Error during project setup. Last state was: %s\n"
-                      "Info:\n%s\n" % (current_state, sys.exc_info()))
+                      "Stack:\n%s\n" % (current_state, stacktrace))
         Project.objects.filter(pk=instance.pk).update(
             error_text=user_error_text)
 

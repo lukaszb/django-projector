@@ -210,6 +210,7 @@ Default::
 
     {
         'bitbucket.org': 'projector.forks.bitbucket.BitbucketForkForm',
+        'github.com': 'projector.forks.github.GithubForkForm',
     }
 
 Dictionary of forms to be used for external forking. Keys would be used as

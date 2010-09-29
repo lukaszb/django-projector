@@ -92,6 +92,7 @@ FORK_EXTERNAL_MAP = getattr(settings,
     'PROJECTOR_FORK_EXTERNAL_MAP',
     {
         'bitbucket.org': 'projector.forks.bitbucket.BitbucketForkForm',
+        'github.com': 'projector.forks.github.GithubForkForm',
     }
 )
 

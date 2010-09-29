@@ -9,6 +9,7 @@ from projector.models import Project
 from projector.tests.base import ProjectorTestCase
 from projector.forks.base import BaseExternalForkForm
 from projector.forks.bitbucket import BitbucketForkForm
+from projector.forks.github import GithubForkForm
 
 class ForkTest(TestCase):
 
@@ -173,6 +174,7 @@ class BitbucketForkTest(TestCase):
         fork = form.fork()
         fork = Project.objects.get(pk=fork.pk)
         self.assertTrue(len(fork.repository.revisions) > 100)
+        self.assertTrue(fork.repository.request('setup.py') is not None)
         self.assertTrue(fork.is_private())
 
     def test_fork_with_same_name(self):
@@ -185,26 +187,6 @@ class BitbucketForkTest(TestCase):
         form = BitbucketForkForm(data)
         form.request = self.request
         self.assertFalse(form.is_valid())
-
-    # Deprecated: errors are handled during project setup as projects are now
-    # created asynchronously
-
-    #def test_wrong_values(self):
-        #joe = User.objects.create(username='joe')
-        #data = {
-            #'username': u'x',
-            #'projectname': u'x',
-        #}
-        #form = BitbucketForkForm(data)
-        #self.assertTrue(form.is_valid())
-        #request = HttpRequest()
-        #request.user = joe
-        #try:
-            #form.fork(request)
-        #except ProjectorError:
-            #pass
-        #else:
-            #self.fail("Form should raise subclass of ProjectorError")
 
     def test_valid(self):
         """
@@ -220,6 +202,56 @@ class BitbucketForkTest(TestCase):
         ))]
         for data in data_list:
             form = BitbucketForkForm(data)
+            form.request = self.request
+            self.assertFalse(form.is_valid())
+
+
+class GithubForkTest(TestCase):
+
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.user = User.objects.create(username='mirror')
+
+    def test_fork(self):
+        data = {
+            'username': u'lukaszb',
+            'projectname': u'django-guardian',
+            #'as_private': u'checked',
+        }
+        form = GithubForkForm(data)
+        form.request = self.request
+        self.assertTrue(form.is_valid())
+        fork = form.fork()
+        fork = Project.objects.get(pk=fork.pk)
+        self.assertTrue(len(fork.repository.revisions) > 5)
+        self.assertTrue(fork.repository.request('setup.py') is not None)
+        self.assertFalse(fork.is_private())
+
+    def test_fork_with_same_name(self):
+        Project.objects.create(name=u'mirror-same', author=self.request.user)
+        data = {
+            'username': u'whatever',
+            'projectname': u'mirror-same',
+            'as_private': u'checked',
+        }
+        form = GithubForkForm(data)
+        form.request = self.request
+        self.assertFalse(form.is_valid())
+
+    def test_valid(self):
+        """
+        This test checks if sane values have been passed to the form.
+        Allowing external forking may be very dangerous as we may expose
+        own project to be used as *proxy* for attacks on external locations.
+        """
+        data_list = [dict((key, val) for key, val in (
+            ('foobar', '<script...'),
+            ('<script', 'foobar'),
+            ('foobar', '../../'),
+            ('../../', 'foobar'),
+        ))]
+        for data in data_list:
+            form = GithubForkForm(data)
             form.request = self.request
             self.assertFalse(form.is_valid())
 
