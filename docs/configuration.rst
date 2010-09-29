@@ -174,13 +174,13 @@ List of permission codenames allowed to be edited by projects' owners.
 PROJECTOR_ENABLED_VCS_BACKENDS
 ------------------------------
 
-Default: ``[hg]``
+Default: ``['hg', 'git']``
 
 Iterable of vcs_ *aliases*. To check what backends are available run::
 
     >>> import vcs
     >>> vcs.backends.BACKENDS.keys()
-    ['hg']
+    ['hg', 'git']
 
 See more at `vcs's documentation`_.
 
