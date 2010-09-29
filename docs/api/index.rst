@@ -7,8 +7,10 @@ API Reference
    :maxdepth: 3
 
    core/index.rst
+   forms
    managers
    models
    utils
    signals
+   views/index.rst
    

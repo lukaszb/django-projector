@@ -145,6 +145,9 @@ class ProjectForkForm(forms.Form):
 
 
 class ConfigForm(forms.ModelForm):
+    """
+    ModelForm for :model:`Config`.
+    """
     changesets_paginate_by = forms.IntegerField(
         label=_('Changesets paginate by'), min_value=5, max_value=50)
 
@@ -441,6 +444,20 @@ class UserProfileForm(forms.ModelForm):
 
 
 class UserConvertToTeamForm(forms.Form):
+    """
+    Simple form which converts user into :model:`Team`.
+
+    .. note::
+       User instance has to be set within a view::
+
+          def aview(request):
+              form = UserConvertToTeamForm(request.POST or None)
+              form.user = request.user
+              # ...
+
+    .. seealso:: :ref:`teamwork-membership-convert`
+
+    """
     confirm = forms.BooleanField(label=_('confirm'))
 
     def _get_user(self):
@@ -452,6 +469,10 @@ class UserConvertToTeamForm(forms.Form):
     user = property(_get_user, _set_user)
 
     def clean(self):
+        """
+        Cleans ``confirm`` field. If checked and ``user`` attribute has been
+        set, :manager:`TeamManager`'s method ``convert_from_user`` is called.
+        """
         if any(self.errors):
             return
         if not self.user:
@@ -470,6 +491,12 @@ class ExternalForkSourcesForm(forms.Form):
 
 
 class ExternalForkWizard(FormWizard):
+    """
+    Form wizard which processes each step of external forking.
+
+    .. seealso:: :ref:`projects-forking-external`
+
+    """
 
     def done(self, request, form_list):
         form = form_list[1]
@@ -503,6 +530,10 @@ class ExternalForkWizard(FormWizard):
 
 
 class DashboardAddMemberForm(forms.Form):
+    """
+    Form providing ability to add user to the group. It is useful for users
+    converted into :model:`Team` to add new members.
+    """
     user = UserByNameField()
 
     def __init__(self, group, *args, **kwargs):
@@ -527,6 +558,9 @@ class DashboardAddMemberForm(forms.Form):
         return user
 
     def save(self, commit=True):
+        """
+        Adds chosen user to the group.
+        """
         user = self.cleaned_data['user']
         if commit:
             user.groups.add(self.group)

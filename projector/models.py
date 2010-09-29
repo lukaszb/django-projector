@@ -1472,7 +1472,7 @@ class UserProfile(RichUserProfile):
     """
     Base user profile class for ``django-projector``.
     Would be abstract if ``AUTH_PROFILE_MODULE`` is not set or doesn't equal
-    with ``projector.UserProfile``.
+    to ``projector.UserProfile``.
     """
     activation_token = models.CharField(_('activation token'), max_length=32,
         editable=False)

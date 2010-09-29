@@ -27,6 +27,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'example_project.settings'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'exts']
 
+#autodoc_default_flags = ['show-inheritance', 'inherited-members']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']
 

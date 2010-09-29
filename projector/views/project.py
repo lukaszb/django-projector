@@ -34,10 +34,56 @@ class ProjectView(View):
     Logic should be implemented at ``response`` method.
 
     Would check necessary permissions defined by class attributes: ``perms``,
-    ``perms_POST`` and ``perms_POST``. ``perms`` are always checked,
-    ``perms_POST`` are additional checks which would be made for ``GET`` method
-    requests only and ``perms_POST`` would be made for ``POST`` method requests.
-    ``perms_private`` would be checked for private projects only.
+    ``perms_GET`` and ``perms_POST``.
+
+    ``perms`` are always checked, ``perms_POST`` are additional checks which
+    would be made for ``GET`` method requests only and ``perms_POST`` would be
+    made for ``POST`` method requests.  ``perms_private`` would be checked for
+    private projects only.
+
+    .. note::
+       This view class should be considered as abstract - it does not implement
+       ``response`` method.
+
+    **View attributes**
+
+    * ``perms``: ``[]``
+    * ``perms_private``: ``['view_project']``
+    * ``perms_GET``: ``[]``
+    * ``perms_POST``: ``[]``
+
+    * ``template_error_name``:  ``projector/project/error.html``
+    * ``template_pending_name``: ``projector/project/pending.html``
+
+    **Required parameters**
+
+    * ``request``: ``django.http.HttpRequest`` instance, which is always passed
+      as first positional argument
+
+    * ``username``:  :model:`Project` would be fetched using this parameter as
+      ``User``'s ``username`` attribute lookup
+
+    * ``project_slug``: :model:`Project` would be fetched using this parameter
+      as :model:`Project`'s ``slug`` attribute lookup
+
+
+    **Context variables**
+
+    * ``project``: :model:`Project` instance fetched using provided parameters
+
+    * ``STATES``: class describing project states (:class:`projector.models.State`)
+
+    * ``project_root``: :model:`Project` instance which is a root in requested
+      project forks tree. If requested project is a root, value of this variable
+      would be same as ``project`` variable.
+
+    * ``forks``: list of :model:`Project` instances which are fork of the
+      requested project. If requested project is a root, list would contain only
+      requested project (would be same as ``project`` variable).
+
+    * ``user_fork``: :model:`Project` instance representing ``request.user``'s
+      own fork of requested project. If user haven't forked this project then
+      ``user_fork`` would be ``None``.
 
     """
 
@@ -114,6 +160,11 @@ class ProjectView(View):
         return perms
 
     def check_permissions(self):
+        """
+        Checks if user has permissions to call this view. By default, this
+        method would perform checks using requested :model:`Project` instance
+        and permission list retrieved by ``get_required_perms`` method.
+        """
         # Owner's are always allowed to do anything with their projects
         # - this would make less database hits
         if self.project.author == self.request.user:
@@ -146,15 +197,25 @@ class ProjectDetailView(ProjectView):
     We make necessary permission checks *after* dispatching between
     normal and mercurial request, as mercurial requests has it's own
     permission requirements.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/project/detail.html``
+
+    * ``csrf_exempt``: ``True``
+
     """
 
     template_name = 'projector/project/detail.html'
     csrf_exempt = True
 
     def get_required_perms(self):
+        """
+        Returns empty list if request is identified as *mercurial request*.
+        For mercurial requests lets underlying view to manage permissions
+        checks.
+        """
         if is_mercurial(self.request):
-            # For mercurial requests lets undelying view to
-            # manage permissions checking
             return []
         return super(ProjectDetailView, self).get_required_perms()
 
@@ -235,6 +296,17 @@ def _project_detail_hg(request, project):
 class ProjectListView(View):
     """
     Project listing view.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/project/list.html``
+
+    **Additional context variables**
+
+    * ``project_list``: :model:`Project` queryset filtered for request's user.
+      Additionally, projects are annotated with :model:`Task` count (available
+      as ``task__count`` attribute on each retrieved project).
+
     """
 
     template_name = 'projector/project/list.html'
@@ -251,6 +323,12 @@ class ProjectListView(View):
 class ProjectCreateView(View):
     """
     New project creation view.
+
+    .. seealso:: :ref:`projects-basics-create`
+
+    **Additional context variables**
+
+    * ``form``: :form:`ProjectCreateForm`
     """
 
     template_name = 'projector/project/create.html'
@@ -283,9 +361,10 @@ class ProjectCreateView(View):
         she is allowed to create new one.
 
         If user is trying to create more project than specified by
-        MAX_PROJECTS_PER_USER configuration value then we disallow.
+        :setting:`PROJECTOR_MAX_PROJECTS_PER_USER` configuration value then we
+        disallow.
 
-        If request is given, send messages.
+        If request is given, sends messages.
         """
 
         def send_error(request, message):
@@ -318,6 +397,13 @@ class ProjectCreateView(View):
 class ProjectForkView(ProjectView):
     """
     Project fork (internal fork) view.
+
+    .. seealso:: :ref:`projects-forking`
+
+    **Additional context variables**
+
+    * ``form``: :form:`ProjectForkForm`
+
     """
 
     template_name = 'projector/project/fork.html'
@@ -348,6 +434,13 @@ class ProjectForkView(ProjectView):
 class ProjectEditView(ProjectView):
     """
     Update project view.
+
+    **Additional context variables**
+
+    * ``form``: :form:`ProjectEditForm`
+
+    * ``form_config``: :form:`ConfigForm`
+
     """
 
     template_name = 'projector/project/edit.html'

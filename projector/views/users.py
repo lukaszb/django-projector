@@ -26,6 +26,18 @@ def can_fork_external():
 
 
 class UserListView(View):
+    """
+    Lists all users.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/user_list.html``
+
+    **Context variables**
+
+    * ``user_list``: queryset of all users
+
+    """
     template_name = 'projector/accounts/user_list.html'
 
     def response(self, request):
@@ -37,6 +49,21 @@ class UserListView(View):
 
 
 class UserHomepageView(View):
+    """
+    Returns user's homepage with some useful data.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/user_homepage.html``
+
+    **Context variables**
+
+    * ``profile``: user's profile fetched with ``get_profile`` ``User``'s method
+
+    * ``owned_task_list``: queryset of :model:`Task` objects owned by the user
+
+    """
+
     template_name = 'projector/accounts/user_homepage.html'
 
     def response(self, request):
@@ -60,6 +87,21 @@ class UserHomepageView(View):
 class UserProfileDetailView(View):
     """
     Public profile of the given user.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/profile.html``
+
+    **Context attributes**
+
+    * ``profile``: user's profile fetched with ``get_profile`` ``User``'s method
+
+    * ``project_list``: queryset of :model:`Project` objects for which user is
+      member
+
+    * ``groups``: queryset of ``django.contrib.auth.models.Group`` objects for
+      the user if user is converted into a :model:`Team`
+
     """
     template_name = 'projector/accounts/profile.html'
 
@@ -76,7 +118,23 @@ class UserProfileDetailView(View):
 
 class UserDashboardView(View):
     """
-    Edit profile view.
+    User's dashboard panel.
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/dashboard.html``
+
+    **Context variables**
+
+    * ``form``: :form:`UserProfileForm` with current user's profile instance
+
+    * ``profile``: profile passed as instance into the form
+
+    * ``site``: current ``Site`` object
+
+    * ``can_fork_external``: boolean allowing or disallowing user to fork
+      projects from external locations
+
     """
 
     template_name = 'projector/accounts/dashboard.html'
@@ -101,7 +159,17 @@ class UserDashboardView(View):
 
 class UserDashboardForkView(View):
     """
-    Fork external project view.
+    Returns :form:`ExternalForkWizard` which encapsulates logic for external
+    forks.
+
+    .. seealso:: :ref:`projects-forking-external`
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/dashboard_fork.html``
+
+    * ``login_required``: ``True``
+
     """
 
     template_name = 'projector/accounts/dashboard_fork.html'
@@ -124,7 +192,21 @@ class UserDashboardForkView(View):
 
 class UserDashboardConvert2TeamView(View):
     """
-    Convert to team view.
+    Converts user into :model:`Team`.
+
+    .. seealso:: :ref:`teamwork-membership-convert`
+
+    **View attributes**
+
+    * ``template_name``: ``projector/accounts/dashboard-convert-confirm.html``
+
+    **Context variables**
+
+    * ``form``: :form:`UserConvertToTeamForm`
+
+    * ``profile``: user's profile retrieved using ``User``'s ``get_profile``
+      method
+
     """
 
     template_name = 'projector/accounts/dashboard-convert-confirm.html'
@@ -154,7 +236,7 @@ class UserDashboardConvert2TeamView(View):
 
 class UserDashboardAddMember(View):
     """
-    Add new member view.
+    Adds new member. Only applicable for :model:`Team`.
     """
 
     template_name = 'projector/accounts/dashboard-add-new-member.html'
