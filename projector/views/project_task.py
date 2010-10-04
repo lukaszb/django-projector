@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
+from django.utils.simplejson import dumps
 
 from projector.models import Task
 from projector.forms import TaskForm, TaskEditForm
@@ -157,6 +158,7 @@ class TaskEditView(ProjectView):
         self.context['form'] = form
 
         return self.context
+
 
 class TaskWatchView(ProjectView):
     """

@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
@@ -164,6 +165,8 @@ class TaskForm(LimitingModelForm):
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
     watch_changes = forms.BooleanField(False, label=_('Watch for changes'),
         initial=True)
+    description = RestructuredTextAreaField(max_length=3000,
+        label=_('Description'))
 
     class Meta:
         model = Task
@@ -201,8 +204,6 @@ class TaskForm(LimitingModelForm):
 class TaskEditForm(TaskForm):
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
-    description = RestructuredTextAreaField(max_length=3000,
-        label=_('Description'))
     comment = RestructuredTextAreaField(max_length=3000,
         label=_('Comment'), widget=forms.Textarea, required=False)
 

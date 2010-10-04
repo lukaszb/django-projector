@@ -9,6 +9,7 @@ urlpatterns = patterns('',
 
     (r'^accounts/', include('registration.urls')),
     (r'^projector/', include('projector.urls')),
+    (r'^richtemplates/', include('richtemplates.urls')),
 
     (r'^admin_tools/', include('admin_tools.urls')),
     (r'^admin/', include(admin.site.urls)),
