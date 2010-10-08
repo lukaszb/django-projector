@@ -1,7 +1,6 @@
 import logging
 
 from django import forms
-from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
@@ -119,8 +118,7 @@ class ProjectBaseForm(forms.ModelForm):
 class ProjectCreateForm(ProjectBaseForm):
     vcs_alias = forms.ChoiceField(choices=VCS_BACKENDS_CHOICES,
         label=_('Version Control Backend'),
-        initial=get_config_value('DEFAULT_VCS_BACKEND'),
-        widget=forms.HiddenInput) # Hidden until more backends are supported
+        initial=get_config_value('DEFAULT_VCS_BACKEND'))
 
     def save(self, commit=True):
         instance = super(ProjectCreateForm, self).save(commit=False)

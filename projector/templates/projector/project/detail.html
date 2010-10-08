@@ -152,6 +152,10 @@
                             {% endif %}
                         </td>
                     </tr>
+                    <tr>
+                        <th>SCM</th>
+                        <td>{% if project.repository.alias %}{{ project.repository.alias }}{% else %}-{% endif %}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
