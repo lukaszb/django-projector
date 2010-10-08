@@ -171,6 +171,6 @@ def get_config_value(key):
     preferred way to retrieve ``projector``'s configuration values.
     """
     if key.startswith('PROJECTOR_'):
-        key = key[key.find('PROJECTOR_'):]
+        key = key[len('PROJECTOR_'):]
     return globals()[key]
 
