@@ -174,7 +174,8 @@ class BitbucketForkTest(TestCase):
         fork = form.fork()
         fork = Project.objects.get(pk=fork.pk)
         self.assertTrue(len(fork.repository.revisions) > 100)
-        self.assertTrue(fork.repository.request('setup.py') is not None)
+        changeset = fork.repository.get_changeset()
+        self.assertTrue(changeset.get_node('setup.py') is not None)
         self.assertTrue(fork.is_private())
 
     def test_fork_with_same_name(self):
@@ -224,7 +225,8 @@ class GithubForkTest(TestCase):
         fork = form.fork()
         fork = Project.objects.get(pk=fork.pk)
         self.assertTrue(len(fork.repository.revisions) > 5)
-        self.assertTrue(fork.repository.request('setup.py') is not None)
+        changeset = fork.repository.get_changeset()
+        self.assertTrue(changeset.get_node('setup.py') is not None)
         self.assertFalse(fork.is_private())
 
     def test_fork_with_same_name(self):
