@@ -352,6 +352,13 @@ class Project(AL_Node, Watchable):
         })
 
     @models.permalink
+    def get_milestone_gantt_url(self):
+        return ('projector_project_milestones_gantt', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+        })
+
+    @models.permalink
     def get_milestone_add_url(self):
         return ('projector_project_milestone_add', (), {
             'username': self.author.username,
@@ -1023,7 +1030,8 @@ class Milestone(models.Model):
         always_update=True, unique_with='project')
     description = models.TextField()
     author = models.ForeignKey(User, verbose_name=_('author'))
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    created_at = models.DateTimeField(_('created at'),
+        default=datetime.datetime.now)
     deadline = models.DateField(_('deadline'), default=datetime.date.today() +
         datetime.timedelta(days=10))
             #projector_settings.get_config_value('MILESTONE_DEADLINE_DELTA')))

@@ -1,0 +1,81 @@
+{% extends "projector/project/milestones/home.html" %}
+
+{% load i18n %}
+
+{% block extra-head %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}projector/css/jquery.ganttView.css" />
+<script type="text/javascript" src="{{ MEDIA_URL }}projector/js/jquery.ganttView.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}projector/js/date.js"></script>
+{% endblock %}
+
+{% block col-single-title %}{{ project.name }}{% endblock %}
+
+{% block col-single-extra %}
+<div class="richtemplates-panel">    
+    <h5>{% trans "Milestone gaant chart" %}</h5>
+    <div class="richtemplates-panel-content">
+        {% block milestones-menu %}{{ block.super }}{% endblock %}
+
+        {% if milestone_list %}
+        <div id="ganttChart"></div>
+
+        <script type="text/javascript">
+            var myData = [
+                {% for milestone in project.milestone_set.all %}
+                {
+                    id: "{{ milestone.slug }}",
+                    itemName: "{% trans 'Milestone' %}",
+                    series: [
+                        {
+                            seriesName: "{{ milestone }}",
+                            start: new Date(
+                                {{ milestone.created_at.year }},
+                                {{ milestone.created_at.month }}-1,
+                                {{ milestone.created_at.day }}),
+                            end: new Date(
+                                {{ milestone.deadline.year }},
+                                {{ milestone.deadline.month }}-1,
+                                {{ milestone.deadline.day }})
+                        }
+                    ]
+
+                }{% if not forloop.last %},
+                {% endif %}
+                {% endfor %}
+            ]
+            
+            $(function (){
+                
+                $("#ganttChart").ganttView({
+                    //data: ganttData,
+                    data: myData,
+                    start: new Date(
+                        {{ milestone_first.created_at.year }},
+                        {{ milestone_first.created_at.month }}-1,
+                        {{ milestone_first.created_at.day }}),
+                    end: new Date(
+                        {{ milestone_last.deadline.year }},
+                        {{ milestone_last.deadline.month }}-1,
+                        {{ milestone_last.deadline.day }}),
+                    slideWidth: 900,
+                    behavior: {
+                        clickable: true,
+                        onClick: function(data){
+                            window.location="{{ project.get_milestones_url }}" + data.id + "/"
+                        },
+                        draggable: false,
+                        resizable: false
+                    }
+                });
+            });
+        </script>
+        {% else %}
+        <div class="message message-info">
+            <p>{% trans "There are no milestones defined yet" %}</p>
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock col-single-extra %}
+
