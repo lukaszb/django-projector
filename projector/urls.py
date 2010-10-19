@@ -47,6 +47,8 @@ urlpatterns += patterns('projector.views.project',
     url(r'^projects/fork-external-project/$',
         view='ProjectCreateView',
         name='projector_project_fork_external'),
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+?)\.git/',
+        include('projector.contrib.git.urls')),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/admin/$',
         view='ProjectEditView',
         name='projector_project_edit'),
@@ -58,7 +60,6 @@ urlpatterns += patterns('projector.views.project',
         name='projector_project_state'),
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/$',
         view='ProjectDetailView', name='projector_project_detail'),
-
 )
 
 # Milestones
