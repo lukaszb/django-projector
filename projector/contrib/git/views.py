@@ -11,7 +11,6 @@ from dulwich.web import HTTPGitRequest
 
 from projector.contrib.git.utils import is_git_request
 from projector.contrib.git.utils import get_wsgi_response
-from projector.contrib.git.utils import start_response2django
 from projector.views.project import ProjectView
 
 from vcs.web.simplevcs.utils import log_error

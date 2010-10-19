@@ -13,19 +13,6 @@ def is_git_request(request):
         return False
     return False
 
-def start_response2django(status, headers):
-    """
-    Fakes standard wsgi start_response function but returns instance of
-    ``django.http.HttpResponse`` object.
-    """
-    response = HttpResponse()
-    response.status_code = int(status[:3])
-    for key, val in headers:
-        print key, val
-        response[key] = val
-    return response.write
-
-
 class GitResponse(HttpResponse):
 
     def write(self, content):
