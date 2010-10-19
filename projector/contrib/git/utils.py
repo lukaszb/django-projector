@@ -31,7 +31,6 @@ def get_wsgi_response(app, request):
     def start_response(status, headers):
         response.status_code = int(status[:3])
         for key, val in headers:
-            logging.info("%s: %s" % (key, val))
             response[key] = val
         return response.write
     env = copy.copy(request.META)
