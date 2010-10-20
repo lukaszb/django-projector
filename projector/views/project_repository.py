@@ -134,7 +134,8 @@ class RepositoryFileRaw(RepositoryView):
     def response(self, request, username, project_slug, revision, rel_repo_url):
         if self.has_errors:
             return self.get_error_response()
-        node = self.project.repository.request(rel_repo_url, revision)
+        changeset = self.project.repository.get_changeset(revision)
+        node = changeset.get_node(rel_repo_url)
         response = HttpResponse(node.content, mimetype=node.mimetype)
         response['Content-Disposition'] = 'attachment; filename=%s' % node.name
         return response

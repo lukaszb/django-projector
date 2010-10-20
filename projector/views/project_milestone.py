@@ -15,11 +15,29 @@ class MilestoneListView(ProjectView):
         milestone_list = self.project.milestone_set\
             .annotate(Count('task'))\
             .order_by('-created_at')
-        context = {
-            'project': self.project,
-            'milestone_list': milestone_list,
-        }
-        return context
+        self.context['milestone_list'] = milestone_list
+        return self.context
+
+
+class MilestoneGanttView(MilestoneListView):
+
+    template_name = 'projector/project/milestones/gantt.html'
+
+    def response(self, request, username, project_slug):
+        milestone_list = self.project.milestone_set\
+            .annotate(Count('task'))\
+            .order_by('created_at')
+        self.context['milestone_list'] = milestone_list
+        self.context['milestone_first'] = milestone_list and milestone_list[0]
+        if milestone_list:
+            # Get last by deadline
+            last = milestone_list[0]
+            for milestone in milestone_list[1:]:
+                if milestone.deadline > last.deadline:
+                    last = milestone
+            self.context['milestone_last'] = last
+        return self.context
+
 
 class MilestoneDetailView(ProjectView):
     """

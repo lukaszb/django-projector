@@ -371,6 +371,8 @@ class TeamDeleteForm(forms.Form):
 
 
 class MilestoneForm(forms.ModelForm, PerProjectUniqueNameMixin):
+    created_at = forms.DateField(required=False, label=_("Start date"),
+        widget=forms.DateInput(attrs={'class': 'datepicker'}))
     deadline = forms.DateField(required=False, label=_("Deadline"),
         widget=forms.DateInput(attrs={'class': 'datepicker'}))
 
