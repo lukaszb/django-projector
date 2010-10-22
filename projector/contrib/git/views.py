@@ -7,7 +7,7 @@ from projector.contrib.git.utils import is_git_request
 from projector.contrib.git.githttp import GitWebServer
 from projector.views.project import ProjectView
 
-from vcs.web.simplevcs.utils import log_error
+from vcs.web.simplevcs.utils import log_error, ask_basic_auth, basic_auth
 
 
 class ProjectGitBaseView(ProjectView):
@@ -55,7 +55,6 @@ class ProjectGitHandler(ProjectGitBaseView):
     def get_authed_user(self):
         if self.project.is_public():
             return None
-        from vcs.web.simplevcs.utils import ask_basic_auth, basic_auth
         # Check if user have been already authorized or ask to
         self.request.user = basic_auth(self.request)
         if self.request.user is None:
