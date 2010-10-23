@@ -1,5 +1,4 @@
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext as _
 from django.http import Http404
 
 from projector.models import Membership, Watchable
@@ -27,14 +26,25 @@ get_project_permissions.function = True
 def put_username_into_url(value, user):
     """
     Puts username into url for the given User object.
+    ``value`` is first splitted and if any chunk starts with one of the prefixes
+    defined below, username would be injected there.
     """
     if not user.is_authenticated():
         return value
     prefixes = ['http://', 'https://', 'ftp://']
-    for prefix in prefixes:
-        if value.lower().startswith(prefix):
-            value = ''.join((
-                value[:len(prefix)], user.username, '@', value[len(prefix):]))
+    replacers = {}
+    for chunk in value.split():
+        for prefix in prefixes:
+            if chunk.lower().startswith(prefix):
+                newchunk = ''.join((
+                    chunk[:len(prefix)],
+                    user.username,
+                    '@',
+                    chunk[len(prefix):]))
+                replacers[chunk] = newchunk
+                break
+    for chunk, replacer in replacers.items():
+        value = value.replace(chunk, replacer, 1)
     return value
 put_username_into_url = filter(put_username_into_url)
 

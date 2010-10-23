@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, PermissionDenied,\
     ImproperlyConfigured
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -414,6 +415,42 @@ class Project(AL_Node, Watchable):
             'project_slug': self.slug,
         })
 
+    def get_clone_url(self):
+        if self.repository.alias == 'hg':
+            return self.get_absolute_url()
+        elif self.repository.alias == 'git':
+            return reverse('projector-project-git', kwargs={
+                'username': self.author.username,
+                'project_slug': self.slug,
+            }).rstrip('/')
+        return None
+
+    def get_repo_url(self):
+        """
+        Returns full url of the project (with domain based on
+        django sites framework).
+        """
+        current_site = Site.objects.get_current()
+        # FIXME: What should we do with hardcoded schemas?
+        if settings.DEBUG:
+            prefix = 'http://'
+        else:
+            prefix = 'https://'
+
+        suffix = self.get_clone_url() or self.get_absolute_url()
+        return ''.join((prefix, current_site.domain, suffix))
+
+    def get_clone_cmd(self):
+        """
+        Returns client command to run in order to clone this repository.
+        """
+        url = self.get_repo_url()
+        if self.repository.alias == 'hg':
+            return 'hg clone %s' % url
+        elif self.repository.alias == 'git':
+            return 'git clone %s' % url
+        return None
+
     def is_pending(self):
         return self.state != State.ERROR and self.state < State.READY
 
@@ -477,19 +514,6 @@ class Project(AL_Node, Watchable):
         alias = self.get_vcs_alias()
         repo_path = abspath(self._get_homedir(), alias)
         return repo_path
-
-    def get_repo_url(self):
-        """
-        Returns full url of the project (with domain based on
-        django sites framework).
-        """
-        current_site = Site.objects.get_current()
-        # FIXME: What should we do with hardcoded schemas?
-        if settings.DEBUG:
-            prefix = 'http://'
-        else:
-            prefix = 'https://'
-        return ''.join((prefix, current_site.domain, self.get_absolute_url()))
 
     def add_timeline_entry(self, action, author):
         """

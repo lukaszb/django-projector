@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 
 from projector.contrib.git.utils import is_git_request
@@ -60,4 +61,5 @@ class ProjectGitHandler(ProjectGitBaseView):
         if self.request.user is None:
             return ask_basic_auth(self.request,
                 realm=self.project.config.basic_realm)
+        raise PermissionDenied
 

@@ -88,11 +88,11 @@ class ProjectorUploadPackHandler(UploadPackHandler):
         if len(objects_iter) == 0:
             return
 
-        self.progress("dul-daemon says what\n")
+        #self.progress("dul-daemon says what\n")
         self.progress("counting objects: %d, done.\n" % len(objects_iter))
         write_pack_data(ProtocolFile(None, write), objects_iter,
                         len(objects_iter))
-        self.progress("how was that, then?\n")
+        #self.progress("how was that, then?\n")
         # we are done
         self.proto.write("0000")
 
