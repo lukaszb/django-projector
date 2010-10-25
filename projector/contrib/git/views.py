@@ -59,34 +59,36 @@ class ProjectGitHandler(ProjectGitBaseView):
 
     def response(self, request, username, project_slug):
         try:
-            #if 'git-upload-pack' in self.request.META['PATH_INFO']:
-                #self.type = GitWebServer.Type.READ
-                #pre_push.send(sender=self,
-                    #repo_path=self.project.repository.path,
-                    #ip=self.request.META.get('REMOTE_ADDR', ''),
-                    #username=self.request.user.username)
-            #elif 'git-receive-pack' in self.request.META['PATH_INFO']:
-                #self.type = GitWebServer.Type.WRITE
-                #pre_clone.send(sender=self,
-                    #repo_path=self.project.repository.path,
-                    #ip=self.request.META.get('REMOTE_ADDR', ''),
-                    #username=self.request.user.username)
-            #else:
-                #self.type = GitWebServer.Type.UNSPECIFIED
+            if 'git-upload-pack' in self.request.META['PATH_INFO']:
+                self.type = GitWebServer.Type.READ
+                pre_push.send(sender=self,
+                    repo_path=self.project.repository.path,
+                    ip=self.request.META.get('REMOTE_ADDR', ''),
+                    username=self.request.user.username)
+            elif 'git-receive-pack' in self.request.META['PATH_INFO']:
+                self.type = GitWebServer.Type.WRITE
+                pre_clone.send(sender=self,
+                    repo_path=self.project.repository.path,
+                    ip=self.request.META.get('REMOTE_ADDR', ''),
+                    username=self.request.user.username)
+            else:
+                self.type = GitWebServer.Type.UNSPECIFIED
 
             auth_response = self.get_authed_user()
             if auth_response:
                 return auth_response
             git_server = GitWebServer(self.project.repository)
             response = git_server.get_response(request)
-            #if self.is_read():
-                #post_clone.send(sender=self, repo_path=self.project.repository.path,
-                    #ip=self.request.META.get('REMOTE_ADDR', ''),
-                    #username=self.request.username)
-            #elif self.is_write():
-                #post_push.send(sender=self, repo_path=self.project.repository.path,
-                    #ip=self.request.META.get('REMOTE_ADDR', ''),
-                    #username=self.request.username)
+            if self.is_read():
+                post_clone.send(sender=self,
+                    repo_path=self.project.repository.path,
+                    ip=self.request.META.get('REMOTE_ADDR', ''),
+                    username=self.request.user.username)
+            elif self.is_write():
+                post_push.send(sender=self,
+                    repo_path=self.project.repository.path,
+                    ip=self.request.META.get('REMOTE_ADDR', ''),
+                    username=self.request.user.username)
         except Exception, err:
             log_error(err)
             raise err
