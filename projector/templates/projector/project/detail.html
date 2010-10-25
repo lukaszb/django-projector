@@ -92,7 +92,7 @@
         </ul>
         {% endif %}
 
-        {% if project.repository %}
+        {% if project.repository.pk %}
         {% with project.get_clone_cmd|put_username_into_url:user as clone_url %}
         <ul class="messages">
             <li class="message message-info">{% trans "Clone repository" %}:

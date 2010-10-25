@@ -1,6 +1,8 @@
 import logging
 
 from django.http import Http404, HttpResponse
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import filesizeformat
 
 from dulwich.pack import write_pack_data
 from dulwich.protocol import ProtocolFile
@@ -15,12 +17,16 @@ from projector.contrib.git.utils import get_wsgi_response
 
 class GitWebServer(object):
 
+    class Type:
+        READ = 'read'
+        WRITE = 'write'
+        UNSPECIFIED = 'unspecified'
+
     def __init__(self, repository):
         self.repository = repository
         self.response = HttpResponse()
 
     def get_response(self, request):
-        #backend = DictBackend({'/': Repo(self.repository.path)})
         backend = ProjectorGitBackend(self.repository)
         app = GitApplication(backend, handlers={
             'git-upload-pack': ProjectorUploadPackHandler,
@@ -93,6 +99,10 @@ class ProjectorUploadPackHandler(UploadPackHandler):
         write_pack_data(ProtocolFile(None, write), objects_iter,
                         len(objects_iter))
         #self.progress("how was that, then?\n")
+        size = self.backend.repository.info.size
+        msg = _('Repository size: %s\n' % filesizeformat(size))
+        logging.info(msg)
+        self.progress(msg)
         # we are done
         self.proto.write("0000")
 

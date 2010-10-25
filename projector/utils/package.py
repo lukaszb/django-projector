@@ -15,7 +15,7 @@ def get_current_revision():
         from vcs.exceptions import RepositoryError, VCSError
         repopath = os.path.join(os.path.dirname(__file__), '..', '..')
         scm = get_scm(repopath)[0]
-        repo = get_repo(scm, repopath)
+        repo = get_repo(path=repopath, alias=scm)
         tip = repo.get_changeset()
         return (tip.revision, tip.id)
     except (ImportError, RepositoryError, VCSError), err:
