@@ -62,7 +62,7 @@ class ProjectGitHandler(ProjectGitBaseView):
         try:
             self.send_pre_signals()
 
-            auth_response = self.get_authed_user()
+            auth_response = self.check_auth()
             if auth_response:
                 return auth_response
 
@@ -118,20 +118,31 @@ class ProjectGitHandler(ProjectGitBaseView):
         info = self.get_signal_info()
         return signal.send(**info)
 
-    def get_authed_user(self):
-        if self.project.is_public():
+    def check_auth(self):
+        if self.project.is_public() and not self.is_write():
             return None
         # Check if user have been already authorized or ask to
         self.request.user = basic_auth(self.request)
         if self.request.user is None:
             return ask_basic_auth(self.request,
                 realm=self.project.config.basic_realm)
-        raise PermissionDenied
+
+            raise PermissionDenied
+        if self.project.is_public() and self.is_write() and not\
+            self.request.user.has_perm('can_write_to_repository', self.project):
+            raise PermissionDenied
+
+        if self.project.is_private() and not\
+            self.request.user.has_perm('can_read_repository', self.project):
+            raise PermissionDenied
+        if self.project.is_private() and self.is_write() and not\
+            self.request.user.has_perm('can_write_to_repository', self.project):
+            raise PermissionDenied
+        return
 
     def is_read(self):
         return self.type == GitWebServer.Type.READ
 
     def is_write(self):
         return self.type == GitWebServer.Type.WRITE
-
 
