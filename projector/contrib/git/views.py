@@ -127,7 +127,6 @@ class ProjectGitHandler(ProjectGitBaseView):
             return ask_basic_auth(self.request,
                 realm=self.project.config.basic_realm)
 
-            raise PermissionDenied
         if self.project.is_public() and self.is_write() and not\
             self.request.user.has_perm('can_write_to_repository', self.project):
             raise PermissionDenied
