@@ -148,6 +148,10 @@ urlpatterns += patterns('projector.views.project_repository',
         view='RepositoryFileDiff',
         name='projector_project_sources_diff'),
 
+    url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/quickstart/$',
+        view='RepositoryQuickstart',
+        name='projector_project_sources_quickstart'),
+
     url(r'^(?P<username>[-\w]+)/(?P<project_slug>[-\w]+)/src/raw/(?P<revision>[\w]*)/(?P<rel_repo_url>.*)$',
         view='RepositoryFileRaw',
         name='projector_project_sources_raw'),

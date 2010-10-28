@@ -31,13 +31,14 @@ class RepositoryView(ProjectView):
         if not self.project.repository_id:
             messages.info(self.request, _("Project has no repository"))
             response = redirect(self.project)
-        if not self.project._get_repo_path():
+        elif not self.project._get_repo_path() or \
+                self.project.repository is None:
             msg = _("There is something wrong with project's repository")
             messages.error(self.request, msg)
             response = redirect(self.project)
-        if not self.project.repository or not self.project.repository.revisions:
+        elif not self.project.repository.revisions:
             messages.info(self.request, _("Repository has no changesets yet"))
-            response = redirect(self.project)
+            return RepositoryQuickstart(self.request, *self.args, **self.kwargs)
         return response
 
     def get_error_response(self):
@@ -216,4 +217,18 @@ class RepositoryChangesetDetail(RepositoryView):
         }
         return diff_changeset(self.request, **diff_info)
 
+
+class RepositoryQuickstart(RepositoryView):
+    """
+    Shows quickstart help for the project's repository.
+
+    **View attributes**
+
+    * ``template_name``: ``'projector/project/repository/quickstart.html'``.
+    """
+
+    template_name = 'projector/project/repository/quickstart.html'
+
+    def response(self, request, username, project_slug):
+        return self.context
 

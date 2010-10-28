@@ -1,0 +1,26 @@
+{% extends "projector/project/detail.html" %}
+
+{% load i18n %}
+{% load markup %}
+{% load native %}
+{% load projector_tags %}
+{% load richtemplates_tags %}
+
+{% block col-single-extra %}
+
+<div class="richtemplates-panel">
+    <h5>{% trans "Quickstart" %}</h5>
+    <div class="richtemplates-panel-content">
+        {% with project.get_repo_url|put_username_into_url:user as clone_url %}
+        {% if project.repository.alias == "hg" %}
+            {% include "projector/project/repository/quickstart_hg.html" %}
+        {% endif %}
+        {% if project.repository.alias == "git" %}
+            {% include "projector/project/repository/quickstart_git.html" %}
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+{% endblock %}
+

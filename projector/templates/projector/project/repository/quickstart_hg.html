@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load native %}
+
+<h1>{% trans "Mercurial repository quickstart" %}</h1>
+
+<h2>{% trans "New repository" %}</h2>
+
+<div class="message message-info">
+{% blocktrans %}
+<p>If you want to create new repository simply follow example below.</p>
+{% endblocktrans %}
+</div>
+
+{% highlight_block bash cssclass="code-highlight" %}
+hg init {{ project.slug }}
+cd {{ project.slug }}
+echo "This is readme" >> README
+hg add README
+hg commit -m "Initial commit"
+echo -e "[paths]\ndefault={{ clone_url }}" >> .hg/hgrc
+hg push
+{% endhighlight_block %}
+
+<h2>{% trans "Existing repo" %}</h2>
+
+<div class="message message-info">
+{% blocktrans %}
+<p>
+    If you already have repository and you wish to push it here
+    you would need to add remote to your repo and push it back.
+</p>
+{% endblocktrans %}
+</div>
+
+{% highlight_block bash cssclass="code-highlight" %}
+cd EXISTING_REPO_PATH
+echo -e "[paths]\ndefault={{ clone_url }}" >> .hg/hgrc
+hg push
+{% endhighlight_block %}
+
