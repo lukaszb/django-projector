@@ -41,7 +41,7 @@
 <div class="richtemplates-panel">
     <h5>{{ project.name }}</h5>
     <div class="richtemplates-panel-content">
-        <h1>{{ project.name }}{% if project.is_fork %} {% richicon "arrow_switch.png" %}{% endif %}</h1>
+        <h1><a href="{{ project.get_absolute_url }}">{{ project.name }}</a>{% if project.is_fork %} {% richicon "arrow_switch.png" %}{% endif %}</h1>
         {% if project.is_fork %}
             <div class="message message-info">
                 <p>
@@ -179,7 +179,13 @@
         <h2>{% trans "Timeline" %}:</h2>
         <ul class="nav-vertical">
             {% for entry in project.timelineentry_set.all %}
-            <li>{{ entry.action }} by {{ entry.user }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}</li>
+            <li>
+                {% if entry.user %}
+                    {{ entry.action }} by {{ entry.user }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}
+                {% else %}
+                    {{ entry.action }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}
+                {% endif %}
+            </li>
             {% empty %}
             <li>
                 <ul class="messages">

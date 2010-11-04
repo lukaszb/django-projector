@@ -98,6 +98,6 @@ def start_listening():
     # Projector signals connection
     post_fork.connect(fork_done)
     setup_project.connect(setup_project_listener, sender=Project)
-    retrieve_hg_post_push_messages.connect(hg_extra_messages,
-        sender=None)
+    #retrieve_hg_post_push_messages.connect(hg_extra_messages,
+        #sender=None)
 

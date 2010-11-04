@@ -1120,7 +1120,8 @@ class Milestone(models.Model):
 class TimelineEntry(models.Model):
     project = models.ForeignKey(Project, verbose_name=_('project'),
         editable=False)
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    created_at = models.DateTimeField(_('created at'), db_index=True,
+        default=datetime.datetime.now)
     user = models.ForeignKey(User, verbose_name=_('user'), null=True,
         blank=True, editable=False)
     action = models.CharField(_('action'), max_length=256,
