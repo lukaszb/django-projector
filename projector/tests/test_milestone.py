@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from projector.tests.base import ProjectorTestCase
 from projector.models import Project, Milestone
 
+
 class MilestoneTest(ProjectorTestCase):
 
     def setUp(self):
@@ -32,12 +33,17 @@ class MilestoneTest(ProjectorTestCase):
         new_milestone_name = u'milestone-1'
         response = self._get_response(
             url = self.project.get_milestone_add_url())
+        instance = response.context['form'].instance
+
+        created_at = instance.created_at.strftime('%Y-%m-%d')
+
         self._get_response(
             url = self.project.get_milestone_add_url(),
             data = {
                 'name': new_milestone_name,
                 'description': u'anything',
                 'deadline': deadline,
+                'created_at': created_at,
             },
             method = 'POST', follow = True)
 
@@ -49,6 +55,7 @@ class MilestoneTest(ProjectorTestCase):
                 'name': new_milestone_name,
                 'description': u'anything',
                 'deadline': deadline,
+                'created_at': created_at,
             },
             method = 'POST', follow = True)
 
@@ -66,6 +73,7 @@ class MilestoneTest(ProjectorTestCase):
                 'name': another_name,
                 'description': u'anything',
                 'deadline': deadline,
+                'created_at': created_at,
             },
             method = 'POST', follow = True)
         # Should not allow to update name of the milestone to one already
@@ -78,6 +86,7 @@ class MilestoneTest(ProjectorTestCase):
                 'name': new_milestone_name,
                 'description': u'anything',
                 'deadline': deadline,
+                'created_at': created_at,
             },
             method = 'POST', follow = True)
         name_field_errors = response.context['form']._errors['name']
@@ -85,7 +94,4 @@ class MilestoneTest(ProjectorTestCase):
             "Milestone with name '%s' for this project already exist "
             "so we shouldn't be able to change old name '%s' to this one"
             % (new_milestone_name, milestone.name))
-
-
-
 
