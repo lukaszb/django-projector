@@ -129,7 +129,7 @@ class MemberDeleteView(ProjectView):
         perms_to_delete = UserObjectPermission.objects.filter(
             user = member,
             content_type = ContentType.objects.get_for_model(project),
-            object_id = project.id)
+            object_pk = project.id)
 
         if request.method == 'POST':
             # Confirm removal

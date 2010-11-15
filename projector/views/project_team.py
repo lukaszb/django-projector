@@ -116,7 +116,7 @@ class TeamDeleteView(ProjectView):
         perms_to_delete = GroupObjectPermission.objects.filter(
             group = group,
             content_type = ContentType.objects.get_for_model(project),
-            object_id = project.id)
+            object_pk = project.id)
 
         if request.method == 'POST':
             # Confirm removal
