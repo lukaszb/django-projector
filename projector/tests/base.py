@@ -3,6 +3,7 @@ import sys
 from django.conf import settings
 from django.test import TestCase
 
+
 class ProjectorTestCase(TestCase):
 
     def _get_response(self, url, data={}, method='GET', code=200, follow=False):
@@ -30,7 +31,12 @@ class ProjectorTestCase(TestCase):
                 "[Enter to continue]",
             ))).lower()
             if answer == 'd':
-                import pdb; pdb.set_trace()
+                try:
+                    import ipdb
+                    ipdb.set_trace()
+                except ImportError:
+                    import pdb
+                    pdb.set_trace()
             elif answer == 'c':
                 sys.stdout.err.write(response.content)
             raise err
