@@ -5,6 +5,7 @@ from test_controllers import *
 from test_emails import *
 from test_fork import *
 from test_helpers import *
+from test_members import *
 from test_milestone import *
 from test_permissions import *
 from test_settings import *

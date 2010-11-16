@@ -310,6 +310,14 @@ class Project(AL_Node, Watchable):
         })
 
     @models.permalink
+    def get_members_delete_url(self, username):
+        return ('projector_project_member_delete', (), {
+            'username': self.author.username,
+            'project_slug': self.slug,
+            'member_username': username,
+        })
+
+    @models.permalink
     def get_teams_url(self):
         return ('projector_project_teams', (), {
             'username': self.author.username,
