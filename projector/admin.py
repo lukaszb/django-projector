@@ -3,10 +3,19 @@ import logging
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
-from projector.models import Status, Task, Priority,\
-    Project, ProjectCategory, TaskType, Milestone, Component,\
-    TaskRevision
-from projector.models import Membership, Team
+from guardian.admin import GuardedModelAdmin
+
+from projector.models import Component
+from projector.models import Membership
+from projector.models import Milestone
+from projector.models import Priority
+from projector.models import Project
+from projector.models import ProjectCategory
+from projector.models import Status
+from projector.models import Task
+from projector.models import TaskType
+from projector.models import TaskRevision
+from projector.models import Team
 
 from richtemplates.forms import LimitingModelForm
 
@@ -119,7 +128,7 @@ class PriorityInline(admin.TabularInline):
     model = Priority
     extra = 1
 
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(GuardedModelAdmin):
     list_display = ('id', 'name', 'category', 'home_page_url', 'is_active',
         'public', 'author', 'created_at', 'outdated')
     list_display_links = ('name',)

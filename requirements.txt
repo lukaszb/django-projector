@@ -8,7 +8,7 @@ django-celery==2.0.2
 django-celery-email==0.1.1
 django-extensions==0.5
 django-gravatar==0.1.0
-django-guardian==0.1.0
+-e git+git://github.com/lukaszb/django-guardian.git#egg=django-guardian
 django-keyedcache==1.4-1
 django-filter==0.5.3
 django-native-tags==0.5
