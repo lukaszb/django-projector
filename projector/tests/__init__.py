@@ -1,4 +1,5 @@
 from version import *
+from test_activity import *
 from test_component import *
 from test_concurrency import *
 from test_controllers import *

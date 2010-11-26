@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from projector.settings import get_config_value
 from projector.models import Project, Task, WatchedItem
-from projector.signals import post_fork, setup_project
+from projector.signals import post_fork
+from projector.signals import setup_project
 from projector.tasks import setup_project as setup_project_task
 
 from richtemplates.utils import get_user_profile_model
@@ -42,7 +43,6 @@ def setup_project_listener(sender, instance, vcs_alias=None,
         func = setup_project_task
     logging.info("Calling setup_project task for instance %s" % instance)
     return func(instance, vcs_alias, workflow)
-
 
 def fork_done(sender, fork, **kwargs):
     """

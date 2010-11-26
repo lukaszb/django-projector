@@ -21,8 +21,10 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
+from django.utils.translation import ugettext_lazy as _
+from django.utils.timesince import timesince
+from django.utils.translation import string_concat
 
 from guardian.shortcuts import assign, get_perms, get_perms_for_model
 
@@ -894,6 +896,65 @@ class Project(AL_Node, Watchable):
         """
         return self.parent is not None or self.fork_url
 
+    def get_actions(self):
+        """
+        Returns activity stream for this projcet.
+        """
+        #return Project.objects.get_actions(self)
+        return self.actions.all()
+
+    def create_action(self, verb, **kwargs):
+        return Action.objects.create(project=self, verb=verb, **kwargs)
+
+
+class ActionManager(models.Manager):
+    def create(self, **kwargs):
+        action_object = kwargs.pop('action_object', None)
+        if action_object is not None:
+            kwargs['action_object_content_type'] = \
+                ContentType.objects.get_for_model(action_object)
+            kwargs['action_object_pk'] = action_object.pk
+        return super(ActionManager, self).create(**kwargs)
+
+
+class Action(models.Model):
+    project = models.ForeignKey(Project, verbose_name=_('Project'),
+        related_name='actions')
+    author = models.ForeignKey(User, null=True, blank=True,
+        verbose_name=_('User'))
+    verb = models.CharField(_('verb'), max_length=128)
+    description = models.TextField(_('description'), null=True, blank=True)
+    created_at = models.DateTimeField(_('created at'),
+        default=datetime.datetime.now)
+    is_public = models.BooleanField(_('is public'), default=True)
+
+    # Optional related object
+    action_object_pk = models.CharField(max_length=255, null=True, blank=True)
+    action_object_content_type = models.ForeignKey(ContentType, null=True,
+        blank=True, verbose_name=_('content type'))
+    action_object = generic.GenericForeignKey('action_object_content_type',
+        'action_object_pk')
+
+    objects = ActionManager()
+
+    class Meta:
+        verbose_name = _('action')
+        verbose_name_plural = _('actions')
+        ordering = ['-created_at']
+        get_latest_by = 'created_at'
+
+    def __unicode__(self):
+        _verb = _(self.verb)
+        if self.action_object:
+            return string_concat(self.author.username, ' ', _verb, ' ',
+                self.action_object, ' ', self.timesince(), ' ', _('ago'))
+        return string_concat(self.author.username, ' ', _verb, ' ',
+            self.project, ' ', self.timesince(), ' ', _('ago'))
+
+    def timesince(self, now=None):
+        return timesince(self.created_at, now)
+
+
 class Config(models.Model):
     """
     This model stores configuration on "per project" basis.
@@ -1132,10 +1193,12 @@ class TimelineEntry(models.Model):
         editable=False)
     created_at = models.DateTimeField(_('created at'), db_index=True,
         default=datetime.datetime.now)
-    user = models.ForeignKey(User, verbose_name=_('user'), null=True,
+    author = models.ForeignKey(User, verbose_name=_('author'), null=True,
         blank=True, editable=False)
     action = models.CharField(_('action'), max_length=256,
-        help_text=_('Short note on activity, i.e.: commit message'))
+        help_text=_('Short note on activity, i.e.: "created", "joined" etc.'))
+    description = models.TextField(_('description'), null=True, blank=True,
+        help_text=_('May be for example a commit messages from single push'))
 
     class Meta:
         ordering = ('-created_at',)
@@ -1587,4 +1650,6 @@ def get_user_from_string(value):
 
 from projector.listeners import start_listening
 start_listening()
+from projector.actions import actions_start_listening
+actions_start_listening()
 

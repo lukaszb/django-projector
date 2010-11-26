@@ -68,6 +68,20 @@ class ProjectManager(models.Manager):
             vcs_alias=vcs_alias, workflow=workflow)
         return instance
 
+    def get_actions(self, project, include_private=False):
+        from actstream.models import Action
+        from projector.models import Project
+        ctype = ContentType.objects.get_for_model(Project)
+        q1 = Q(action_object_content_type=ctype, action_object_object_id=project.pk)
+        q2 = Q(target_content_type=ctype, target_object_id=project.pk)
+        qset = q1 | q2
+        queryset = Action.objects\
+            .filter(qset)\
+            .order_by('-timestamp')
+        if not include_private:
+            queryset = queryset.filter(public=True)
+        return queryset
+
 
 class TaskManager(models.Manager):
 
