@@ -3,7 +3,33 @@ from projector.models import Project
 
 import logging
 
-class ProjectAction(object):
+
+class ProjectorBaseAction(object):
+    """
+    Base Action class. Must define following attributes:
+
+    ``alias``: unique identifier of this action
+
+    ``verb``: short action's verb
+
+    ``signal``: signal with which this action would be connected
+
+    ``sender``: sender class or object
+
+    Action classes must implement required, static method called ``action``
+    which in fact is standard Django signal handler.
+    """
+
+    @staticmethod
+    def action(sender, **kwargs):
+        raise NotImplementedError
+
+    @classmethod
+    def connect_signal(cls):
+        cls.signal.connect(cls.action, sender=cls.sender)
+
+
+class ProjectCreatedAction(ProjectorBaseAction):
     alias = "project_created"
     verb = "created"
     signal = post_save
@@ -12,13 +38,21 @@ class ProjectAction(object):
     @staticmethod
     def action(sender, instance, created, **kwargs):
         logging.debug("Sending ProjectAction")
-        if created and instance.parent:
-            instance.parent.create_action("forked", author=instance.author)
-        elif created:
-            instance.create_action("created")
+        if created and not instance.parent:
+            instance.create_action(ProjectCreatedAction.verb)
 
-    def connect_signal(self):
-        self.signal.connect(ProjectAction.action, sender=ProjectAction.sender)
+
+class ProjectForkedAction(ProjectorBaseAction):
+    alias = "project_forked"
+    verb = "forked"
+    signal = post_save
+    sender = Project
+
+    @staticmethod
+    def action(sender, instance, created, **kwargs):
+        if created and instance.parent:
+            instance.parent.create_action(ProjectForkedAction.verb,
+                author=instance.author)
 
 
 def action_project_created(sender, instance, created, **kwargs):
@@ -38,9 +72,9 @@ def actions_start_listening():
     """
     #post_save.connect(action_project_created, sender=Project)
     actions = (
-        ProjectAction,
+        ProjectCreatedAction,
+        ProjectForkedAction,
     )
-    for ActionClass in actions:
-        action = ActionClass()
-        action.connect_signal()
+    for cls in actions:
+        cls.connect_signal()
 

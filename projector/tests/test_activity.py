@@ -24,6 +24,17 @@ class ActivityTest(ProjectorTestCase):
         self.assertEqual(actions[0].verb, 'created')
         self.assertEqual(actions[0].is_public, self.project.public)
 
+    def test_project_forked(self):
+        fork = self.project.fork(self.jack)
+
+        actions = fork.get_actions().all()
+        self.assertEqual(actions.count(), 0)
+
+        actions = self.project.get_actions().all()
+        self.assertEqual(actions.count(), 2)
+        self.assertEqual(actions[0].verb, 'forked')
+        self.assertEqual(actions[1].verb, 'created')
+
     def test_project_action_with_custom_params(self):
         verb = "custom action taken"
         author = self.jack # other than author
@@ -43,15 +54,4 @@ class ActivityTest(ProjectorTestCase):
         self.assertEqual(action.description, description)
         self.assertEqual(action.action_object, action_object)
         self.assertEqual(action.project, self.project)
-
-    def test_project_forked(self):
-        fork = self.project.fork(self.jack)
-
-        actions = fork.get_actions().all()
-        self.assertEqual(actions.count(), 0)
-
-        actions = self.project.get_actions().all()
-        self.assertEqual(actions.count(), 2)
-        self.assertEqual(actions[0].verb, 'forked')
-        self.assertEqual(actions[1].verb, 'created')
 

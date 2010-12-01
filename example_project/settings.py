@@ -49,7 +49,6 @@ INSTALLED_APPS = (
 
 
     # External
-    'actstream',
     'djalog',
     'django_extensions',
     'django_sorting',
