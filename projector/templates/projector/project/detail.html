@@ -178,6 +178,23 @@
 
         <h2>{% trans "Timeline" %}:</h2>
         <ul class="nav-vertical">
+            {% for action in project.actions.all %}
+            <li>
+                {{ action.author }} {% trans action.verb %}
+                {% if action.action_object %}
+                    {{ action_object }} {% trans "on" %}
+                {% endif %}
+                {{ action.project }} {{ action.created_at|timesince }} {% trans "ago" %}
+            </li>
+            {% empty %}
+            <li>
+                <ul class="messages">
+                    <li class="message message-info">{% trans "No timeline entries defined yet" %}</li>
+                </ul>
+            </li>
+            {% endfor %}
+
+            {% comment %}
             {% for entry in project.timelineentry_set.all %}
             <li>
                 {% if entry.user %}
@@ -193,6 +210,7 @@
                 </ul>
             </li>
             {% endfor %}
+            {% endcomment %}
         </ul>
         
     </div>
