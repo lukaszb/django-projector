@@ -1,6 +1,10 @@
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+
 from projector.models import Project
 from projector.models import Task
+
+from vcs.web.simplevcs.models import Repository
 
 
 def action_project_created(sender, instance, created, **kwargs):
@@ -8,7 +12,7 @@ def action_project_created(sender, instance, created, **kwargs):
     if created and instance.parent:
         instance.parent.create_action("forked", author=instance.author)
     elif created:
-        instance.create_action("created")
+        instance.create_action("created", author=instance.author)
 
 
 def action_task_saved(sender, instance, created, **kwargs):
@@ -38,6 +42,17 @@ def pushed(sender, **kwargs):
     logging.critical("Pushing!")
     logging.debug("Sender: %s" % sender)
     logging.debug("kwargs: %s" % kwargs)
+    try:
+        project = Project.objects\
+            .select_related('repository')\
+            .get(repository__path=kwargs.get('repo_path'))
+        author = User.objects.get(username=kwargs.get('username'))
+        verb = "pushed"
+        project.create_action(verb, author=author)
+    except Project.DoesNotExist:
+        pass
+    except User.DoesNotExist:
+        pass
 
 def actions_start_listening():
     """

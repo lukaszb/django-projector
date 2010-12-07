@@ -1653,3 +1653,20 @@ start_listening()
 from projector.actions import actions_start_listening
 actions_start_listening()
 
+
+class Commit(models.Model):
+    id = models.CharField(max_length=255)
+    project = models.ForeignKey(Project)
+    repo = models.ForeignKey(Repository)
+
+    class Meta:
+        abstract = True
+
+    @models.permalink
+    def get_absolute_url(self):
+        return {
+            'username': self.project.author.username,
+            'project_slug': self.project.slug,
+            'revision': self.id,
+        }
+

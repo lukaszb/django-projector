@@ -1,5 +1,12 @@
 #!/usr/bin/env python
+import os
+import sys
 from django.core.management import execute_manager
+
+PROJECT_ROOT = '/Users/lukaszb/develop/workspace/projector/example_project'
+sys.path.insert(0, PROJECT_ROOT)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'example_project.settings'
+
 try:
     import settings # Assumed to be in the same directory.
 except ImportError:

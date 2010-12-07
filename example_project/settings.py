@@ -62,9 +62,11 @@ INSTALLED_APPS = (
     'richtemplates',
     'projector',
     'vcs.web.simplevcs',
+    'sss',
 
     'example_project',
 )
+ADMINBROWSE_MEDIA_URL = '/media/adminbrowse/'
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
