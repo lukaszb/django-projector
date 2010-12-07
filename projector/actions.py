@@ -38,16 +38,12 @@ def action_task_saved(sender, instance, created, **kwargs):
 
 
 def pushed(sender, **kwargs):
-    import logging
-    logging.critical("Pushing!")
-    logging.debug("Sender: %s" % sender)
-    logging.debug("kwargs: %s" % kwargs)
     try:
         project = Project.objects\
             .select_related('repository')\
             .get(repository__path=kwargs.get('repo_path'))
         author = User.objects.get(username=kwargs.get('username'))
-        verb = "pushed"
+        verb = "pushed to"
         project.create_action(verb, author=author)
     except Project.DoesNotExist:
         pass

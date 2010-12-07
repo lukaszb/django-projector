@@ -180,11 +180,23 @@
         <ul class="nav-vertical">
             {% for action in project.actions.all %}
             <li>
-                {{ action.author }} {% trans action.verb %}
+                <img src="{% gravatar_for_user project.author %}"
+                     width="16"
+                     height="16"/>
+                <a href="{% url projector_users_profile_detail action.author %}">{{ action.author }}</a>
+                
+                {% trans action.verb %}
+
                 {% if action.action_object %}
-                    {{ action_object }} {% trans "on" %}
+                    {% if action_object.get_absolute_url %}
+                    <a href="{{ action_object.get_absolute_url }}">{{ action_object }}</a>
+                    {% else %}
+                    {{ action_object }}
+                    {% endif %}
+                    {% trans "on" %}
                 {% endif %}
-                {{ action.project }} {{ action.created_at|timesince }} {% trans "ago" %}
+                <a href="{{ action.project.get_absolute_url }}">{{ action.project }}</a>
+                {{ action.created_at|timesince }} {% trans "ago" %}
             </li>
             {% empty %}
             <li>
@@ -194,23 +206,6 @@
             </li>
             {% endfor %}
 
-            {% comment %}
-            {% for entry in project.timelineentry_set.all %}
-            <li>
-                {% if entry.user %}
-                    {{ entry.action }} by {{ entry.user }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}
-                {% else %}
-                    {{ entry.action }} at {{ entry.created_at|date:"Y-m-d H:i:s" }}
-                {% endif %}
-            </li>
-            {% empty %}
-            <li>
-                <ul class="messages">
-                    <li class="message message-info">{% trans "No timeline entries defined yet" %}</li>
-                </ul>
-            </li>
-            {% endfor %}
-            {% endcomment %}
         </ul>
         
     </div>
