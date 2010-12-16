@@ -24,7 +24,6 @@ from django.template.loader import render_to_string
 from django.utils.datastructures import SortedDict
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timesince import timesince
-from django.utils.translation import string_concat
 
 from guardian.shortcuts import assign, get_perms, get_perms_for_model
 
@@ -944,12 +943,11 @@ class Action(models.Model):
         get_latest_by = 'created_at'
 
     def __unicode__(self):
-        _verb = _(self.verb)
         if self.action_object:
-            return string_concat(self.author.username, ' ', _verb, ' ',
-                self.action_object, ' ', self.timesince(), ' ', _('ago'))
-        return string_concat(self.author.username, ' ', _verb, ' ',
-            self.project, ' ', self.timesince(), ' ', _('ago'))
+            return u'%s %s %s %s ago' % (self.author, self.verb,
+                self.action_object, self.timesince())
+        return u'%s %s %s %s ago' % (self.author, self.verb, self.project,
+            self.timesince())
 
     def timesince(self, now=None):
         return timesince(self.created_at, now)
