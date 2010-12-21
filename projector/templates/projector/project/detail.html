@@ -176,22 +176,30 @@
             </ul>
         {% endfor %}
 
+        <style type="text/css">
+        .action-item {
+            border-bottom: 2px solid gray;
+        }
+        .action-verb {
+            text-shadow: #aaa -0px -1px 0px;
+        }
+        </style>
         <h2>{% trans "Timeline" %}:</h2>
-        <ul class="nav-vertical">
+        <ul id="actions-list" class="nav-vertical">
             {% for action in project.actions.all %}
-            <li>
+            <li class="action-item">
                 <img src="{% gravatar_for_user project.author %}"
-                     width="16"
-                     height="16"/>
+                     width="32"
+                     height="32"/>
                 <a href="{% url projector_users_profile_detail action.author %}">{{ action.author }}</a>
                 
-                {% trans action.verb %}
+                <span class="action-verb">{% trans action.verb %}</span>
 
                 {% if action.action_object %}
-                    {% if action_object.get_absolute_url %}
-                    <a href="{{ action_object.get_absolute_url }}">{{ action_object }}</a>
+                    {% if action.action_object.get_absolute_url %}
+                    <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
                     {% else %}
-                    {{ action_object }}
+                    {{ action.action_object }}
                     {% endif %}
                     {% trans "on" %}
                 {% endif %}

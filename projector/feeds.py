@@ -14,3 +14,4 @@ class LatestProjectsFeed(Feed):
             [:5] # Limiting query
 
 
+
