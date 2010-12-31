@@ -425,7 +425,7 @@ class Project(AL_Node, Watchable):
         })
 
     def get_clone_url(self):
-        if not self.repository:
+        if self.repository is None:
             return None
         if self.repository.alias == 'hg':
             return self.get_absolute_url()
@@ -459,7 +459,7 @@ class Project(AL_Node, Watchable):
         if self.repository.alias == 'hg':
             return 'hg clone %s' % url
         elif self.repository.alias == 'git':
-            return 'git clone %s' % url
+            return 'git clone %s' % url.rstrip('/')
         return None
 
     def is_pending(self):
