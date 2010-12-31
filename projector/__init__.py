@@ -4,7 +4,7 @@ tracker and repository backend integration.
 """
 from projector.utils.package import get_current_revision
 
-VERSION = (0, 1, 10, 'dev')
+VERSION = (0, 2, 0)
 
 _rev = get_current_revision()
 if 'dev' in VERSION and _rev:
