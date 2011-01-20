@@ -1,6 +1,6 @@
-Django==1.2.3
+Django==1.2.4
 Djalog==0.9.4
-Pygments==1.3.1
+Pygments==1.4
 celery==2.0.3
 django-admin-tools==0.3.0
 django-autoslug==1.4.1
@@ -23,4 +23,4 @@ dulwich==0.6.1
 ghettoq==0.4.4
 mercurial==1.6.3
 wsgiref==0.1.2
-vcs==0.1.7
+-e hg+https://bitbucket.org/marcinkuzminski/vcs#egg=vcs

@@ -10,6 +10,10 @@ def get_current_revision():
     or None if repository could not be found.
     """
     try:
+        import vcs
+    except ImportError:
+        return None
+    try:
         from vcs import get_repo
         from vcs.utils.helpers import get_scm
         from vcs.exceptions import RepositoryError, VCSError

@@ -2,7 +2,6 @@
 Utilities and helpers for ``django-projector``.
 """
 import os
-
 from django.conf import settings
 from projector.utils.basic import str2obj, codename_to_label
 
