@@ -16,7 +16,7 @@
 {% trans "Content" %}
 {% for x in _("Content") %}={% endfor %}
 
-{{ task.description }}
+{{ task.description|safe }}
 
 {# Comment if necessary #}
 {% if task.current_revision and task.current_revision.comment %}
@@ -27,7 +27,7 @@
 {{ comment_by }} {{ task.current_revision.author }}
 {% for x in comment_by %}={% endfor %}={% for x in task.current_revision.author.username %}={% endfor %}
 
-{{ task.current_revision.comment }}
+{{ task.current_revision.comment|safe }}
 
 {% endwith %}
 
